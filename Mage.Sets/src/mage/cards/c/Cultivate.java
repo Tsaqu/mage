@@ -1,46 +1,16 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.c;
 
 import java.util.UUID;
 import mage.MageObject;
 import mage.abilities.Ability;
 import mage.abilities.effects.OneShotEffect;
-import mage.cards.Card;
-import mage.cards.CardImpl;
-import mage.cards.CardSetInfo;
-import mage.cards.Cards;
-import mage.cards.CardsImpl;
+import mage.cards.*;
 import mage.constants.CardType;
 import mage.constants.Outcome;
 import mage.constants.Zone;
 import mage.filter.FilterCard;
-import mage.filter.common.FilterBasicLandCard;
+import mage.filter.StaticFilters;
 import mage.game.Game;
 import mage.players.Player;
 import mage.target.TargetCard;
@@ -50,10 +20,10 @@ import mage.target.common.TargetCardInLibrary;
  *
  * @author BetaSteward_at_googlemail.com
  */
-public class Cultivate extends CardImpl {
+public final class Cultivate extends CardImpl {
 
     public Cultivate(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.SORCERY},"{2}{G}");
+        super(ownerId, setInfo, new CardType[]{CardType.SORCERY}, "{2}{G}");
 
         // Search your library for up to two basic land cards, reveal those cards, and put one onto the battlefield tapped and the other into your hand. Then shuffle your library.
         this.getSpellAbility().addEffect(new CultivateEffect());
@@ -96,14 +66,10 @@ class CultivateEffect extends OneShotEffect {
         if (controller == null || sourceObject == null) {
             return false;
         }
-        TargetCardInLibrary target = new TargetCardInLibrary(0, 2, new FilterBasicLandCard());
+        TargetCardInLibrary target = new TargetCardInLibrary(0, 2, StaticFilters.FILTER_CARD_BASIC_LAND);
         if (controller.searchLibrary(target, game)) {
-            if (target.getTargets().size() > 0) {
-                Cards revealed = new CardsImpl();
-                for (UUID cardId : target.getTargets()) {
-                    Card card = controller.getLibrary().getCard(cardId, game);
-                    revealed.add(card);
-                }
+            if (!target.getTargets().isEmpty()) {
+                Cards revealed = new CardsImpl(target.getTargets());
                 controller.revealCards(sourceObject.getIdName(), revealed, game);
                 if (target.getTargets().size() == 2) {
                     TargetCard target2 = new TargetCard(Zone.LIBRARY, filter);
@@ -123,13 +89,10 @@ class CultivateEffect extends OneShotEffect {
                         controller.moveCards(card, Zone.BATTLEFIELD, source, game, true, false, false, null);
                     }
                 }
-
             }
-            controller.shuffleLibrary(source, game);
-            return true;
         }
         controller.shuffleLibrary(source, game);
-        return false;
+        return true;
 
     }
 

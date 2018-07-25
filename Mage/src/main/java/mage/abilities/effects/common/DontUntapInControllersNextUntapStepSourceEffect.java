@@ -37,7 +37,7 @@ public class DontUntapInControllersNextUntapStepSourceEffect extends ContinuousR
     public String getInfoMessage(Ability source, GameEvent event, Game game) {
         MageObject mageObject = game.getObject(source.getSourceId());
         if (mageObject != null) {
-            return "{this} doesn't untap (" + mageObject.getLogName() + ")";
+            return "{this} doesn't untap (" + mageObject.getLogName() + ')';
         }
         return null;
     }
@@ -59,8 +59,8 @@ public class DontUntapInControllersNextUntapStepSourceEffect extends ContinuousR
             return false;
         }
         // remember the turn of the untap step the effect has to be applied
-        if (GameEvent.EventType.UNTAP_STEP.equals(event.getType())
-                && game.getActivePlayerId().equals(source.getControllerId())) {
+        if (event.getType() == GameEvent.EventType.UNTAP_STEP
+                && game.isActivePlayer(source.getControllerId())) {
             if (validForTurnNum == game.getTurnNum()) { // the turn has a second untap step but the effect is already related to the first untap step
                 discard();
                 return false;                
@@ -70,7 +70,7 @@ public class DontUntapInControllersNextUntapStepSourceEffect extends ContinuousR
         // skip untap action
         if (game.getTurn().getStepType() == PhaseStep.UNTAP
                 && event.getType() == GameEvent.EventType.UNTAP
-                && game.getActivePlayerId().equals(source.getControllerId())
+                && game.isActivePlayer(source.getControllerId())
                 && event.getTargetId().equals(source.getSourceId())) {
                 discard();
             return true;

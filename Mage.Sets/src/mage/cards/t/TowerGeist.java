@@ -30,8 +30,6 @@
 package mage.cards.t;
 
 import java.util.UUID;
-import mage.constants.CardType;
-import mage.constants.Zone;
 import mage.MageInt;
 import mage.abilities.common.EntersBattlefieldTriggeredAbility;
 import mage.abilities.dynamicvalue.common.StaticValue;
@@ -39,17 +37,20 @@ import mage.abilities.effects.common.LookLibraryAndPickControllerEffect;
 import mage.abilities.keyword.FlyingAbility;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
+import mage.constants.CardType;
+import mage.constants.SubType;
+import mage.constants.Zone;
 import mage.filter.FilterCard;
 
 /**
  *
  * @author LevelX
  */
-public class TowerGeist extends CardImpl {
+public final class TowerGeist extends CardImpl {
 
     public TowerGeist(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{3}{U}");
-        this.subtype.add("Spirit");
+        this.subtype.add(SubType.SPIRIT);
 
         this.power = new MageInt(2);
         this.toughness = new MageInt(2);

@@ -1,82 +1,56 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.abilities.effects.common.continuous;
 
 import mage.MageObjectReference;
 import mage.abilities.Ability;
 import mage.abilities.dynamicvalue.DynamicValue;
 import mage.abilities.effects.ContinuousEffectImpl;
-import mage.cards.repository.CardRepository;
-import mage.constants.CardType;
-import mage.constants.Duration;
-import mage.constants.Layer;
-import mage.constants.Outcome;
-import mage.constants.SubLayer;
+import mage.constants.*;
 import mage.game.Game;
 import mage.game.permanent.Permanent;
 import mage.game.permanent.token.Token;
 
 /**
- *
  * @author BetaSteward_at_googlemail.com
  */
 public class BecomesCreatureSourceEffect extends ContinuousEffectImpl implements SourceEffect {
 
     protected Token token;
-    protected String type;
+    protected String theyAreStillType;
     protected boolean losePreviousTypes;
+    protected boolean loseAbilities;
     protected DynamicValue power = null;
     protected DynamicValue toughness = null;
 
-    public BecomesCreatureSourceEffect(Token token, String type, Duration duration) {
-        this(token, type, duration, false, false);
+    public BecomesCreatureSourceEffect(Token token, String theyAreStillType, Duration duration) {
+        this(token, theyAreStillType, duration, false, false);
     }
 
-    public BecomesCreatureSourceEffect(Token token, String type, Duration duration, boolean losePreviousTypes, boolean characterDefining) {
-        this(token, type, duration, losePreviousTypes, characterDefining, null, null);
+    public BecomesCreatureSourceEffect(Token token, String theyAreStillType, Duration duration, boolean losePreviousTypes, boolean characterDefining) {
+        this(token, theyAreStillType, duration, losePreviousTypes, characterDefining, null, null);
     }
 
-    public BecomesCreatureSourceEffect(Token token, String type, Duration duration, boolean losePreviousTypes, boolean characterDefining, DynamicValue power, DynamicValue toughness) {
+    public BecomesCreatureSourceEffect(Token token, String theyAreStillType, Duration duration, boolean losePreviousTypes, boolean characterDefining, DynamicValue power, DynamicValue toughness) {
+        this(token, theyAreStillType,duration,losePreviousTypes,characterDefining,power,toughness,false);
+    }
+    public BecomesCreatureSourceEffect(Token token, String theyAreStillType, Duration duration, boolean losePreviousTypes, boolean characterDefining, DynamicValue power, DynamicValue toughness, boolean loseAbilities) {
         super(duration, Outcome.BecomeCreature);
         this.characterDefining = characterDefining;
         this.token = token;
-        this.type = type;
+        this.theyAreStillType = theyAreStillType;
         this.losePreviousTypes = losePreviousTypes;
         this.power = power;
-        this.toughness = toughness;
+        this.toughness = toughness;this.loseAbilities=loseAbilities;
         setText();
+
+        this.addDependencyType(DependencyType.BecomeCreature);
     }
 
     public BecomesCreatureSourceEffect(final BecomesCreatureSourceEffect effect) {
         super(effect);
         this.token = effect.token.copy();
-        this.type = effect.type;
-        this.losePreviousTypes = effect.losePreviousTypes;
+        this.theyAreStillType = effect.theyAreStillType;
+        this.losePreviousTypes = effect.losePreviousTypes;this.loseAbilities=effect.loseAbilities;
         if (effect.power != null) {
             this.power = effect.power.copy();
         }
@@ -113,21 +87,20 @@ public class BecomesCreatureSourceEffect extends ContinuousEffectImpl implements
                         if (losePreviousTypes) {
                             permanent.getCardType().clear();
                         }
-                        if (token.getCardType().size() > 0) {
-                            for (CardType t : token.getCardType()) {
-                                if (!permanent.getCardType().contains(t)) {
-                                    permanent.getCardType().add(t);
-                                }
-                            }
+                        for (CardType cardType : token.getCardType()) {
+                            permanent.addCardType(cardType);
                         }
-                        if ("".equals(type) || type == null && permanent.getCardType().contains(CardType.LAND)) {
-                            permanent.getSubtype(game).retainAll(CardRepository.instance.getLandTypes());
+
+                        if (theyAreStillType != null && theyAreStillType.isEmpty() || theyAreStillType == null && permanent.isLand()) {
+                            permanent.getSubtype(game).retainAll(SubType.getLandTypes(false));
                         }
-                        if (token.getSubtype(game).size() > 0) {
+                        if (!token.getSubtype(game).isEmpty()) {
                             permanent.getSubtype(game).addAll(token.getSubtype(game));
                         }
+                        permanent.setIsAllCreatureTypes(token.isAllCreatureTypes());
                     }
                     break;
+
                 case ColorChangingEffects_5:
                     if (sublayer == SubLayer.NA) {
                         if (token.getColor(game).hasColor()) {
@@ -135,20 +108,22 @@ public class BecomesCreatureSourceEffect extends ContinuousEffectImpl implements
                         }
                     }
                     break;
+
                 case AbilityAddingRemovingEffects_6:
                     if (sublayer == SubLayer.NA) {
-                        if (token.getAbilities().size() > 0) {
-                            for (Ability ability : token.getAbilities()) {
-                                permanent.addAbility(ability, source.getSourceId(), game);
-                            }
+                        if(loseAbilities){
+                        permanent.removeAllAbilities(source.getSourceId(), game);}
+                        for (Ability ability : token.getAbilities()) {
+                            permanent.addAbility(ability, source.getSourceId(), game);
                         }
                     }
                     break;
+
                 case PTChangingEffects_7:
                     if ((sublayer == SubLayer.CharacteristicDefining_7a && isCharacterDefining())
                             || (sublayer == SubLayer.SetPT_7b && !isCharacterDefining())) {
                         if (power != null) {
-                            permanent.getPower().setValue(power.calculate(game, source, this));
+                            permanent.getPower().setValue(power.calculate(game, source, this)); // check all other becomes to use calculate?
                         } else if (token.getPower() != null) {
                             permanent.getPower().setValue(token.getPower().getValue());
                         }
@@ -158,11 +133,15 @@ public class BecomesCreatureSourceEffect extends ContinuousEffectImpl implements
                             permanent.getToughness().setValue(token.getToughness().getValue());
                         }
                     }
+                    break;
             }
+
             return true;
-        } else if (duration.equals(Duration.Custom)) {
+
+        } else if (duration == Duration.Custom) {
             this.discard();
         }
+
         return false;
     }
 
@@ -172,8 +151,8 @@ public class BecomesCreatureSourceEffect extends ContinuousEffectImpl implements
     }
 
     private void setText() {
-        if (type != null && type.length() > 0) {
-            staticText = duration.toString() + " {this} becomes a " + token.getDescription() + " that's still a " + this.type;
+        if (theyAreStillType != null && !theyAreStillType.isEmpty()) {
+            staticText = duration.toString() + " {this} becomes a " + token.getDescription() + " that's still a " + this.theyAreStillType;
         } else {
             staticText = duration.toString() + " {this} becomes a " + token.getDescription();
         }

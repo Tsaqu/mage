@@ -1,52 +1,24 @@
-/*
-* Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are
-* permitted provided that the following conditions are met:
-*
-*    1. Redistributions of source code must retain the above copyright notice, this list of
-*       conditions and the following disclaimer.
-*
-*    2. Redistributions in binary form must reproduce the above copyright notice, this list
-*       of conditions and the following disclaimer in the documentation and/or other materials
-*       provided with the distribution.
-*
-* THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-* FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*
-* The views and conclusions contained in the software and documentation are those of the
-* authors and should not be interpreted as representing official policies, either expressed
-* or implied, of BetaSteward_at_googlemail.com.
-*/
 
 package mage.sets;
 
-import mage.constants.SetType;
 import mage.cards.ExpansionSet;
 import mage.constants.Rarity;
-import mage.cards.CardGraphicInfo;
+import mage.constants.SetType;
 
 /**
  *
  * @author BetaSteward_at_googlemail.com
  */
-public class Magic2010 extends ExpansionSet {
+public final class Magic2010 extends ExpansionSet {
 
-    private static final Magic2010 fINSTANCE = new Magic2010();
+    private static final Magic2010 instance = new Magic2010();
 
     public static Magic2010 getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     private Magic2010() {
-        super("Magic 2010", "M10", ExpansionSet.buildDate(2009, 6, 17), SetType.CORE);
+        super("Magic 2010", "M10", ExpansionSet.buildDate(2009, 7, 17), SetType.CORE);
         this.hasBoosters = true;
         this.numBoosterLands = 1;
         this.numBoosterCommon = 10;
@@ -128,10 +100,10 @@ public class Magic2010 extends ExpansionSet {
         cards.add(new SetCardInfo("Firebreathing", 137, Rarity.COMMON, mage.cards.f.Firebreathing.class));
         cards.add(new SetCardInfo("Flashfreeze", 53, Rarity.UNCOMMON, mage.cards.f.Flashfreeze.class));
         cards.add(new SetCardInfo("Fog", 182, Rarity.COMMON, mage.cards.f.Fog.class));
-        cards.add(new SetCardInfo("Forest", 246, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 247, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 248, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 249, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Forest", 246, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 247, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 248, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 249, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Gargoyle Castle", 225, Rarity.RARE, mage.cards.g.GargoyleCastle.class));
         cards.add(new SetCardInfo("Garruk Wildspeaker", 183, Rarity.MYTHIC, mage.cards.g.GarrukWildspeaker.class));
         cards.add(new SetCardInfo("Giant Growth", 184, Rarity.COMMON, mage.cards.g.GiantGrowth.class));
@@ -161,10 +133,10 @@ public class Magic2010 extends ExpansionSet {
         cards.add(new SetCardInfo("Illusionary Servant", 57, Rarity.COMMON, mage.cards.i.IllusionaryServant.class));
         cards.add(new SetCardInfo("Indestructibility", 17, Rarity.RARE, mage.cards.i.Indestructibility.class));
         cards.add(new SetCardInfo("Inferno Elemental", 142, Rarity.UNCOMMON, mage.cards.i.InfernoElemental.class));
-        cards.add(new SetCardInfo("Island", 234, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 235, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 236, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 237, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Island", 234, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 235, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 236, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 237, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Jace Beleren", 58, Rarity.MYTHIC, mage.cards.j.JaceBeleren.class));
         cards.add(new SetCardInfo("Jackal Familiar", 143, Rarity.COMMON, mage.cards.j.JackalFamiliar.class));
         cards.add(new SetCardInfo("Jump", 59, Rarity.COMMON, mage.cards.j.Jump.class));
@@ -198,10 +170,10 @@ public class Magic2010 extends ExpansionSet {
         cards.add(new SetCardInfo("Mirror of Fate", 215, Rarity.RARE, mage.cards.m.MirrorOfFate.class));
         cards.add(new SetCardInfo("Mist Leopard", 193, Rarity.COMMON, mage.cards.m.MistLeopard.class));
         cards.add(new SetCardInfo("Mold Adder", 194, Rarity.UNCOMMON, mage.cards.m.MoldAdder.class));
-        cards.add(new SetCardInfo("Mountain", 242, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 243, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 244, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 245, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Mountain", 242, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 243, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 244, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 245, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Naturalize", 195, Rarity.COMMON, mage.cards.n.Naturalize.class));
         cards.add(new SetCardInfo("Nature's Spiral", 196, Rarity.UNCOMMON, mage.cards.n.NaturesSpiral.class));
         cards.add(new SetCardInfo("Negate", 65, Rarity.COMMON, mage.cards.n.Negate.class));
@@ -215,10 +187,10 @@ public class Magic2010 extends ExpansionSet {
         cards.add(new SetCardInfo("Panic Attack", 150, Rarity.COMMON, mage.cards.p.PanicAttack.class));
         cards.add(new SetCardInfo("Phantom Warrior", 66, Rarity.UNCOMMON, mage.cards.p.PhantomWarrior.class));
         cards.add(new SetCardInfo("Pithing Needle", 217, Rarity.RARE, mage.cards.p.PithingNeedle.class));
-        cards.add(new SetCardInfo("Plains", 230, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 231, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 232, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 233, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Plains", 230, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 231, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 232, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 233, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Planar Cleansing", 24, Rarity.RARE, mage.cards.p.PlanarCleansing.class));
         cards.add(new SetCardInfo("Platinum Angel", 218, Rarity.MYTHIC, mage.cards.p.PlatinumAngel.class));
         cards.add(new SetCardInfo("Polymorph", 67, Rarity.RARE, mage.cards.p.Polymorph.class));
@@ -264,10 +236,10 @@ public class Magic2010 extends ExpansionSet {
         cards.add(new SetCardInfo("Stone Giant", 159, Rarity.UNCOMMON, mage.cards.s.StoneGiant.class));
         cards.add(new SetCardInfo("Stormfront Pegasus", 35, Rarity.COMMON, mage.cards.s.StormfrontPegasus.class));
         cards.add(new SetCardInfo("Sunpetal Grove", 228, Rarity.RARE, mage.cards.s.SunpetalGrove.class));
-        cards.add(new SetCardInfo("Swamp", 238, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 239, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 240, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 241, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Swamp", 238, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 239, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 240, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 241, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Telepathy", 74, Rarity.UNCOMMON, mage.cards.t.Telepathy.class));
         cards.add(new SetCardInfo("Tempest of Light", 36, Rarity.UNCOMMON, mage.cards.t.TempestOfLight.class));
         cards.add(new SetCardInfo("Tendrils of Corruption", 114, Rarity.COMMON, mage.cards.t.TendrilsOfCorruption.class));

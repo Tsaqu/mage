@@ -1,30 +1,4 @@
-/*
- *  Copyright 2011 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 
  /*
  * TournamentPanel.java
@@ -40,9 +14,11 @@ import java.awt.event.ActionEvent;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -84,7 +60,7 @@ public class TournamentPanel extends javax.swing.JPanel {
     private boolean firstInitDone = false;
 
     private final TournamentPlayersTableModel playersModel;
-    private TournamentMatchesTableModel matchesModel;
+    private final TournamentMatchesTableModel matchesModel;
     private UpdateTournamentTask updateTask;
     private final DateFormat df;
 
@@ -174,7 +150,7 @@ public class TournamentPanel extends javax.swing.JPanel {
     private void saveDividerLocations() {
         // save panel sizes and divider locations.
         Rectangle rec = MageFrame.getDesktop().getBounds();
-        String sb = Double.toString(rec.getWidth()) + "x" + Double.toString(rec.getHeight());
+        String sb = Double.toString(rec.getWidth()) + 'x' + Double.toString(rec.getHeight());
         PreferencesDialog.saveValue(PreferencesDialog.KEY_MAGE_PANEL_LAST_SIZE, sb);
         PreferencesDialog.saveValue(PreferencesDialog.KEY_TOURNAMENT_DIVIDER_LOCATION_1, Integer.toString(this.jSplitPane1.getDividerLocation()));
         PreferencesDialog.saveValue(PreferencesDialog.KEY_TOURNAMENT_DIVIDER_LOCATION_2, Integer.toString(this.jSplitPane2.getDividerLocation()));
@@ -184,7 +160,7 @@ public class TournamentPanel extends javax.swing.JPanel {
         Rectangle rec = MageFrame.getDesktop().getBounds();
         if (rec != null) {
             String size = PreferencesDialog.getCachedValue(PreferencesDialog.KEY_MAGE_PANEL_LAST_SIZE, null);
-            String sb = Double.toString(rec.getWidth()) + "x" + Double.toString(rec.getHeight());
+            String sb = Double.toString(rec.getWidth()) + 'x' + Double.toString(rec.getHeight());
             // use divider positions only if screen size is the same as it was the time the settings were saved
             if (size != null && size.equals(sb)) {
                 String location = PreferencesDialog.getCachedValue(PreferencesDialog.KEY_TOURNAMENT_DIVIDER_LOCATION_1, null);
@@ -202,9 +178,9 @@ public class TournamentPanel extends javax.swing.JPanel {
     public synchronized void showTournament(UUID tournamentId) {
         this.tournamentId = tournamentId;
         // MageFrame.addTournament(tournamentId, this);
-        UUID chatRoomId = SessionHandler.getTournamentChatId(tournamentId);
-        if (SessionHandler.joinTournament(tournamentId) && chatRoomId != null) {
-            this.chatPanel1.connect(chatRoomId);
+        Optional<UUID> chatRoomId = SessionHandler.getTournamentChatId(tournamentId);
+        if (SessionHandler.joinTournament(tournamentId) && chatRoomId.isPresent()) {
+            this.chatPanel1.connect(chatRoomId.get());
             startTasks();
             this.setVisible(true);
             this.repaint();
@@ -244,7 +220,7 @@ public class TournamentPanel extends javax.swing.JPanel {
                 c = c.getParent();
             }
             if (c != null) {
-                ((TournamentPane) c).setTitle("Tournament [" + tournament.getTournamentName() + "]");
+                ((TournamentPane) c).setTitle("Tournament [" + tournament.getTournamentName() + ']');
             }
             txtName.setText(tournament.getTournamentName());
             txtType.setText(tournament.getTournamentType());
@@ -260,7 +236,7 @@ public class TournamentPanel extends javax.swing.JPanel {
                 if (tournament.getStepStartTime() != null) {
                     timeLeft = Format.getDuration(tournament.getConstructionTime() - (tournament.getServerTime().getTime() - tournament.getStepStartTime().getTime()) / 1000);
                 }
-                txtTournamentState.setText(new StringBuilder(tournament.getTournamentState()).append(" (").append(timeLeft).append(")").toString());
+                txtTournamentState.setText(new StringBuilder(tournament.getTournamentState()).append(" (").append(timeLeft).append(')').toString());
                 break;
             case "Dueling":
             case "Drafting":
@@ -358,11 +334,7 @@ public class TournamentPanel extends javax.swing.JPanel {
         txtName.setMaximumSize(new java.awt.Dimension(50, 22));
         txtName.setOpaque(false);
         txtName.setRequestFocusEnabled(false);
-        txtName.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtNameActionPerformed(evt);
-            }
-        });
+        txtName.addActionListener(evt -> txtNameActionPerformed(evt));
 
         txtType.setEditable(false);
         txtType.setHorizontalAlignment(javax.swing.JTextField.LEFT);
@@ -394,19 +366,11 @@ public class TournamentPanel extends javax.swing.JPanel {
 
         btnQuitTournament.setText("Quit Tournament");
         btnQuitTournament.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        btnQuitTournament.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnQuitTournamentActionPerformed(evt);
-            }
-        });
+        btnQuitTournament.addActionListener(evt -> btnQuitTournamentActionPerformed(evt));
 
         btnCloseWindow.setText("Close Window");
         btnCloseWindow.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        btnCloseWindow.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCloseWindowActionPerformed(evt);
-            }
-        });
+        btnCloseWindow.addActionListener(evt -> btnCloseWindowActionPerformed(evt));
 
         lblName.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         lblName.setText("Name:");
@@ -739,7 +703,7 @@ class UpdateTournamentTask extends SwingWorker<Void, TournamentView> {
     protected Void doInBackground() throws Exception {
         while (!isCancelled()) {
             this.publish(SessionHandler.getTournament(tournamentId));
-            Thread.sleep(2000);
+            TimeUnit.SECONDS.sleep(2);
         }
         return null;
     }

@@ -1,36 +1,7 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.game;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import mage.abilities.Ability;
 import mage.abilities.common.SimpleStaticAbility;
@@ -38,7 +9,6 @@ import mage.abilities.effects.common.InfoEffect;
 import mage.abilities.effects.common.continuous.CommanderReplacementEffect;
 import mage.abilities.effects.common.cost.CommanderCostModification;
 import mage.cards.Card;
-import mage.cards.Cards;
 import mage.constants.MultiplayerAttackOption;
 import mage.constants.PhaseStep;
 import mage.constants.RangeOfInfluence;
@@ -49,11 +19,8 @@ import mage.watchers.common.CommanderInfoWatcher;
 
 public abstract class GameCommanderImpl extends GameImpl {
 
-    static boolean CHECK_COMMANDER_DAMAGE = true;
-
-    private final Map<UUID, Cards> mulliganedCards = new HashMap<>();
-    // private final Set<CommanderInfoWatcher> commanderCombatWatcher = new HashSet<>();
-
+    // private final Map<UUID, Cards> mulliganedCards = new HashMap<>();
+    protected boolean checkCommanderDamage = true;
     protected boolean alsoHand;    // replace commander going to hand
     protected boolean alsoLibrary; // replace commander going to library
     protected boolean startingPlayerSkipsDraw = true;
@@ -67,6 +34,7 @@ public abstract class GameCommanderImpl extends GameImpl {
         this.alsoHand = game.alsoHand;
         this.alsoLibrary = game.alsoLibrary;
         this.startingPlayerSkipsDraw = game.startingPlayerSkipsDraw;
+        this.checkCommanderDamage = game.checkCommanderDamage;
     }
 
     @Override
@@ -76,24 +44,21 @@ public abstract class GameCommanderImpl extends GameImpl {
         for (UUID playerId : state.getPlayerList(startingPlayerId)) {
             Player player = getPlayer(playerId);
             if (player != null) {
-                if (player.getSideboard().size() > 0) {
-                    Card commander = getCard((UUID) player.getSideboard().toArray()[0]);
+                while (!player.getSideboard().isEmpty()) {
+                    Card commander = this.getCard(player.getSideboard().iterator().next());
                     if (commander != null) {
-                        player.setCommanderId(commander.getId());
+                        player.addCommanderId(commander.getId());
                         commander.moveToZone(Zone.COMMAND, null, this, true);
                         commander.getAbilities().setControllerId(player.getId());
                         ability.addEffect(new CommanderReplacementEffect(commander.getId(), alsoHand, alsoLibrary));
                         ability.addEffect(new CommanderCostModification(commander.getId()));
-                        // Commander rule #4 was removed Jan. 18, 2016
-                        // ability.addEffect(new CommanderManaReplacementEffect(player.getId(), CardUtil.getColorIdentity(commander)));
                         getState().setValue(commander.getId() + "_castCount", 0);
-                        CommanderInfoWatcher watcher = new CommanderInfoWatcher(commander.getId(), CHECK_COMMANDER_DAMAGE);
+                        CommanderInfoWatcher watcher = new CommanderInfoWatcher(commander.getId(), checkCommanderDamage);
                         getState().getWatchers().add(watcher);
                         watcher.addCardInfoToCommander(this);
                     }
                 }
             }
-
         }
         this.getState().addAbility(ability, null);
         super.init(choosingPlayerId);
@@ -104,10 +69,10 @@ public abstract class GameCommanderImpl extends GameImpl {
 
     //20130711
     /*903.8. The Commander variant uses an alternate mulligan rule.
-     * Each time a player takes a mulligan, rather than shuffling his or her entire hand of cards into his or her library, that player exiles any number of cards from his or her hand face down.
+     * Each time a player takes a mulligan, rather than shuffling their entire hand of cards into their library, that player exiles any number of cards from their hand face down.
      * Then the player draws a number of cards equal to one less than the number of cards he or she exiled this way.
      * That player may look at all cards exiled this way while taking mulligans.
-     * Once a player keeps an opening hand, that player shuffles all cards he or she exiled this way into his or her library.
+     * Once a player keeps an opening hand, that player shuffles all cards he or she exiled this way into their library.
      * */
     //TODO implement may look at exile cards
     @Override
@@ -182,43 +147,29 @@ public abstract class GameCommanderImpl extends GameImpl {
     }
 
     /* 20130711
-     *903.14a A player that’s been dealt 21 or more combat damage by the same commander
+     *903.14a A player that's been dealt 21 or more combat damage by the same commander
      * over the course of the game loses the game. (This is a state-based action. See rule 704.)
      *
      */
     @Override
     protected boolean checkStateBasedActions() {
         for (Player player : getPlayers().values()) {
-            CommanderInfoWatcher damageWatcher = (CommanderInfoWatcher) getState().getWatchers().get("CommanderCombatDamageWatcher", player.getCommanderId());
-            if (damageWatcher == null) {
-                continue;
-            }
-            for (Map.Entry<UUID, Integer> entrySet : damageWatcher.getDamageToPlayer().entrySet()) {
-                if (entrySet.getValue() > 20) {
-                    Player opponent = getPlayer(entrySet.getKey());
-                    if (opponent != null && !opponent.hasLost() && player.isInGame()) {
-                        opponent.lost(this);
+            for (UUID commanderId : player.getCommandersIds()) {
+                CommanderInfoWatcher damageWatcher = (CommanderInfoWatcher) getState().getWatchers().get(CommanderInfoWatcher.class.getSimpleName(), commanderId);
+                if (damageWatcher == null) {
+                    continue;
+                }
+                for (Map.Entry<UUID, Integer> entrySet : damageWatcher.getDamageToPlayer().entrySet()) {
+                    if (entrySet.getValue() > 20) {
+                        Player opponent = getPlayer(entrySet.getKey());
+                        if (opponent != null && !opponent.hasLost() && player.isInGame()) {
+                            opponent.lost(this);
+                        }
                     }
                 }
             }
         }
         return super.checkStateBasedActions();
-    }
-
-    @Override
-    public Set<UUID> getOpponents(UUID playerId) {
-        Set<UUID> opponents = new HashSet<>();
-        for (UUID opponentId : getState().getPlayersInRange(playerId, this)) {
-            if (!opponentId.equals(playerId)) {
-                opponents.add(opponentId);
-            }
-        }
-        return opponents;
-    }
-
-    @Override
-    public boolean isOpponent(Player player, UUID playerToCheck) {
-        return !player.getId().equals(playerToCheck);
     }
 
     public void setAlsoHand(boolean alsoHand) {
@@ -228,4 +179,13 @@ public abstract class GameCommanderImpl extends GameImpl {
     public void setAlsoLibrary(boolean alsoLibrary) {
         this.alsoLibrary = alsoLibrary;
     }
+
+    public boolean isCheckCommanderDamage() {
+        return checkCommanderDamage;
+    }
+
+    public void setCheckCommanderDamage(boolean checkCommanderDamage) {
+        this.checkCommanderDamage = checkCommanderDamage;
+    }
+
 }

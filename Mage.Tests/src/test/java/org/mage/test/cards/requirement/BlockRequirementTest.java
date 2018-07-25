@@ -1,36 +1,13 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package org.mage.test.cards.requirement;
 
 import mage.constants.PhaseStep;
 import mage.constants.Zone;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBase;
+
+import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  *
@@ -66,7 +43,7 @@ public class BlockRequirementTest extends CardTestPlayerBase {
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Oppressive Rays", "Silvercoat Lion");
 
-        // Silvercoat Lion has not to block because it has to pay {3} to block
+        // Silvercoat Lion cannot block because it has to pay {3} to block
         attack(2, playerB, "Prized Unicorn");
 
         setStopAt(2, PhaseStep.POSTCOMBAT_MAIN);
@@ -212,12 +189,13 @@ public class BlockRequirementTest extends CardTestPlayerBase {
         block(1, playerB, "Hill Giant", "Breaker of Armies");
 
         setStopAt(1, PhaseStep.POSTCOMBAT_MAIN);
-        execute();
 
-        // Hill giant is still alive
-        assertPermanentCount(playerB, "Hill Giant", 1);
-        // Player B was unable to block, so goes down to 10 life
-        assertLife(playerB, 8);
+        try {
+            execute();
+            fail("Expected exception not thrown");
+        } catch (UnsupportedOperationException e) {
+            assertEquals("Breaker of Armies is blocked by 1 creature(s). It has to be blocked by 2 or more.", e.getMessage());
+        }
     }
     
     /*
@@ -230,17 +208,17 @@ public class BlockRequirementTest extends CardTestPlayerBase {
         addCard(Zone.BATTLEFIELD, playerA, "Slayer's Cleaver");
         addCard(Zone.BATTLEFIELD, playerA, "Mountain", 4);
         addCard(Zone.BATTLEFIELD, playerA, "Memnite"); // {1} 1/1
-        
+
         addCard(Zone.BATTLEFIELD, playerB, "Dimensional Infiltrator"); // 2/1 - Eldrazi
         addCard(Zone.BATTLEFIELD, playerB, "Llanowar Elves"); // 1/1
-        
+
         activateAbility(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Equip", "Memnite"); // pumps to 4/2
         attack(1, playerA, "Memnite"); // must be blocked by Dimensional Infiltrator
         block(1, playerB, "Llanowar Elves", "Memnite"); // should not be allowed as only blocker
-        
+
         setStopAt(1, PhaseStep.END_COMBAT);
         execute();
-                
+
         assertPermanentCount(playerA, "Slayer's Cleaver", 1);
         assertLife(playerB, 20);
         assertGraveyardCount(playerA, "Memnite", 1);

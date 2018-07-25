@@ -1,37 +1,10 @@
-/*
- * Copyright 2011 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.sets;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import mage.cards.Card;
-import mage.cards.CardGraphicInfo;
 import mage.cards.ExpansionSet;
 import mage.cards.repository.CardCriteria;
 import mage.cards.repository.CardInfo;
@@ -44,12 +17,12 @@ import mage.util.RandomUtil;
  *
  * @author fireshoes
  */
-public class ShadowsOverInnistrad extends ExpansionSet {
+public final class ShadowsOverInnistrad extends ExpansionSet {
 
-    private static final ShadowsOverInnistrad fINSTANCE = new ShadowsOverInnistrad();
+    private static final ShadowsOverInnistrad instance = new ShadowsOverInnistrad();
 
     public static ShadowsOverInnistrad getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     protected final EnumMap<Rarity, List<CardInfo>> savedDoubleFacedCards;
@@ -58,6 +31,7 @@ public class ShadowsOverInnistrad extends ExpansionSet {
         super("Shadows over Innistrad", "SOI", ExpansionSet.buildDate(2016, 4, 8), SetType.EXPANSION);
         this.blockName = "Shadows over Innistrad";
         this.hasBoosters = true;
+        this.hasBasicLands = true;
         this.numBoosterLands = 1;
         this.numBoosterCommon = 9;
         this.numBoosterUncommon = 3;
@@ -136,7 +110,7 @@ public class ShadowsOverInnistrad extends ExpansionSet {
         cards.add(new SetCardInfo("Dual Shot", 153, Rarity.COMMON, mage.cards.d.DualShot.class));
         cards.add(new SetCardInfo("Duskwatch Recruiter", 203, Rarity.UNCOMMON, mage.cards.d.DuskwatchRecruiter.class));
         cards.add(new SetCardInfo("Eerie Interlude", 16, Rarity.RARE, mage.cards.e.EerieInterlude.class));
-        cards.add(new SetCardInfo("Elusive Tormentor", 108, Rarity.RARE, mage.cards.e.ElusiveTormentor.class));
+        cards.add(new SetCardInfo("Elusive Tormentor", "108a", Rarity.RARE, mage.cards.e.ElusiveTormentor.class));
         cards.add(new SetCardInfo("Ember-Eye Wolf", 154, Rarity.COMMON, mage.cards.e.EmberEyeWolf.class));
         cards.add(new SetCardInfo("Emissary of the Sleepless", 17, Rarity.COMMON, mage.cards.e.EmissaryOfTheSleepless.class));
         cards.add(new SetCardInfo("Engulf the Shore", 58, Rarity.RARE, mage.cards.e.EngulfTheShore.class));
@@ -157,9 +131,9 @@ public class ShadowsOverInnistrad extends ExpansionSet {
         cards.add(new SetCardInfo("Flameheart Werewolf", 169, Rarity.UNCOMMON, mage.cards.f.FlameheartWerewolf.class));
         cards.add(new SetCardInfo("Fleeting Memories", 62, Rarity.UNCOMMON, mage.cards.f.FleetingMemories.class));
         cards.add(new SetCardInfo("Foreboding Ruins", 272, Rarity.RARE, mage.cards.f.ForebodingRuins.class));
-        cards.add(new SetCardInfo("Forest", 295, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 296, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 297, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Forest", 295, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 296, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 297, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Forgotten Creation", 63, Rarity.RARE, mage.cards.f.ForgottenCreation.class));
         cards.add(new SetCardInfo("Fork in the Road", 205, Rarity.COMMON, mage.cards.f.ForkInTheRoad.class));
         cards.add(new SetCardInfo("Forsaken Sanctuary", 273, Rarity.UNCOMMON, mage.cards.f.ForsakenSanctuary.class));
@@ -207,15 +181,15 @@ public class ShadowsOverInnistrad extends ExpansionSet {
         cards.add(new SetCardInfo("Infectious Curse", 97, Rarity.UNCOMMON, mage.cards.i.InfectiousCurse.class));
         cards.add(new SetCardInfo("Inner Struggle", 167, Rarity.UNCOMMON, mage.cards.i.InnerStruggle.class));
         cards.add(new SetCardInfo("Inquisitor's Ox", 24, Rarity.COMMON, mage.cards.i.InquisitorsOx.class));
-        cards.add(new SetCardInfo("Insidious Mist", 108, Rarity.RARE, mage.cards.i.InsidiousMist.class));
+        cards.add(new SetCardInfo("Insidious Mist", "108b", Rarity.RARE, mage.cards.i.InsidiousMist.class));
         cards.add(new SetCardInfo("Insolent Neonate", 168, Rarity.COMMON, mage.cards.i.InsolentNeonate.class));
         cards.add(new SetCardInfo("Inspiring Captain", 25, Rarity.COMMON, mage.cards.i.InspiringCaptain.class));
         cards.add(new SetCardInfo("Intrepid Provisioner", 213, Rarity.COMMON, mage.cards.i.IntrepidProvisioner.class));
         cards.add(new SetCardInfo("Invasive Surgery", 68, Rarity.UNCOMMON, mage.cards.i.InvasiveSurgery.class));
         cards.add(new SetCardInfo("Invocation of Saint Traft", 246, Rarity.RARE, mage.cards.i.InvocationOfSaintTraft.class));
-        cards.add(new SetCardInfo("Island", 286, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 287, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 288, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Island", 286, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 287, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 288, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Jace's Scrutiny", 70, Rarity.COMMON, mage.cards.j.JacesScrutiny.class));
         cards.add(new SetCardInfo("Jace, Unraveler of Secrets", 69, Rarity.MYTHIC, mage.cards.j.JaceUnravelerOfSecrets.class));
         cards.add(new SetCardInfo("Just the Wind", 71, Rarity.COMMON, mage.cards.j.JustTheWind.class));
@@ -247,9 +221,9 @@ public class ShadowsOverInnistrad extends ExpansionSet {
         cards.add(new SetCardInfo("Moonrise Intruder", 190, Rarity.UNCOMMON, mage.cards.m.MoonriseIntruder.class));
         cards.add(new SetCardInfo("Moorland Drifter", 27, Rarity.COMMON, mage.cards.m.MoorlandDrifter.class));
         cards.add(new SetCardInfo("Morkrut Necropod", 125, Rarity.UNCOMMON, mage.cards.m.MorkrutNecropod.class));
-        cards.add(new SetCardInfo("Mountain", 292, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 293, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 294, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Mountain", 292, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 293, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 294, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Murderer's Axe", 259, Rarity.UNCOMMON, mage.cards.m.MurderersAxe.class));
         cards.add(new SetCardInfo("Murderous Compulsion", 126, Rarity.COMMON, mage.cards.m.MurderousCompulsion.class));
         cards.add(new SetCardInfo("Nagging Thoughts", 74, Rarity.COMMON, mage.cards.n.NaggingThoughts.class));
@@ -277,9 +251,9 @@ public class ShadowsOverInnistrad extends ExpansionSet {
         cards.add(new SetCardInfo("Pick the Brain", 129, Rarity.UNCOMMON, mage.cards.p.PickTheBrain.class));
         cards.add(new SetCardInfo("Pieces of the Puzzle", 78, Rarity.COMMON, mage.cards.p.PiecesOfThePuzzle.class));
         cards.add(new SetCardInfo("Pious Evangel", 34, Rarity.UNCOMMON, mage.cards.p.PiousEvangel.class));
-        cards.add(new SetCardInfo("Plains", 283, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 284, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 285, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Plains", 283, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 284, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 285, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Pore Over the Pages", 79, Rarity.UNCOMMON, mage.cards.p.PoreOverThePages.class));
         cards.add(new SetCardInfo("Port Town", 278, Rarity.RARE, mage.cards.p.PortTown.class));
         cards.add(new SetCardInfo("Press for Answers", 80, Rarity.COMMON, mage.cards.p.PressForAnswers.class));
@@ -342,9 +316,9 @@ public class ShadowsOverInnistrad extends ExpansionSet {
         cards.add(new SetCardInfo("Stromkirk Mentor", 137, Rarity.COMMON, mage.cards.s.StromkirkMentor.class));
         cards.add(new SetCardInfo("Structural Distortion", 185, Rarity.COMMON, mage.cards.s.StructuralDistortion.class));
         cards.add(new SetCardInfo("Survive the Night", 41, Rarity.COMMON, mage.cards.s.SurviveTheNight.class));
-        cards.add(new SetCardInfo("Swamp", 289, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 290, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 291, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Swamp", 289, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 290, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 291, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Tamiyo's Journal", 265, Rarity.RARE, mage.cards.t.TamiyosJournal.class));
         cards.add(new SetCardInfo("Tenacity", 42, Rarity.UNCOMMON, mage.cards.t.Tenacity.class));
         cards.add(new SetCardInfo("Thalia's Lieutenant", 43, Rarity.RARE, mage.cards.t.ThaliasLieutenant.class));

@@ -1,35 +1,14 @@
-/*
-* Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are
-* permitted provided that the following conditions are met:
-*
-*    1. Redistributions of source code must retain the above copyright notice, this list of
-*       conditions and the following disclaimer.
-*
-*    2. Redistributions in binary form must reproduce the above copyright notice, this list
-*       of conditions and the following disclaimer in the documentation and/or other materials
-*       provided with the distribution.
-*
-* THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-* FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*
-* The views and conclusions contained in the software and documentation are those of the
-* authors and should not be interpreted as representing official policies, either expressed
-* or implied, of BetaSteward_at_googlemail.com.
-*/
 
 package mage.server.game;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import mage.cards.decks.DeckCardLists;
 import mage.constants.ManaType;
 import mage.constants.PlayerAction;
@@ -41,20 +20,21 @@ import mage.view.GameView;
  *
  * @author BetaSteward_at_googlemail.com
  */
-public class GameManager {
-    private static final GameManager INSTANCE = new GameManager();
-
-    public static GameManager getInstance() {
-        return INSTANCE;
-    }
-
-    private GameManager() {}
+public enum GameManager {
+    instance;
 
     private final ConcurrentHashMap<UUID, GameController> gameControllers = new ConcurrentHashMap<>();
+    private final ReadWriteLock gameControllersLock = new ReentrantReadWriteLock();
 
     public UUID createGameSession(Game game, ConcurrentHashMap<UUID, UUID> userPlayerMap, UUID tableId, UUID choosingPlayerId, GameOptions gameOptions) {
         GameController gameController = new GameController(game, userPlayerMap, tableId, choosingPlayerId, gameOptions);
-        gameControllers.put(game.getId(), gameController);
+        final Lock w = gameControllersLock.writeLock();
+        w.lock();
+        try {
+            gameControllers.put(game.getId(), gameController);
+        } finally {
+            w.unlock();
+        }
         return gameController.getSessionId();
     }
 
@@ -65,12 +45,12 @@ public class GameManager {
         }
     }
 
-    public UUID getChatId(UUID gameId) {
+    public Optional<UUID> getChatId(UUID gameId) {
         GameController gameController = gameControllers.get(gameId);
         if (gameController != null) {
-            return gameController.getChatId();
+            return Optional.of(gameController.getChatId());
         }
-        return null;
+        return Optional.empty();
     }
 
     public void sendPlayerUUID(UUID gameId, UUID userId, UUID data) {
@@ -114,19 +94,20 @@ public class GameManager {
             gameController.quitMatch(userId);
         }
     }
-   
+
     public void sendPlayerAction(PlayerAction playerAction, UUID gameId, UUID userId, Object data) {
         GameController gameController = gameControllers.get(gameId);
-        if (gameController != null) {        
+        if (gameController != null) {
             gameController.sendPlayerAction(playerAction, userId, data);
         }
     }
 
-    public void watchGame(UUID gameId, UUID userId) {
+    public boolean watchGame(UUID gameId, UUID userId) {
         GameController gameController = gameControllers.get(gameId);
         if (gameController != null) {
-            gameController.watch(userId);
+            return gameController.watch(userId);
         }
+        return false;
     }
 
     public void stopWatching(UUID gameId, UUID userId) {
@@ -155,7 +136,13 @@ public class GameManager {
         GameController gameController = gameControllers.get(gameId);
         if (gameController != null) {
             gameController.cleanUp();
-            gameControllers.remove(gameId);
+            final Lock w = gameControllersLock.writeLock();
+            w.lock();
+            try {
+                gameControllers.remove(gameId);
+            } finally {
+                w.unlock();
+            }
         }
     }
 
@@ -178,8 +165,16 @@ public class GameManager {
     public int getNumberActiveGames() {
         return gameControllers.size();
     }
-    
-    public ConcurrentHashMap<UUID, GameController> getGameController() {
-        return gameControllers;
+
+    public Map<UUID, GameController> getGameController() {
+        Map<UUID, GameController> newControllers = new HashMap<>();
+        final Lock r = gameControllersLock.readLock();
+        r.lock();
+        try {
+            newControllers.putAll(gameControllers);
+        } finally {
+            r.unlock();
+        }
+        return newControllers;
     }
 }

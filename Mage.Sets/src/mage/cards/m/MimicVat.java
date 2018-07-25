@@ -1,32 +1,8 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.m;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import mage.abilities.Ability;
 import mage.abilities.DelayedTriggeredAbility;
@@ -36,8 +12,8 @@ import mage.abilities.common.delayed.AtTheBeginOfNextEndStepDelayedTriggeredAbil
 import mage.abilities.costs.common.TapSourceCost;
 import mage.abilities.costs.mana.GenericManaCost;
 import mage.abilities.effects.OneShotEffect;
+import mage.abilities.effects.common.CreateTokenCopyTargetEffect;
 import mage.abilities.effects.common.ExileTargetEffect;
-import mage.abilities.effects.common.PutTokenOntoBattlefieldCopyTargetEffect;
 import mage.cards.Card;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
@@ -56,15 +32,15 @@ import mage.target.targetpointer.FixedTarget;
 /**
  * @author nantuko
  */
-public class MimicVat extends CardImpl {
+public final class MimicVat extends CardImpl {
 
     public MimicVat(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.ARTIFACT},"{3}");
+        super(ownerId, setInfo, new CardType[]{CardType.ARTIFACT}, "{3}");
 
         // Imprint - Whenever a nontoken creature dies, you may exile that card. If you do, return each other card exiled with Mimic Vat to its owner's graveyard.
         this.addAbility(new MimicVatTriggeredAbility());
 
-        // {3}, {tap}: Put a token onto the battlefield that's a copy of the exiled card. It gains haste. Exile it at the beginning of the next end step.
+        // {3}, {tap}: Create a token that's a copy of the exiled card. It gains haste. Exile it at the beginning of the next end step.
         Ability ability = new SimpleActivatedAbility(Zone.BATTLEFIELD, new MimicVatCreateTokenEffect(), new GenericManaCost(3));
         ability.addCost(new TapSourceCost());
         this.addAbility(ability);
@@ -118,9 +94,9 @@ class MimicVatTriggeredAbility extends TriggeredAbilityImpl {
                 && zEvent.getToZone() == Zone.GRAVEYARD
                 && zEvent.getFromZone() == Zone.BATTLEFIELD
                 && !(permanent instanceof PermanentToken)
-                && permanent.getCardType().contains(CardType.CREATURE)) {
+                && permanent.isCreature()) {
 
-            getEffects().get(0).setTargetPointer(new FixedTarget(permanent.getId()));
+            getEffects().get(0).setTargetPointer(new FixedTarget(permanent.getId(), game));
             return true;
         }
         return false;
@@ -150,19 +126,22 @@ class MimicVatEffect extends OneShotEffect {
         if (controller == null || permanent == null) {
             return false;
         }
-        // return older cards to graveyard
-        for (UUID imprinted : permanent.getImprinted()) {
-            Card card = game.getCard(imprinted);
-            controller.moveCards(card, Zone.GRAVEYARD, source, game);
-        }
-        permanent.clearImprinted(game);
-
         // Imprint a new one
-        UUID target = targetPointer.getFirst(game, source);
-        if (target != null) {
-            Card card = game.getCard(target);
-            card.moveToExile(getId(), "Mimic Vat (Imprint)", source.getSourceId(), game);
-            permanent.imprint(card.getId(), game);
+        Card newCard = game.getCard(getTargetPointer().getFirst(game, source));
+        if (newCard != null) {
+            // return older cards to graveyard
+            Set<Card> toGraveyard = new HashSet<>();
+            for (UUID imprintedId : permanent.getImprinted()) {
+                Card card = game.getCard(imprintedId);
+                if (card != null) {
+                    toGraveyard.add(card);
+                }
+            }
+            controller.moveCards(toGraveyard, Zone.GRAVEYARD, source, game);
+            permanent.clearImprinted(game);
+
+            controller.moveCardsToExile(newCard, source, game, true, source.getSourceId(), permanent.getName() + " (Imprint)");
+            permanent.imprint(newCard.getId(), game);
         }
 
         return true;
@@ -179,7 +158,7 @@ class MimicVatCreateTokenEffect extends OneShotEffect {
 
     public MimicVatCreateTokenEffect() {
         super(Outcome.PutCreatureInPlay);
-        this.staticText = "Put a token onto the battlefield that's a copy of the exiled card. It gains haste. Exile it at the beginning of the next end step";
+        this.staticText = "Create a token that's a copy of a card exiled with {this}. It gains haste. Exile it at the beginning of the next end step";
     }
 
     public MimicVatCreateTokenEffect(final MimicVatCreateTokenEffect effect) {
@@ -198,10 +177,10 @@ class MimicVatCreateTokenEffect extends OneShotEffect {
             return false;
         }
 
-        if (permanent.getImprinted().size() > 0) {
+        if (!permanent.getImprinted().isEmpty()) {
             Card card = game.getCard(permanent.getImprinted().get(0));
             if (card != null) {
-                PutTokenOntoBattlefieldCopyTargetEffect effect = new PutTokenOntoBattlefieldCopyTargetEffect(source.getControllerId(), null, true);
+                CreateTokenCopyTargetEffect effect = new CreateTokenCopyTargetEffect(source.getControllerId(), null, true);
                 effect.setTargetPointer(new FixedTarget(card.getId(), card.getZoneChangeCounter(game)));
                 effect.apply(game, source);
                 for (Permanent addedToken : effect.getAddedPermanent()) {

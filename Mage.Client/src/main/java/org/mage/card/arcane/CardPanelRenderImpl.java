@@ -1,26 +1,23 @@
 package org.mage.card.arcane;
 
 import com.google.common.collect.MapMaker;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.Map;
-import java.util.UUID;
 import mage.cards.action.ActionCallback;
 import mage.constants.CardType;
+import mage.constants.SubType;
+import mage.constants.SuperType;
 import mage.view.CardView;
 import mage.view.CounterView;
 import mage.view.PermanentView;
 import mage.view.StackAbilityView;
-import net.java.truevfs.access.TFile;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.graphics.GraphicsUtilities;
-import static org.mage.plugins.card.constants.Constants.THUMBNAIL_SIZE_FULL;
-import org.mage.plugins.card.dl.sources.DirectLinksForDownload;
 import org.mage.plugins.card.images.ImageCache;
+import mage.client.constants.Constants;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.Map;
+import java.util.UUID;
 
 public class CardPanelRenderImpl extends CardPanel {
 
@@ -63,7 +60,10 @@ public class CardPanelRenderImpl extends CardPanel {
         if (!a.getRules().equals(b.getRules())) {
             return false;
         }
-        if (!a.getRarity().equals(b.getRarity())) {
+        if (a.getRarity() == null || b.getRarity() == null) {
+            return false;
+        }
+        if (a.getRarity() != b.getRarity()) {
             return false;
         }
         if (a.getCardNumber() != null && !a.getCardNumber().equals(b.getCardNumber())) {
@@ -111,7 +111,7 @@ public class CardPanelRenderImpl extends CardPanel {
         return true;
     }
 
-    class ImageKey {
+    static class ImageKey {
 
         final BufferedImage artImage;
         final int width;
@@ -155,10 +155,10 @@ public class CardPanelRenderImpl extends CardPanel {
             for (CardType type : this.view.getCardTypes()) {
                 sb.append((char) type.ordinal());
             }
-            for (String s : this.view.getSuperTypes()) {
+            for (SuperType s : this.view.getSuperTypes()) {
                 sb.append(s);
             }
-            for (String s : this.view.getSubTypes()) {
+            for (SubType s : this.view.getSubTypes()) {
                 sb.append(s);
             }
             for (String s : this.view.getManaCost()) {
@@ -220,6 +220,12 @@ public class CardPanelRenderImpl extends CardPanel {
     // The art image for the card, loaded in from the disk
     private BufferedImage artImage;
 
+    // The faceart image for the card, loaded in from the disk (based on artid from mtgo)
+    private BufferedImage faceArtImage;
+
+    // Factory to generate card appropriate views
+    private CardRendererFactory cardRendererFactory = new CardRendererFactory();
+
     // The rendered card image, with or without the art image loaded yet
     // = null while invalid
     private BufferedImage cardImage;
@@ -230,7 +236,7 @@ public class CardPanelRenderImpl extends CardPanel {
         super(newGameCard, gameId, loadImage, callback, foil, dimension);
 
         // Renderer
-        cardRenderer = new ModernCardRenderer(gameCard, isTransformed());
+        cardRenderer = cardRendererFactory.create(gameCard, isTransformed());
 
         // Draw the parts
         initialDraw();
@@ -244,6 +250,8 @@ public class CardPanelRenderImpl extends CardPanel {
             // Use the art image and current rendered image from the card
             artImage = impl.artImage;
             cardRenderer.setArtImage(artImage);
+            faceArtImage = impl.faceArtImage;
+            cardRenderer.setFaceArtImage(faceArtImage);
             cardImage = impl.cardImage;
         }
     }
@@ -257,19 +265,18 @@ public class CardPanelRenderImpl extends CardPanel {
                     = new ImageKey(gameCard, artImage,
                             getCardWidth(), getCardHeight(),
                             isChoosable(), isSelected());
-            cardImage = IMAGE_CACHE.get(key);
+            cardImage = IMAGE_CACHE.computeIfAbsent(key, k -> renderCard());
 
             // No cached copy exists? Render one and cache it
-            if (cardImage == null) {
-                cardImage = renderCard();
-                IMAGE_CACHE.put(key, cardImage);
-            }
         }
 
         // And draw the image we now have
         g.drawImage(cardImage, getCardXOffset(), getCardYOffset(), null);
     }
 
+    /**
+     * Create an appropriate card renderer for the
+     */
     /**
      * Render the card to a new BufferedImage at it's current dimensions
      *
@@ -292,7 +299,7 @@ public class CardPanelRenderImpl extends CardPanel {
                 = new CardPanelAttributes(cardWidth, cardHeight, isChoosable(), isSelected());
 
         // Draw card itself
-        cardRenderer.draw(g2d, attribs);
+        cardRenderer.draw(g2d, attribs, image);
 
         // Done
         g2d.dispose();
@@ -307,6 +314,7 @@ public class CardPanelRenderImpl extends CardPanel {
         artImage = null;
         cardImage = null;
         cardRenderer.setArtImage(null);
+        cardRenderer.setFaceArtImage(null);
 
         // Stop animation
         tappedAngle = isTapped() ? CardPanel.TAPPED_ANGLE : 0;
@@ -321,39 +329,40 @@ public class CardPanelRenderImpl extends CardPanel {
         // Submit a task to draw with the card art when it arrives
         if (artImage == null) {
             final int stamp = ++updateArtImageStamp;
-            Util.threadPool.submit(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        final BufferedImage srcImage;
-                        if (gameCard.isFaceDown()) {
-                            // Nothing to do
-                            srcImage = null;
-                        } else if (getCardWidth() > THUMBNAIL_SIZE_FULL.width) {
-                            srcImage = ImageCache.getImage(gameCard, getCardWidth(), getCardHeight());
-                        } else {
-                            srcImage = ImageCache.getThumbnail(gameCard);
-                        }
-
-                        UI.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (stamp == updateArtImageStamp) {
-                                    artImage = srcImage;
-                                    cardRenderer.setArtImage(srcImage);
-                                    if (srcImage != null) {
-                                        // Invalidate and repaint
-                                        cardImage = null;
-                                        repaint();
-                                    }
-                                }
-                            }
-                        });
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } catch (Error err) {
-                        err.printStackTrace();
+            Util.threadPool.submit(() -> {
+                try {
+                    final BufferedImage srcImage;
+                    final BufferedImage faceArtSrcImage;
+                    if (gameCard.isFaceDown()) {
+                        // Nothing to do
+                        srcImage = null;
+                        faceArtSrcImage = null;
+                    } else if (getCardWidth() > Constants.THUMBNAIL_SIZE_FULL.width) {
+                        srcImage = ImageCache.getImage(gameCard, getCardWidth(), getCardHeight());
+                        faceArtSrcImage = ImageCache.getFaceImage(gameCard, getCardWidth(), getCardHeight());
+                    } else {
+                        srcImage = ImageCache.getThumbnail(gameCard);
+                        faceArtSrcImage = ImageCache.getFaceImage(gameCard, getCardWidth(), getCardHeight());
                     }
+
+                    UI.invokeLater(() -> {
+                        if (stamp == updateArtImageStamp) {
+                            artImage = srcImage;
+                            cardRenderer.setArtImage(srcImage);
+                            faceArtImage = faceArtSrcImage;
+                            cardRenderer.setFaceArtImage(faceArtSrcImage);
+
+                            if (srcImage != null) {
+                                // Invalidate and repaint
+                                cardImage = null;
+                                repaint();
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } catch (Error err) {
+                    err.printStackTrace();
                 }
             });
         }
@@ -366,8 +375,9 @@ public class CardPanelRenderImpl extends CardPanel {
 
         // Update renderer
         cardImage = null;
-        cardRenderer = new ModernCardRenderer(gameCard, isTransformed());
+        cardRenderer = cardRendererFactory.create(gameCard, isTransformed());
         cardRenderer.setArtImage(artImage);
+        cardRenderer.setFaceArtImage(faceArtImage);
 
         // Repaint
         repaint();
@@ -396,7 +406,7 @@ public class CardPanelRenderImpl extends CardPanel {
         } else if (this.gameCard instanceof StackAbilityView) {
             return ImageCache.getMorphImage();
         } else {
-            return ImageCache.loadImage(new TFile(DirectLinksForDownload.outDir + File.separator + DirectLinksForDownload.cardbackFilename));
+            return ImageCache.getCardbackImage();
         }
     }
 

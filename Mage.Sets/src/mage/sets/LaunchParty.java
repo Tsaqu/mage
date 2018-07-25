@@ -1,47 +1,20 @@
-/*
-* Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are
-* permitted provided that the following conditions are met:
-*
-*    1. Redistributions of source code must retain the above copyright notice, this list of
-*       conditions and the following disclaimer.
-*
-*    2. Redistributions in binary form must reproduce the above copyright notice, this list
-*       of conditions and the following disclaimer in the documentation and/or other materials
-*       provided with the distribution.
-*
-* THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-* FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*
-* The views and conclusions contained in the software and documentation are those of the
-* authors and should not be interpreted as representing official policies, either expressed
-* or implied, of BetaSteward_at_googlemail.com.
-*/
 
 package mage.sets;
 
-import mage.constants.SetType;
 import mage.cards.ExpansionSet;
 import mage.constants.Rarity;
+import mage.constants.SetType;
 
 /**
  *
  * @author fireshoes
  */
-public class LaunchParty extends ExpansionSet {
+public final class LaunchParty extends ExpansionSet {
 
-    private static final LaunchParty fINSTANCE = new LaunchParty();
+    private static final LaunchParty instance = new LaunchParty();
 
     public static LaunchParty getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     private LaunchParty() {
@@ -53,6 +26,7 @@ public class LaunchParty extends ExpansionSet {
         cards.add(new SetCardInfo("Angel of Deliverance", 35, Rarity.RARE, mage.cards.a.AngelOfDeliverance.class));
         cards.add(new SetCardInfo("Ant Queen", 7, Rarity.RARE, mage.cards.a.AntQueen.class));
         cards.add(new SetCardInfo("Bident of Thassa", 24, Rarity.RARE, mage.cards.b.BidentOfThassa.class));
+        cards.add(new SetCardInfo("Bishop of Rebirth", 41, Rarity.RARE, mage.cards.b.BishopOfRebirth.class));
         cards.add(new SetCardInfo("Blight Herder", 32, Rarity.RARE, mage.cards.b.BlightHerder.class));
         cards.add(new SetCardInfo("Breaking // Entering", 22, Rarity.RARE, mage.cards.b.BreakingEntering.class));
         cards.add(new SetCardInfo("Colossal Whale", 23, Rarity.RARE, mage.cards.c.ColossalWhale.class));
@@ -74,7 +48,10 @@ public class LaunchParty extends ExpansionSet {
         cards.add(new SetCardInfo("Mizzium Meddler", 31, Rarity.RARE, mage.cards.m.MizziumMeddler.class));
         cards.add(new SetCardInfo("Mondronen Shaman", 17, Rarity.RARE, mage.cards.m.MondronenShaman.class));
         cards.add(new SetCardInfo("Obelisk of Alara", 5, Rarity.RARE, mage.cards.o.ObeliskOfAlara.class));
+        cards.add(new SetCardInfo("Oracle's Vault", 39, Rarity.RARE, mage.cards.o.OraclesVault.class));
         cards.add(new SetCardInfo("Phyrexian Metamorph", 14, Rarity.RARE, mage.cards.p.PhyrexianMetamorph.class));
+        cards.add(new SetCardInfo("Quicksmith Rebel", 38, Rarity.RARE, mage.cards.q.QuicksmithRebel.class));
+        cards.add(new SetCardInfo("Ramunap Excavator", 40, Rarity.RARE, mage.cards.r.RamunapExcavator.class));
         cards.add(new SetCardInfo("Restoration Angel", 18, Rarity.RARE, mage.cards.r.RestorationAngel.class));
         cards.add(new SetCardInfo("Saheeli's Artistry", 37, Rarity.RARE, mage.cards.s.SaheelisArtistry.class));
         cards.add(new SetCardInfo("Sandsteppe Mastodon", 29, Rarity.RARE, mage.cards.s.SandsteppeMastodon.class));

@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.k;
 
 import java.util.ArrayList;
@@ -36,17 +10,17 @@ import mage.abilities.DelayedTriggeredAbility;
 import mage.abilities.LoyaltyAbility;
 import mage.abilities.common.PlanswalkerEntersWithLoyalityCountersAbility;
 import mage.abilities.effects.OneShotEffect;
-import mage.abilities.effects.common.ExileFromZoneTargetEffect;
-import mage.abilities.effects.common.ExileTargetEffect;
+import mage.abilities.effects.common.ExileTargetForSourceEffect;
 import mage.cards.Card;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.cards.Cards;
 import mage.cards.CardsImpl;
 import mage.constants.CardType;
+import mage.constants.SubType;
 import mage.constants.Outcome;
+import mage.constants.SuperType;
 import mage.constants.Zone;
-import mage.filter.FilterCard;
 import mage.game.ExileZone;
 import mage.game.Game;
 import mage.game.command.Commander;
@@ -57,33 +31,33 @@ import mage.game.permanent.PermanentImpl;
 import mage.players.Player;
 import mage.target.TargetPermanent;
 import mage.target.TargetPlayer;
+import mage.target.common.TargetCardInHand;
 import mage.util.CardUtil;
 
 /**
  *
- * @author anonymous
+ * @author bunchOfDevs
  */
-public class KarnLiberated extends CardImpl {
-
-    private UUID exileId = UUID.randomUUID();
+public final class KarnLiberated extends CardImpl {
 
     public KarnLiberated(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.PLANESWALKER},"{7}");
-        this.subtype.add("Karn");
+        super(ownerId, setInfo, new CardType[]{CardType.PLANESWALKER}, "{7}");
+        this.addSuperType(SuperType.LEGENDARY);
+        this.subtype.add(SubType.KARN);
         this.addAbility(new PlanswalkerEntersWithLoyalityCountersAbility(6));
 
-        // +4: Target player exiles a card from his or her hand.
-        LoyaltyAbility ability1 = new LoyaltyAbility(new ExileFromZoneTargetEffect(Zone.HAND, exileId, this.getIdName(), new FilterCard()), 4);
+        // +4: Target player exiles a card from their hand.
+        LoyaltyAbility ability1 = new LoyaltyAbility(new KarnPlayerExileEffect(), 4);
         ability1.addTarget(new TargetPlayer());
         this.addAbility(ability1);
 
         // -3: Exile target permanent.
-        LoyaltyAbility ability2 = new LoyaltyAbility(new ExileTargetEffect(exileId, this.getIdName()), -3);
+        LoyaltyAbility ability2 = new LoyaltyAbility(new ExileTargetForSourceEffect(), -3);
         ability2.addTarget(new TargetPermanent());
         this.addAbility(ability2);
 
         // -14: Restart the game, leaving in exile all non-Aura permanent cards exiled with Karn Liberated. Then put those cards onto the battlefield under your control.
-        this.addAbility(new LoyaltyAbility(new KarnLiberatedEffect(exileId), -14));
+        this.addAbility(new LoyaltyAbility(new KarnLiberatedEffect(), -14));
     }
 
     public KarnLiberated(final KarnLiberated card) {
@@ -100,15 +74,13 @@ class KarnLiberatedEffect extends OneShotEffect {
 
     private UUID exileId;
 
-    public KarnLiberatedEffect(UUID exileId) {
+    public KarnLiberatedEffect() {
         super(Outcome.ExtraTurn);
-        this.exileId = exileId;
         this.staticText = "Restart the game, leaving in exile all non-Aura permanent cards exiled with {this}. Then put those cards onto the battlefield under your control";
     }
 
     public KarnLiberatedEffect(final KarnLiberatedEffect effect) {
         super(effect);
-        this.exileId = effect.exileId;
     }
 
     @Override
@@ -119,9 +91,11 @@ class KarnLiberatedEffect extends OneShotEffect {
         }
         List<Card> cards = new ArrayList<>();
         for (ExileZone zone : game.getExile().getExileZones()) {
+            exileId = CardUtil.getExileZoneId(game, source.getSourceId(), source.getSourceObjectZoneChangeCounter());
             if (zone.getId().equals(exileId)) {
                 for (Card card : zone.getCards(game)) {
-                    if (!card.getSubtype(game).contains("Aura") && CardUtil.isPermanentCard(card)) {
+                    if (!card.hasSubtype(SubType.AURA, game)
+                            && card.isPermanent()) {
                         cards.add(card);
                     }
                 }
@@ -137,10 +111,10 @@ class KarnLiberatedEffect extends OneShotEffect {
                 player.getHand().clear();
                 player.getLibrary().clear();
                 for (Card card : game.getCards()) {
-                    if (card.getOwnerId().equals(player.getId()) && !card.isCopy() // no copies
+                    if (card.isOwnedBy(player.getId()) && !card.isCopy() // no copies
                             && !player.getSideboard().contains(card.getId())
                             && !cards.contains(card)) { // not the exiled cards
-                        if (card.getId().equals(player.getCommanderId())) {
+                        if (player.getCommandersIds().contains(card.getId())) {
                             game.addCommander(new Commander(card));
                             game.setZone(card.getId(), Zone.COMMAND);
                         } else {
@@ -153,11 +127,13 @@ class KarnLiberatedEffect extends OneShotEffect {
         }
         for (Card card : cards) {
             game.getState().setZone(card.getId(), Zone.EXILED);
-            if (CardUtil.isPermanentCard(card) && !card.getSubtype(game).contains("Aura")) {
+            if (card.isPermanent()
+                    && !card.hasSubtype(SubType.AURA, game)) {
                 game.getExile().add(exileId, sourceObject.getIdName(), card);
             }
         }
         game.addDelayedTriggeredAbility(new KarnLiberatedDelayedTriggeredAbility(exileId), source);
+        game.setStartingPlayerId(source.getControllerId());
         game.start(null);
         return true;
     }
@@ -221,13 +197,19 @@ class KarnLiberatedDelayedEffect extends OneShotEffect {
                 // since the beginning of the first turn. They can attack and their activated abilities with {T} in the cost can be activated.
                 Cards cards = new CardsImpl(); // needed because putOntoTheBattlefield removes from exile
                 cards.addAll(exile);
-                controller.moveCards(cards, Zone.BATTLEFIELD, source, game);
-                for (Card card : cards.getCards(game)) {
-                    Permanent permanent = game.getPermanent(card.getId());
-                    ((PermanentImpl) permanent).removeSummoningSickness();
+                if (!cards.isEmpty()) {
+                    controller.moveCards(cards, Zone.BATTLEFIELD, source, game);
+                    for (Card card : cards.getCards(game)) {
+                        if (card != null) {
+                            Permanent permanent = game.getPermanent(card.getId());
+                            if (permanent != null) {
+                                ((PermanentImpl) permanent).removeSummoningSickness();
+                            }
+                        }
+                    }
                 }
-                return true;
             }
+            return true;
         }
         return false;
     }
@@ -235,6 +217,43 @@ class KarnLiberatedDelayedEffect extends OneShotEffect {
     @Override
     public KarnLiberatedDelayedEffect copy() {
         return new KarnLiberatedDelayedEffect(this);
+    }
+
+}
+
+class KarnPlayerExileEffect extends OneShotEffect {
+
+    public KarnPlayerExileEffect() {
+        super(Outcome.Exile);
+        staticText = "target player exiles a card from their hand.";
+    }
+
+    public KarnPlayerExileEffect(final KarnPlayerExileEffect effect) {
+        super(effect);
+    }
+
+    @Override
+    public boolean apply(Game game, Ability source) {
+        Player player = game.getPlayer(targetPointer.getFirst(game, source));
+        MageObject sourceObject = source.getSourceObject(game);
+        if (sourceObject == null) {
+            return false;
+        }
+        if (player == null) {
+            return false;
+        }
+        TargetCardInHand target = new TargetCardInHand();
+        if (target.canChoose(source.getSourceId(), player.getId(), game)
+                && target.chooseTarget(Outcome.Exile, player.getId(), source, game)) {
+            UUID exileId = CardUtil.getExileZoneId(game, source.getSourceId(), source.getSourceObjectZoneChangeCounter());
+            return player.moveCardsToExile(new CardsImpl(target.getTargets()).getCards(game), source, game, true, exileId, sourceObject.getIdName());
+        }
+        return false;
+    }
+
+    @Override
+    public KarnPlayerExileEffect copy() {
+        return new KarnPlayerExileEffect(this);
     }
 
 }

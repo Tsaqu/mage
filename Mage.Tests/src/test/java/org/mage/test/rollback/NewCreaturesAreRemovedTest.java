@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package org.mage.test.rollback;
 
 import mage.constants.PhaseStep;
@@ -49,7 +23,7 @@ public class NewCreaturesAreRemovedTest extends CardTestPlayerBase {
     @Test
     public void testTamiyosJournal() {
         addCard(Zone.BATTLEFIELD, playerA, "Swamp", 5);
-        // At the beginning of your upkeep, investigate (Put a colorless Clue artifact token onto the battlefield with \"{2}, Sacrifice this artifact: Draw a card.\").
+        // At the beginning of your upkeep, investigate (Create a colorless Clue artifact token onto the battlefield with \"{2}, Sacrifice this artifact: Draw a card.\").
         // {T}, Sacrifice three Clues: Search your library for a card and put that card into your hand. Then shuffle your library.
         addCard(Zone.HAND, playerA, "Tamiyo's Journal"); // Artifact {5}
         addCard(Zone.BATTLEFIELD, playerA, "Silvercoat Lion", 3);
@@ -58,7 +32,7 @@ public class NewCreaturesAreRemovedTest extends CardTestPlayerBase {
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Tamiyo's Journal");
 
         // As Port Town enters the battlefield, you may reveal a Plains or Island card from your hand. If you don't, Port Town enters the battlefield tapped.
-        // {T}: Add {W} or {U} to your mana pool.
+        // {T}: Add {W} or {U}.
         addCard(Zone.HAND, playerA, "Port Town"); // Land
         addCard(Zone.HAND, playerA, "Island"); // Land
 
@@ -89,12 +63,12 @@ public class NewCreaturesAreRemovedTest extends CardTestPlayerBase {
     @Test
     public void testTamiyosJournalAndRollback() {
         addCard(Zone.BATTLEFIELD, playerA, "Swamp", 5);
-        // At the beginning of your upkeep, investigate (Put a colorless Clue artifact token onto the battlefield with \"{2}, Sacrifice this artifact: Draw a card.\").
+        // At the beginning of your upkeep, investigate (Create a colorless Clue artifact token onto the battlefield with \"{2}, Sacrifice this artifact: Draw a card.\").
         // {T}, Sacrifice three Clues: Search your library for a card and put that card into your hand. Then shuffle your library.
         addCard(Zone.HAND, playerA, "Tamiyo's Journal"); // Artifact {5}
 
         // As Port Town enters the battlefield, you may reveal a Plains or Island card from your hand. If you don't, Port Town enters the battlefield tapped.
-        // {T}: Add {W} or {U} to your mana pool.
+        // {T}: Add {W} or {U}.
         addCard(Zone.HAND, playerA, "Port Town"); // Land
         addCard(Zone.HAND, playerA, "Island"); // Land
 

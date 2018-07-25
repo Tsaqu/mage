@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.f;
 
 import java.util.UUID;
@@ -42,15 +16,15 @@ import mage.abilities.keyword.IntimidateAbility;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.CardType;
+import mage.constants.SubType;
 import mage.constants.Outcome;
 import mage.constants.Zone;
 import mage.counters.CounterType;
-import mage.filter.common.FilterControlledCreaturePermanent;
-import mage.filter.predicate.permanent.AnotherPredicate;
+import mage.filter.StaticFilters;
 import mage.game.Game;
 import mage.game.events.GameEvent;
 import mage.game.permanent.Permanent;
-import mage.game.permanent.token.Token;
+import mage.game.permanent.token.FleshCarverHorrorToken;
 import mage.players.Player;
 import mage.target.common.TargetControlledPermanent;
 
@@ -58,18 +32,12 @@ import mage.target.common.TargetControlledPermanent;
  *
  * @author LevelX2
  */
-public class FleshCarver extends CardImpl {
-
-    private static final FilterControlledCreaturePermanent filter = new FilterControlledCreaturePermanent("another creature");
-
-    static {
-        filter.add(new AnotherPredicate());
-    }
+public final class FleshCarver extends CardImpl {
 
     public FleshCarver(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{2}{B}");
-        this.subtype.add("Human");
-        this.subtype.add("Wizard");
+        super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{2}{B}");
+        this.subtype.add(SubType.HUMAN);
+        this.subtype.add(SubType.WIZARD);
 
         this.power = new MageInt(2);
         this.toughness = new MageInt(2);
@@ -78,10 +46,10 @@ public class FleshCarver extends CardImpl {
         this.addAbility(IntimidateAbility.getInstance());
         // {1}{B}, Sacrifice another creature: Put two +1/+1 counters on Flesh Carver.
         Ability ability = new SimpleActivatedAbility(Zone.BATTLEFIELD, new AddCountersSourceEffect(CounterType.P1P1.createInstance(2)), new ManaCostsImpl("{1}{B}"));
-        ability.addCost(new SacrificeTargetCost(new TargetControlledPermanent(filter)));
+        ability.addCost(new SacrificeTargetCost(new TargetControlledPermanent(StaticFilters.FILTER_CONTROLLED_ANOTHER_CREATURE)));
         this.addAbility(ability);
 
-        // When Flesh Carver dies, put an X/X black Horror creature token onto the battlefield, where X is Flesh Carver's power.
+        // When Flesh Carver dies, create an X/X black Horror creature token, where X is Flesh Carver's power.
         this.addAbility(new FleshCarverAbility());
     }
 
@@ -96,6 +64,7 @@ public class FleshCarver extends CardImpl {
 }
 
 class FleshCarverAbility extends DiesTriggeredAbility {
+
     public FleshCarverAbility() {
         super(new FleshCarverEffect(), false);
     }
@@ -113,8 +82,8 @@ class FleshCarverAbility extends DiesTriggeredAbility {
     public boolean checkTrigger(GameEvent event, Game game) {
         if (super.checkTrigger(event, game)) {
             Permanent permanent = (Permanent) game.getLastKnownInformation(event.getTargetId(), Zone.BATTLEFIELD);
-            if (permanent !=null) {
-                for (Effect effect :this.getEffects()) {
+            if (permanent != null) {
+                for (Effect effect : this.getEffects()) {
                     effect.setValue("power", permanent.getPower().getValue());
                 }
                 return true;
@@ -133,7 +102,7 @@ class FleshCarverEffect extends OneShotEffect {
 
     public FleshCarverEffect() {
         super(Outcome.DestroyPermanent);
-        staticText = "put an X/X black Horror creature token onto the battlefield, where X is {this}'s power";
+        staticText = "create an X/X black Horror creature token, where X is {this}'s power";
     }
 
     public FleshCarverEffect(FleshCarverEffect ability) {
@@ -155,18 +124,4 @@ class FleshCarverEffect extends OneShotEffect {
         return new FleshCarverEffect(this);
     }
 
-}
-
-class FleshCarverHorrorToken extends Token {
-
-    public FleshCarverHorrorToken(int xValue) {
-        super("Horror", "X/X black Horror creature token");
-        setOriginalExpansionSetCode("C14");
-        cardType.add(CardType.CREATURE);
-        color.setBlack(true);
-        subtype.add("Horror");
-        power = new MageInt(xValue);
-        toughness = new MageInt(xValue);
-
-    }
 }

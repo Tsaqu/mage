@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.abilities.effects.common;
 
 import java.io.ObjectStreamException;
@@ -49,9 +23,9 @@ import mage.target.common.TargetOpponent;
 /**
  * 1. The controller of the spell or ability chooses an opponent. (This doesn't
  * target the opponent.) 2. Each player involved in the clash reveals the top
- * card of his or her library. 3. The converted mana costs of the revealed cards
+ * card of their library. 3. The converted mana costs of the revealed cards
  * are noted. 4. In turn order, each player involved in the clash chooses to put
- * his or her revealed card on either the top or bottom of his or her library.
+ * their revealed card on either the top or bottom of their library.
  * (Note that the player whose turn it is does this first, not necessarily the
  * controller of the clash spell or ability.) When the second player makes this
  * decision, he or she will know what the first player chose. Then all cards are
@@ -83,10 +57,10 @@ import mage.target.common.TargetOpponent;
  */
 public class ClashEffect extends OneShotEffect implements MageSingleton {
 
-    private static final ClashEffect fINSTANCE = new ClashEffect();
+    private static final ClashEffect instance = new ClashEffect();
 
     private Object readResolve() throws ObjectStreamException {
-        return fINSTANCE;
+        return instance;
     }
 
     private ClashEffect() {
@@ -95,7 +69,7 @@ public class ClashEffect extends OneShotEffect implements MageSingleton {
     }
 
     public static ClashEffect getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     public ClashEffect(final ClashEffect effect) {
@@ -128,24 +102,24 @@ public class ClashEffect extends OneShotEffect implements MageSingleton {
                     // Reveal top cards of involved players
                     StringBuilder message = new StringBuilder("Clash: ");
                     message.append(controller.getLogName());
-                    if (controller.getLibrary().size() > 0) {
+                    if (controller.getLibrary().hasCards()) {
                         Cards cards = new CardsImpl();
                         cardController = controller.getLibrary().getFromTop(game);
                         cards.add(cardController);
                         controller.revealCards(sourceObject.getIdName() + ": Clash card of " + controller.getName(), cards, game);
                         cmcController = cardController.getConvertedManaCost();
-                        message.append(" (").append(cmcController).append(")");
+                        message.append(" (").append(cmcController).append(')');
                     } else {
                         message.append(" no card");
                     }
                     message.append(" vs. ").append(opponent.getLogName());
-                    if (opponent.getLibrary().size() > 0) {
+                    if (opponent.getLibrary().hasCards()) {
                         Cards cards = new CardsImpl();
                         cardOpponent = opponent.getLibrary().getFromTop(game);
                         cards.add(cardOpponent);
                         opponent.revealCards(sourceObject.getIdName() + ": Clash card of " + opponent.getName(), cards, game);
                         cmcOpponent = cardOpponent.getConvertedManaCost();
-                        message.append(" (").append(cmcOpponent).append(")");
+                        message.append(" (").append(cmcOpponent).append(')');
                     } else {
                         message.append(" no card");
                     }

@@ -1,35 +1,11 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.game.events;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import mage.MageObjectReference;
 import mage.constants.Zone;
 
 /**
@@ -46,7 +22,8 @@ public class GameEvent implements Serializable {
     protected boolean flag;
     protected String data;
     protected Zone zone;
-    protected ArrayList<UUID> appliedEffects = new ArrayList<>();
+    protected List<UUID> appliedEffects = new ArrayList<>();
+    protected MageObjectReference reference; // e.g. the permitting object for casting a spell from non hand zone
     protected UUID customEventType = null;
 
     public enum EventType {
@@ -68,7 +45,7 @@ public class GameEvent implements Serializable {
         BEGIN_COMBAT_STEP_PRE, BEGIN_COMBAT_STEP, BEGIN_COMBAT_STEP_POST,
         DECLARE_ATTACKERS_STEP_PRE, DECLARE_ATTACKERS_STEP, DECLARE_ATTACKERS_STEP_POST,
         DECLARE_BLOCKERS_STEP_PRE, DECLARE_BLOCKERS_STEP, DECLARE_BLOCKERS_STEP_POST,
-        COMBAT_DAMAGE_STEP_PRE, COMBAT_DAMAGE_STEP, COMBAT_DAMAGE_STEP_POST,
+        COMBAT_DAMAGE_STEP, COMBAT_DAMAGE_STEP_PRE, COMBAT_DAMAGE_STEP_PRIORITY, COMBAT_DAMAGE_STEP_POST,
         END_COMBAT_STEP_PRE, END_COMBAT_STEP, END_COMBAT_STEP_POST,
         POSTCOMBAT_MAIN_PHASE, POSTCOMBAT_MAIN_PHASE_PRE, POSTCOMBAT_MAIN_PHASE_POST,
         POSTCOMBAT_MAIN_STEP_PRE, POSTCOMBAT_MAIN_STEP, POSTCOMBAT_MAIN_STEP_POST,
@@ -88,10 +65,14 @@ public class GameEvent implements Serializable {
         ZONE_CHANGE,
         ZONE_CHANGE_GROUP,
         EMPTY_DRAW,
+        DRAW_CARDS, // applies to an instruction to draw more than one card before any replacement effects apply to individual cards drawn
         DRAW_CARD, DREW_CARD,
+        EXPLORED,
+        ECHO_PAID,
         MIRACLE_CARD_REVEALED,
         MADNESS_CARD_EXILED,
         INVESTIGATED,
+        KICKED,
         DISCARD_CARD,
         DISCARDED_CARD,
         CYCLE_CARD, CYCLED_CARD,
@@ -117,6 +98,12 @@ public class GameEvent implements Serializable {
          flag        true = from comabat damage - other from non combat damage
          */
         PLAY_LAND, LAND_PLAYED,
+        CREATURE_CHAMPIONED,
+        /* CREATURE_CHAMPIONED
+         targetId    the id of the creature that was championed
+         sourceId    sourceId of the creature using the champion ability
+         playerId    the id of the controlling player
+         */
         CREW_VEHICLE,
         /* CREW_VEHICLE
          targetId    the id of the creature that crewed a vehicle
@@ -160,7 +147,7 @@ public class GameEvent implements Serializable {
          mana        the mana added
          */
         MANA_ADDED,
-        /* MANA_PAYED
+        /* MANA_PAID
          targetId    id if the ability the mana was paid for (not the sourceId)
          sourceId    sourceId of the mana source
          playerId    controller of the ability the mana was paid for
@@ -168,8 +155,8 @@ public class GameEvent implements Serializable {
          flag        indicates a special condition
          data        originalId of the mana producing ability
          */
-        MANA_PAYED,
-        LOSES, LOST, WINS,
+        MANA_PAID,
+        LOSES, LOST, WINS, DRAW_PLAYER,
         TARGET, TARGETED,
         /* TARGETS_VALID
          targetId    id of the spell or id of stack ability the targets were set to
@@ -220,22 +207,53 @@ public class GameEvent implements Serializable {
         ENCHANT_PLAYER, ENCHANTED_PLAYER,
         CAN_TAKE_MULLIGAN,
         FLIP_COIN, COIN_FLIPPED, SCRY, FATESEAL,
+        ROLL_DICE, DICE_ROLLED,
+        ROLL_PLANAR_DIE, PLANAR_DIE_ROLLED,
+        PLANESWALK, PLANESWALKED,
         PAID_CUMULATIVE_UPKEEP,
         DIDNT_PAY_CUMULATIVE_UPKEEP,
         //permanent events
-        ENTERS_THE_BATTLEFIELD,
+        ENTERS_THE_BATTLEFIELD_SELF, /* 616.1a If any of the replacement and/or prevention effects are self-replacement effects (see rule 614.15),
+                                        one of them must be chosen. If not, proceed to rule 616.1b. */
+        ENTERS_THE_BATTLEFIELD_CONTROL, // 616.1b
+        ENTERS_THE_BATTLEFIELD_COPY, // 616.1c
+        ENTERS_THE_BATTLEFIELD, // 616.1d
         TAP, TAPPED, TAPPED_FOR_MANA,
         UNTAP, UNTAPPED,
         FLIP, FLIPPED,
         UNFLIP, UNFLIPPED,
         TRANSFORM, TRANSFORMED,
         BECOMES_MONSTROUS,
+        BECOMES_EXERTED,
+        /* BECOMES_EXERTED
+         targetId    id of the exerted creature
+         sourceId    id of the exerted creature
+         playerId    playerId of the player that controlls the creature
+         amount      not used for this event
+         flag        not used for this event
+         */
         BECOMES_RENOWNED,
+        /* BECOMES_MONARCH
+         targetId    playerId of the player that becomes the monarch
+         sourceId    id of the source object that created that effect, if no effect exist it's null
+         playerId    playerId of the player that becomes the monarch
+         amount      not used for this event
+         flag        not used for this event
+         */
+        BECOMES_MONARCH,
         MEDITATED,
         PHASE_OUT, PHASED_OUT,
         PHASE_IN, PHASED_IN,
         TURNFACEUP, TURNEDFACEUP,
         TURNFACEDOWN, TURNEDFACEDOWN,
+        /* OPTION_USED
+         targetId    originalId of the ability that triggered the event
+         sourceId    sourceId of the ability that triggered the event
+         playerId    controller of the ability
+         amount      not used for this event
+         flag        not used for this event
+         */
+        OPTION_USED,
         DAMAGE_CREATURE, DAMAGED_CREATURE,
         DAMAGE_PLANESWALKER, DAMAGED_PLANESWALKER,
         DESTROY_PERMANENT,
@@ -256,7 +274,10 @@ public class GameEvent implements Serializable {
         FIGHTED_PERMANENT,
         EXPLOITED_CREATURE,
         EVOLVED_CREATURE,
+        EMBALMED_CREATURE,
+        ETERNALIZED_CREATURE,
         ATTACH, ATTACHED,
+        STAY_ATTACHED,
         UNATTACH, UNATTACHED,
         ADD_COUNTER, COUNTER_ADDED,
         ADD_COUNTERS, COUNTERS_ADDED,
@@ -287,22 +308,15 @@ public class GameEvent implements Serializable {
         COMBAT_DAMAGE_APPLIED,
         SELECTED_ATTACKER, SELECTED_BLOCKER,
         //custom events
-        CUSTOM_EVENT;
-    }
-
-    private GameEvent(EventType type, UUID customEventType,
-            UUID targetId, UUID sourceId, UUID playerId, int amount, boolean flag) {
-        this.type = type;
-        this.customEventType = customEventType;
-        this.targetId = targetId;
-        this.sourceId = sourceId;
-        this.amount = amount;
-        this.playerId = playerId;
-        this.flag = flag;
+        CUSTOM_EVENT
     }
 
     public GameEvent(EventType type, UUID targetId, UUID sourceId, UUID playerId) {
         this(type, null, targetId, sourceId, playerId, 0, false);
+    }
+
+    public GameEvent(EventType type, UUID targetId, UUID sourceId, UUID playerId, MageObjectReference reference) {
+        this(type, null, targetId, sourceId, playerId, 0, false, reference);
     }
 
     public GameEvent(EventType type, UUID targetId, UUID sourceId, UUID playerId, int amount, boolean flag) {
@@ -325,12 +339,16 @@ public class GameEvent implements Serializable {
         return new GameEvent(type, targetId, sourceId, playerId);
     }
 
+    public static GameEvent getEvent(EventType type, UUID targetId, UUID sourceId, UUID playerId, MageObjectReference reference) {
+        return new GameEvent(type, targetId, sourceId, playerId, reference);
+    }
+
     public static GameEvent getEvent(EventType type, UUID targetId, UUID playerId) {
         return new GameEvent(type, targetId, null, playerId);
     }
 
-    public static GameEvent getEvent(EventType type, UUID targetId, UUID playerId, String data, int amount) {
-        GameEvent event = getEvent(type, targetId, playerId);
+    public static GameEvent getEvent(EventType type, UUID targetId, UUID sourceId, UUID playerId, String data, int amount) {
+        GameEvent event = getEvent(type, targetId, sourceId, playerId);
         event.setAmount(amount);
         event.setData(data);
         return event;
@@ -353,6 +371,23 @@ public class GameEvent implements Serializable {
         event.setAmount(amount);
         event.setData(data);
         return event;
+    }
+
+    private GameEvent(EventType type, UUID customEventType,
+            UUID targetId, UUID sourceId, UUID playerId, int amount, boolean flag) {
+        this(type, customEventType, targetId, sourceId, playerId, amount, flag, null);
+    }
+
+    private GameEvent(EventType type, UUID customEventType,
+            UUID targetId, UUID sourceId, UUID playerId, int amount, boolean flag, MageObjectReference reference) {
+        this.type = type;
+        this.customEventType = customEventType;
+        this.targetId = targetId;
+        this.sourceId = sourceId;
+        this.amount = amount;
+        this.playerId = playerId;
+        this.flag = flag;
+        this.reference = reference;
     }
 
     public EventType getType() {
@@ -411,6 +446,14 @@ public class GameEvent implements Serializable {
         this.zone = zone;
     }
 
+    public MageObjectReference getAdditionalReference() {
+        return reference;
+    }
+
+    public void setAdditionalReference(MageObjectReference additionalReference) {
+        this.reference = additionalReference;
+    }
+
     /**
      * used to store which replacement effects were already applied to an event
      * or or any modified events that may replace it
@@ -425,7 +468,7 @@ public class GameEvent implements Serializable {
      *
      * @return
      */
-    public ArrayList<UUID> getAppliedEffects() {
+    public List<UUID> getAppliedEffects() {
         return appliedEffects;
     }
 
@@ -433,12 +476,19 @@ public class GameEvent implements Serializable {
         return type == EventType.CUSTOM_EVENT && this.customEventType.equals(customEventType);
     }
 
-    public void setAppliedEffects(ArrayList<UUID> appliedEffects) {
-        if (this.appliedEffects == null) {
-            this.appliedEffects = new ArrayList<>();
-        }
+    public void addAppliedEffects(List<UUID> appliedEffects) {
         if (appliedEffects != null) {
             this.appliedEffects.addAll(appliedEffects);
+        }
+    }
+
+    public void setAppliedEffects(List<UUID> appliedEffects) {
+        if (appliedEffects != null) {
+            if (this.appliedEffects.isEmpty()) {
+                this.appliedEffects = appliedEffects; // Use object refecence to handle that an replacement effect can only be once applied to an event
+            } else {
+                this.appliedEffects.addAll(appliedEffects);
+            }
         }
     }
 }

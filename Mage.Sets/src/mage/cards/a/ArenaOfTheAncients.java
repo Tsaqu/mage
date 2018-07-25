@@ -13,10 +13,7 @@ import mage.abilities.effects.common.DontUntapInControllersUntapStepAllEffect;
 import mage.abilities.effects.common.TapAllEffect;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
-import mage.constants.CardType;
-import mage.constants.Duration;
-import mage.constants.TargetController;
-import mage.constants.Zone;
+import mage.constants.*;
 import mage.filter.common.FilterCreaturePermanent;
 import mage.filter.predicate.mageobject.SupertypePredicate;
 
@@ -24,23 +21,22 @@ import mage.filter.predicate.mageobject.SupertypePredicate;
  *
  * @author nickmyers
  */
-public class ArenaOfTheAncients extends CardImpl {
+public final class ArenaOfTheAncients extends CardImpl {
     
-    final static FilterCreaturePermanent legendaryFilter = new FilterCreaturePermanent("legendary creatures");
+    private final static FilterCreaturePermanent legendaryFilter = new FilterCreaturePermanent("legendary creatures");
     static {
-        legendaryFilter.add(new SupertypePredicate("Legendary"));
+        legendaryFilter.add(new SupertypePredicate(SuperType.LEGENDARY));
     }
     
     public ArenaOfTheAncients(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId,setInfo,new CardType[]{CardType.ARTIFACT},"{3}");
         
+        // Legendary creatures don't untap during their controllers' untap steps
+        this.addAbility(new SimpleStaticAbility(Zone.BATTLEFIELD, new DontUntapInControllersUntapStepAllEffect(Duration.WhileOnBattlefield, TargetController.ANY, legendaryFilter)));
+
         // When Arena of the Ancients enters the battlefield, tap all Legendary creatures
         Ability tapAllLegendsAbility = new EntersBattlefieldTriggeredAbility(new TapAllEffect(legendaryFilter));
         this.addAbility(tapAllLegendsAbility);
-        
-        // Legendary creatures don't untap during their controllers' untap steps
-        this.addAbility(new SimpleStaticAbility(Zone.BATTLEFIELD, new DontUntapInControllersUntapStepAllEffect(Duration.WhileOnBattlefield, TargetController.ANY, legendaryFilter)));
-        
     }
     
     public ArenaOfTheAncients(final ArenaOfTheAncients card) {

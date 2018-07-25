@@ -1,38 +1,11 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.abilities.costs;
 
 /**
  *
  * @author LevelX2
- * @param <T>
  */
-public class OptionalAdditionalCostImpl<T extends OptionalAdditionalCostImpl> extends CostsImpl<Cost> implements OptionalAdditionalCost {
+public class OptionalAdditionalCostImpl extends CostsImpl<Cost> implements OptionalAdditionalCost {
 
     protected String name;
     protected String reminderText;
@@ -52,7 +25,7 @@ public class OptionalAdditionalCostImpl<T extends OptionalAdditionalCostImpl> ex
         this.delimiter = delimiter;
         this.reminderText = "<i>(" + reminderText + ")</i>";
         this.activatedCounter = 0;
-        this.add((Cost) cost);
+        this.add(cost);
     }
 
     public OptionalAdditionalCostImpl(final OptionalAdditionalCostImpl cost) {
@@ -130,8 +103,6 @@ public class OptionalAdditionalCostImpl<T extends OptionalAdditionalCostImpl> ex
         ++activatedCounter;
     }
 
-    ;
-
     /**
      * Reset the activate and count information
      *
@@ -162,8 +133,6 @@ public class OptionalAdditionalCostImpl<T extends OptionalAdditionalCostImpl> ex
         return repeatable;
     }
 
-    ;
-
     /**
      * Returns if the cost was activated
      *
@@ -174,8 +143,6 @@ public class OptionalAdditionalCostImpl<T extends OptionalAdditionalCostImpl> ex
         return activated;
     }
 
-    ;
-
     /**
      * Returns the number of times the cost was activated
      * @return
@@ -184,8 +151,6 @@ public class OptionalAdditionalCostImpl<T extends OptionalAdditionalCostImpl> ex
     public int getActivateCount() {
         return activatedCounter;
     }
-
-    ;
 
 
     @Override

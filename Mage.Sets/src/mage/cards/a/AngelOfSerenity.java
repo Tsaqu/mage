@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.a;
 
 import java.util.UUID;
@@ -41,6 +15,7 @@ import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.CardType;
 import mage.constants.Outcome;
+import mage.constants.SubType;
 import mage.constants.Zone;
 import mage.filter.FilterCard;
 import mage.filter.common.FilterCreatureCard;
@@ -59,11 +34,11 @@ import mage.util.CardUtil;
  *
  * @author LevelX2
  */
-public class AngelOfSerenity extends CardImpl {
+public final class AngelOfSerenity extends CardImpl {
 
     public AngelOfSerenity(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{4}{W}{W}{W}");
-        this.subtype.add("Angel");
+        this.subtype.add(SubType.ANGEL);
 
         this.power = new MageInt(5);
         this.toughness = new MageInt(6);
@@ -106,7 +81,7 @@ class AngelOfSerenityTriggeredAbility extends ZoneChangeTriggeredAbility {
             filter.add(new AnotherPredicate());
             TargetCreaturePermanent target1 = new TargetCreaturePermanent(0, 3, filter, false);
             game.getPlayer(getControllerId()).chooseTarget(Outcome.Exile, target1, this, game);
-            if (target1.getTargets().size() > 0) {
+            if (!target1.getTargets().isEmpty()) {
                 getTargets().add(target1);
 
             }
@@ -115,7 +90,7 @@ class AngelOfSerenityTriggeredAbility extends ZoneChangeTriggeredAbility {
                 FilterCard filter2 = new FilterCreatureCard("up to " + leftTargets + " target creature card" + (leftTargets > 1 ? "s" : "") + " from graveyards");
                 TargetCardInGraveyard target2 = new TargetCardInGraveyard(0, leftTargets, filter2);
                 game.getPlayer(getControllerId()).chooseTarget(Outcome.Exile, target2, this, game);
-                if (target2.getTargets().size() > 0) {
+                if (!target2.getTargets().isEmpty()) {
                     getTargets().add(target2);
                 }
             }
@@ -152,7 +127,7 @@ class AngelOfSerenityEnterEffect extends OneShotEffect {
         boolean result = true;
         Player controller = game.getPlayer(source.getControllerId());
         MageObject sourceObject = game.getObject(source.getSourceId());
-        if (controller != null && sourceObject != null && source.getTargets().size() > 0) {
+        if (controller != null && sourceObject != null && !source.getTargets().isEmpty()) {
             UUID exileZoneId = CardUtil.getExileZoneId(game, source.getSourceId(), source.getSourceObjectZoneChangeCounter());
             for (Target target : source.getTargets()) {
                 if (target instanceof TargetCreaturePermanent) {

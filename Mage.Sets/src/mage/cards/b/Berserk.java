@@ -1,33 +1,8 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.b;
 
 import java.util.UUID;
+import mage.MageObjectReference;
 import mage.abilities.Ability;
 import mage.abilities.common.SimpleStaticAbility;
 import mage.abilities.common.delayed.AtTheBeginOfNextEndStepDelayedTriggeredAbility;
@@ -41,11 +16,7 @@ import mage.abilities.effects.common.continuous.GainAbilityTargetEffect;
 import mage.abilities.keyword.TrampleAbility;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
-import mage.constants.CardType;
-import mage.constants.Duration;
-import mage.constants.Outcome;
-import mage.constants.WatcherScope;
-import mage.constants.Zone;
+import mage.constants.*;
 import mage.game.Game;
 import mage.game.events.GameEvent;
 import mage.game.permanent.Permanent;
@@ -59,10 +30,10 @@ import mage.watchers.common.AttackedThisTurnWatcher;
  *
  * @author LevelX2
  */
-public class Berserk extends CardImpl {
+public final class Berserk extends CardImpl {
 
     public Berserk(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.INSTANT},"{G}");
+        super(ownerId, setInfo, new CardType[]{CardType.INSTANT}, "{G}");
 
         // Cast Berserk only before the combat damage step. (Zone = all because it can be at least graveyard or hand)
         this.addAbility(new SimpleStaticAbility(Zone.ALL, new BerserkReplacementEffect()), new CombatDamageStepStartedWatcher());
@@ -72,7 +43,7 @@ public class Berserk extends CardImpl {
         Effect effect = new GainAbilityTargetEffect(TrampleAbility.getInstance(), Duration.EndOfTurn);
         effect.setText("Target creature gains trample");
         this.getSpellAbility().addEffect(effect);
-        effect = new BoostTargetEffect(new TargetPermanentPowerCount(), new StaticValue(0), Duration.EndOfTurn);
+        effect = new BoostTargetEffect(new TargetPermanentPowerCount(), new StaticValue(0), Duration.EndOfTurn, true);
         effect.setText("and gets +X/+0 until end of turn, where X is its power");
         this.getSpellAbility().addEffect(effect);
         this.getSpellAbility().addEffect(new BerserkDestroyEffect());
@@ -95,7 +66,7 @@ class BerserkReplacementEffect extends ContinuousRuleModifyingEffectImpl {
 
     BerserkReplacementEffect() {
         super(Duration.EndOfGame, Outcome.Detriment);
-        staticText = "Cast {this} only before the combat damage step";
+        staticText = "Cast this spell only before the combat damage step";
     }
 
     BerserkReplacementEffect(final BerserkReplacementEffect effect) {
@@ -104,8 +75,8 @@ class BerserkReplacementEffect extends ContinuousRuleModifyingEffectImpl {
 
     @Override
     public boolean applies(GameEvent event, Ability source, Game game) {
-        if (event.getType().equals(GameEvent.EventType.CAST_SPELL) && event.getSourceId().equals(source.getSourceId())) {
-            CombatDamageStepStartedWatcher watcher = (CombatDamageStepStartedWatcher) game.getState().getWatchers().get("CombatDamageStepStarted");
+        if (event.getType() == GameEvent.EventType.CAST_SPELL && event.getSourceId().equals(source.getSourceId())) {
+            CombatDamageStepStartedWatcher watcher = (CombatDamageStepStartedWatcher) game.getState().getWatchers().get(CombatDamageStepStartedWatcher.class.getSimpleName());
             return watcher == null || watcher.conditionMet();
         }
         return false;
@@ -125,7 +96,7 @@ class BerserkReplacementEffect extends ContinuousRuleModifyingEffectImpl {
 class CombatDamageStepStartedWatcher extends Watcher {
 
     public CombatDamageStepStartedWatcher() {
-        super("CombatDamageStepStarted", WatcherScope.GAME);
+        super(CombatDamageStepStartedWatcher.class.getSimpleName(), WatcherScope.GAME);
     }
 
     public CombatDamageStepStartedWatcher(final CombatDamageStepStartedWatcher watcher) {
@@ -199,9 +170,9 @@ class BerserkDelayedDestroyEffect extends OneShotEffect {
         if (controller != null) {
             Permanent permanent = game.getPermanent(this.getTargetPointer().getFirst(game, source));
             if (permanent != null) {
-                Watcher watcher = game.getState().getWatchers().get("AttackedThisTurn");
+                Watcher watcher = game.getState().getWatchers().get(AttackedThisTurnWatcher.class.getSimpleName());
                 if (watcher != null && watcher instanceof AttackedThisTurnWatcher) {
-                    if (((AttackedThisTurnWatcher) watcher).getAttackedThisTurnCreatures().contains(permanent.getId())) {
+                    if (((AttackedThisTurnWatcher) watcher).getAttackedThisTurnCreatures().contains(new MageObjectReference(permanent, game))) {
                         return permanent.destroy(source.getSourceId(), game, false);
                     }
                 }

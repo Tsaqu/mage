@@ -46,7 +46,7 @@ public class BeginningOfCombatTriggeredAbility extends TriggeredAbilityImpl {
                 boolean yours = event.getPlayerId().equals(this.controllerId);
                 if (yours && setTargetPointer) {
                     if (getTargets().isEmpty()) {
-                        this.getEffects().stream().forEach((effect) -> {
+                        this.getEffects().forEach(effect -> {
                             effect.setTargetPointer(new FixedTarget(event.getPlayerId()));
                         });
                     }
@@ -55,7 +55,7 @@ public class BeginningOfCombatTriggeredAbility extends TriggeredAbilityImpl {
             case OPPONENT:
                 if (game.getPlayer(this.controllerId).hasOpponent(event.getPlayerId(), game)) {
                     if (setTargetPointer) {
-                        this.getEffects().stream().forEach((effect) -> {
+                        this.getEffects().forEach(effect -> {
                             effect.setTargetPointer(new FixedTarget(event.getPlayerId()));
                         });
                     }
@@ -64,7 +64,7 @@ public class BeginningOfCombatTriggeredAbility extends TriggeredAbilityImpl {
                 break;
             case ANY:
                 if (setTargetPointer) {
-                    this.getEffects().stream().forEach((effect) -> {
+                    this.getEffects().forEach(effect -> {
                         effect.setTargetPointer(new FixedTarget(event.getPlayerId()));
                     });
                 }
@@ -77,11 +77,11 @@ public class BeginningOfCombatTriggeredAbility extends TriggeredAbilityImpl {
     public String getRule() {
         switch (targetController) {
             case YOU:
-                return "At the beginning of combat on your turn, " + generateZoneString() + getEffects().getText(modes.getMode());
+                return "At the beginning of combat on your turn, " + generateZoneString() + super.getRule();
             case OPPONENT:
-                return "At the beginning of each opponent's combat step, " + generateZoneString() + getEffects().getText(modes.getMode());
+                return "At the beginning of each opponent's combat step, " + generateZoneString() + super.getRule();
             case ANY:
-                return "At the beginning of each combat, " + generateZoneString() + getEffects().getText(modes.getMode());
+                return "At the beginning of each combat, " + generateZoneString() + super.getRule();
         }
         return "";
     }

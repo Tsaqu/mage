@@ -24,26 +24,16 @@ public class MageRoundPane extends JPanel {
 
     private int X_OFFSET = 30;
     private int Y_OFFSET = 30;
-    private final Color defaultBackgroundColor = new Color(141, 130, 112, 200);
+    private final Color defaultBackgroundColor = new Color(141, 130, 112, 200); // color of the frame of the popup window
     private Color backgroundColor = defaultBackgroundColor;
-    private final int alpha = 0;
-    private static Map<ShadowKey, BufferedImage> SHADOW_IMAGE_CACHE;
+    private static final int alpha = 0;
+    private static final Map<ShadowKey, BufferedImage> SHADOW_IMAGE_CACHE;
     private static final Map<Key, BufferedImage> IMAGE_CACHE;
 
     static {
-        SHADOW_IMAGE_CACHE = ImageCaches.register(new MapMaker().softValues().makeComputingMap(new Function<ShadowKey, BufferedImage>() {
-            @Override
-            public BufferedImage apply(ShadowKey key) {
-                return createShadowImage(key);
-            }
-        }));
+        SHADOW_IMAGE_CACHE = ImageCaches.register(new MapMaker().softValues().makeComputingMap((Function<ShadowKey, BufferedImage>) key -> createShadowImage(key)));
 
-        IMAGE_CACHE = ImageCaches.register(new MapMaker().softValues().makeComputingMap(new Function<Key, BufferedImage>() {
-            @Override
-            public BufferedImage apply(Key key) {
-                return createImage(key);
-            }
-        }));
+        IMAGE_CACHE = ImageCaches.register(new MapMaker().softValues().makeComputingMap((Function<Key, BufferedImage>) key -> createImage(key)));
     }
 
     private final static class ShadowKey {

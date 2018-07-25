@@ -17,6 +17,7 @@ import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.AbilityType;
 import mage.constants.CardType;
+import mage.constants.SubType;
 import mage.constants.CostModificationType;
 import mage.constants.Duration;
 import mage.constants.Outcome;
@@ -32,11 +33,11 @@ import mage.util.CardUtil;
  *
  * @author nick.myers
  */
-public class PowerArtifact extends CardImpl {
+public final class PowerArtifact extends CardImpl {
 
     public PowerArtifact(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId,setInfo,new CardType[]{CardType.ENCHANTMENT},"{U}{U}");
-        this.subtype.add("Aura");
+        this.subtype.add(SubType.AURA);
 
         // Enchant artifact
         TargetPermanent auraTarget = new TargetArtifactPermanent();
@@ -93,8 +94,8 @@ class PowerArtifactCostModificationEffect extends CostModificationEffectImpl {
     public boolean applies(Ability abilityToModify, Ability source, Game game) {
         Permanent artifact = game.getPermanent(abilityToModify.getSourceId());
         if (artifact != null && artifact.getAttachments().contains(source.getSourceId())) {
-            if (abilityToModify.getAbilityType().equals(AbilityType.ACTIVATED)
-                    || (abilityToModify.getAbilityType().equals(AbilityType.MANA) && (abilityToModify instanceof ActivatedAbility))) {
+            if (abilityToModify.getAbilityType() == AbilityType.ACTIVATED
+                    || (abilityToModify.getAbilityType() == AbilityType.MANA && (abilityToModify instanceof ActivatedAbility))) {
                 return true;
             }
         }

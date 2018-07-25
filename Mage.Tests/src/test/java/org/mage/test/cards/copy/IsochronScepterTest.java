@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package org.mage.test.cards.copy;
 
 import mage.constants.PhaseStep;
@@ -71,7 +45,7 @@ public class IsochronScepterTest extends CardTestPlayerBase {
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Isochron Scepter");
         addTarget(playerA, "Lightning Bolt");
-        activateAbility(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "{2},{T}:");
+        activateAbility(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "{2}, {T}:");
         setChoice(playerA, "Yes");
         setChoice(playerA, "Yes");
 
@@ -93,7 +67,7 @@ public class IsochronScepterTest extends CardTestPlayerBase {
 
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Isochron Scepter");
         addTarget(playerA, "Lightning Bolt");
-        activateAbility(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "{2},{T}:");
+        activateAbility(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "{2}, {T}:");
         setChoice(playerA, "Yes");
         setChoice(playerA, "No");
 
@@ -118,11 +92,11 @@ public class IsochronScepterTest extends CardTestPlayerBase {
     public void testAngelsGrace() {
         addCard(Zone.BATTLEFIELD, playerA, "Plains", 4);
         addCard(Zone.HAND, playerA, "Isochron Scepter");
+
         // Split second (As long as this spell is on the stack, players can't cast spells or activate abilities that aren't mana abilities.)
         // You can't lose the game this turn and your opponents can't win the game this turn.
         // Until end of turn, damage that would reduce your life total to less than 1 reduces it to 1 instead.
-
-        addCard(Zone.HAND, playerA, "Angel's Grace");
+        addCard(Zone.HAND, playerA, "Angel's Grace"); // Instant {W}
 
         addCard(Zone.BATTLEFIELD, playerB, "Dross Crocodile", 4);// 5/1
         addCard(Zone.HAND, playerB, "Lightning Bolt", 2);
@@ -136,7 +110,7 @@ public class IsochronScepterTest extends CardTestPlayerBase {
         attack(2, playerB, "Dross Crocodile");
         attack(2, playerB, "Dross Crocodile");
 
-        activateAbility(2, PhaseStep.DECLARE_BLOCKERS, playerA, "{2},{T}:");
+        activateAbility(2, PhaseStep.DECLARE_BLOCKERS, playerA, "{2}, {T}:");
         setChoice(playerA, "Yes");
         setChoice(playerA, "Yes");
 
@@ -149,9 +123,6 @@ public class IsochronScepterTest extends CardTestPlayerBase {
         setStopAt(3, PhaseStep.BEGIN_COMBAT);
         execute();
 
-        assertExileCount("Angel's Grace", 1);
-        assertGraveyardCount(playerA, "Angel's Grace", 0);
-
         assertLife(playerA, 1);
         assertLife(playerB, 20);
 
@@ -159,6 +130,9 @@ public class IsochronScepterTest extends CardTestPlayerBase {
         assertGraveyardCount(playerB, "Dross Crocodile", 1);
         assertPermanentCount(playerB, "Dross Crocodile", 3);
         assertPermanentCount(playerA, "Isochron Scepter", 1);
+
+        assertExileCount("Angel's Grace", 1);
+        assertGraveyardCount(playerA, "Angel's Grace", 0);
 
     }
 
@@ -180,7 +154,7 @@ public class IsochronScepterTest extends CardTestPlayerBase {
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Isochron Scepter");
         addTarget(playerA, "Silence");
 
-        activateAbility(2, PhaseStep.UPKEEP, playerA, "{2},{T}:");
+        activateAbility(2, PhaseStep.UPKEEP, playerA, "{2}, {T}:");
         setChoice(playerA, "Yes");
         setChoice(playerA, "Yes");
 

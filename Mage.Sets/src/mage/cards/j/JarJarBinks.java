@@ -1,34 +1,6 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.j;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import mage.MageInt;
 import mage.abilities.Ability;
@@ -40,13 +12,7 @@ import mage.abilities.effects.ContinuousEffectImpl;
 import mage.abilities.effects.OneShotEffect;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
-import mage.constants.CardType;
-import mage.constants.Duration;
-import mage.constants.Layer;
-import mage.constants.Outcome;
-import mage.constants.SubLayer;
-import mage.constants.TargetController;
-import mage.filter.Filter;
+import mage.constants.*;
 import mage.filter.common.FilterControlledCreaturePermanent;
 import mage.filter.predicate.mageobject.PowerPredicate;
 import mage.game.Game;
@@ -54,27 +20,28 @@ import mage.game.permanent.Permanent;
 import mage.players.Player;
 import mage.target.Target;
 import mage.target.TargetPermanent;
-import mage.target.targetpointer.FixedTarget;
-import mage.util.RandomUtil;
+import mage.target.common.TargetOpponent;
 
 /**
  *
  * @author Styxo
  */
-public class JarJarBinks extends CardImpl {
+public final class JarJarBinks extends CardImpl {
 
     public JarJarBinks(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{2}{U}");
-        this.supertype.add("Legendary");
-        this.subtype.add("Gungan");
+        super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{2}{U}");
+        addSuperType(SuperType.LEGENDARY);
+        this.subtype.add(SubType.GUNGAN);
         this.power = new MageInt(0);
         this.toughness = new MageInt(1);
 
         // Jar jar Binks can't block.
         this.addAbility(new CantBlockAbility());
 
-        // When Jar Jar Binks enter the battlefield, an opponent gains control of it.
-        this.addAbility(new EntersBattlefieldTriggeredAbility(new JarJarBinksEffect()));
+        // When Jar Jar Binks enter the battlefield, target opponent gains control of it.
+        Ability ability = new EntersBattlefieldTriggeredAbility(new JarJarBinksEffect());
+        ability.addTarget(new TargetOpponent());
+        this.addAbility(ability);
 
         // At the beggining of combat on your turn, tap the creature you control with the highest power. If two or more creatures are tied for the greatest power, you choose one of them.
         this.addAbility(new BeginningOfCombatTriggeredAbility(new JarJarBinksTapEffect(), TargetController.YOU, false));
@@ -94,7 +61,7 @@ class JarJarBinksEffect extends OneShotEffect {
 
     public JarJarBinksEffect() {
         super(Outcome.GainControl);
-        this.staticText = "an opponent gains control of it";
+        this.staticText = "target opponent gains control of it";
     }
 
     public JarJarBinksEffect(final JarJarBinksEffect effect) {
@@ -109,13 +76,13 @@ class JarJarBinksEffect extends OneShotEffect {
     @Override
     public boolean apply(Game game, Ability source) {
         Permanent jarJar = (Permanent) source.getSourceObjectIfItStillExists(game);
-        List<UUID> list = new ArrayList<UUID>(game.getOpponents(source.getControllerId()));
-        UUID player = list.get(RandomUtil.nextInt(list.size()));
-        if (player != null && jarJar != null) {
+        Player player = game.getPlayer(source.getControllerId());
+        Player opponent = game.getPlayer(getTargetPointer().getFirst(game, source));
+        if (player != null && jarJar != null && opponent != null) {
             ContinuousEffect effect = new JarJarBinksGainControlSourceEffect();
-            effect.setTargetPointer(new FixedTarget(player));
+            effect.setTargetPointer(getTargetPointer());
             game.addEffect(effect, source);
-            game.informPlayers(jarJar.getName() + " is now controlled by " + game.getPlayer(player).getLogName());
+            game.informPlayers(jarJar.getName() + " is now controlled by " + opponent.getLogName());
             return true;
         }
         return false;
@@ -186,7 +153,7 @@ class JarJarBinksTapEffect extends OneShotEffect {
             }
             if (multipleExist) {
                 FilterControlledCreaturePermanent filter = new FilterControlledCreaturePermanent("one of the creatures with the highest power");
-                filter.add(new PowerPredicate(Filter.ComparisonType.Equal, highestPower));
+                filter.add(new PowerPredicate(ComparisonType.EQUAL_TO, highestPower));
                 Target target = new TargetPermanent(filter);
                 target.setNotTarget(true);
                 if (target.canChoose(source.getSourceId(), source.getControllerId(), game)) {

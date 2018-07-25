@@ -7,9 +7,11 @@ package mage.target.targetpointer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import mage.MageObjectReference;
 import mage.abilities.Ability;
+import mage.cards.Card;
 import mage.cards.Cards;
 import mage.game.Game;
 import mage.game.permanent.Permanent;
@@ -21,10 +23,12 @@ import mage.game.permanent.Permanent;
 public class FixedTargets implements TargetPointer {
 
     final ArrayList<MageObjectReference> targets = new ArrayList<>();
+    final ArrayList<UUID> targetsNotInitialized = new ArrayList<>();
+
     private boolean initialized;
 
     public FixedTargets(UUID targetId) {
-        targets.add(new MageObjectReference(targetId));
+        targetsNotInitialized.add(targetId);
         this.initialized = false;
     }
 
@@ -44,8 +48,17 @@ public class FixedTargets implements TargetPointer {
         this.initialized = true;
     }
 
+    public FixedTargets(Set<Card> cards, Game game) {
+        for (Card card : cards) {
+            MageObjectReference mor = new MageObjectReference(card.getId(), card.getZoneChangeCounter(game), game);
+            targets.add(mor);
+        }
+        this.initialized = true;
+    }
+
     private FixedTargets(final FixedTargets fixedTargets) {
         this.targets.addAll(fixedTargets.targets);
+        this.targetsNotInitialized.addAll(fixedTargets.targetsNotInitialized);
         this.initialized = fixedTargets.initialized;
     }
 
@@ -53,8 +66,8 @@ public class FixedTargets implements TargetPointer {
     public void init(Game game, Ability source) {
         if (!initialized) {
             initialized = true;
-            for (MageObjectReference mor : targets) {
-                mor.setZoneChangeCounter(game.getState().getZoneChangeCounter(mor.getSourceId()));
+            for (UUID targetId : targetsNotInitialized) {
+                targets.add(new MageObjectReference(targetId, game.getState().getZoneChangeCounter(targetId), game));
             }
         }
     }
@@ -87,4 +100,20 @@ public class FixedTargets implements TargetPointer {
         return new FixedTargets(this);
     }
 
+    /**
+     * Returns a fixed target for (and only) the first taget
+     *
+     * @param game
+     * @param source
+     * @return
+     */
+    @Override
+    public FixedTarget getFixedTarget(Game game, Ability source) {
+        this.init(game, source);
+        UUID firstId = getFirst(game, source);
+        if (firstId != null) {
+            return new FixedTarget(firstId, game.getState().getZoneChangeCounter(firstId));
+        }
+        return null;
+    }
 }

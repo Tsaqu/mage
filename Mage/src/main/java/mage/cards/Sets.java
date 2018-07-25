@@ -1,32 +1,7 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards;
 
+import mage.Mana;
 import mage.cards.decks.DeckCardInfo;
 import mage.cards.decks.DeckCardLayout;
 import mage.cards.decks.DeckCardLists;
@@ -35,9 +10,12 @@ import mage.cards.repository.CardInfo;
 import mage.cards.repository.CardRepository;
 import mage.constants.CardType;
 import mage.constants.ColoredManaSymbol;
+import mage.constants.Rarity;
+import mage.filter.FilterMana;
 import mage.util.ClassScanner;
 import mage.util.RandomUtil;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -45,15 +23,15 @@ import java.util.*;
 
 /**
  *
- * @author BetaSteward_at_googlemail.com
+ * @author BetaSteward_at_googlemail.com, JayDi85
  */
 public class Sets extends HashMap<String, ExpansionSet> {
 
     private static final Logger logger = Logger.getLogger(Sets.class);
-    private static final Sets fINSTANCE = new Sets();
+    private static final Sets instance = new Sets();
 
     public static Sets getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     private Set<String> customSets = new HashSet<>();
@@ -65,6 +43,7 @@ public class Sets extends HashMap<String, ExpansionSet> {
             try {
                 addSet((ExpansionSet) c.getMethod("getInstance").invoke(null));
             } catch (Exception ex) {
+                logger.error(ex);
             }
         }
     }
@@ -92,23 +71,50 @@ public class Sets extends HashMap<String, ExpansionSet> {
      * @return
      */
     public static List<Card> generateRandomCardPool(int cardsCount, List<ColoredManaSymbol> allowedColors) {
+        return generateRandomCardPool(cardsCount, allowedColors, false);
+    }
+
+    public static List<Card> generateRandomCardPool(int cardsCount, List<ColoredManaSymbol> allowedColors, boolean onlyBasicLands) {
         CardCriteria criteria = new CardCriteria();
-        criteria.notTypes(CardType.LAND);
+
+        if (onlyBasicLands) {
+            // only lands
+            criteria.rarities(Rarity.LAND);
+            criteria.colorless(true); // basic lands is colorless
+        } else {
+            // any card, but not basic lands
+            criteria.notTypes(CardType.LAND);
+
+            // clear colors
+            criteria.white(false);
+            criteria.blue(false);
+            criteria.black(false);
+            criteria.red(false);
+            criteria.green(false);
+            criteria.colorless(false); // colorless is not allowed for gen
+        }
+
+        FilterMana manaNeed = new FilterMana();
         for (ColoredManaSymbol color : allowedColors) {
             switch (color) {
                 case W:
+                    manaNeed.setWhite(true);
                     criteria.white(true);
                     break;
                 case U:
+                    manaNeed.setBlue(true);
                     criteria.blue(true);
                     break;
                 case B:
+                    manaNeed.setBlack(true);
                     criteria.black(true);
                     break;
                 case R:
+                    manaNeed.setRed(true);
                     criteria.red(true);
                     break;
                 case G:
+                    manaNeed.setGreen(true);
                     criteria.green(true);
                     break;
             }
@@ -122,9 +128,38 @@ public class Sets extends HashMap<String, ExpansionSet> {
             CardInfo cardInfo = cards.get(RandomUtil.nextInt(cards.size()));
             Card card = cardInfo != null ? cardInfo.getCard() : null;
             if (card != null) {
-                cardPool.add(card);
-                count++;
+
+                FilterMana manaCard = card.getColorIdentity();
+                boolean cardManaOK = true;
+
+                if (onlyBasicLands) {
+                    // lands is colorless
+                    // discard not needed color by mana produce
+                    Assert.assertEquals("only basic lands allow", 1, card.getMana().size());
+                    for (Mana manaLand : card.getMana()) {
+                        if (manaLand.getWhite() > 0 && !manaNeed.isWhite()) { cardManaOK = false; }
+                        if (manaLand.getBlue() > 0 && !manaNeed.isBlue()) { cardManaOK = false; }
+                        if (manaLand.getBlack() > 0 && !manaNeed.isBlack()) { cardManaOK = false; }
+                        if (manaLand.getRed() > 0 && !manaNeed.isRed()) { cardManaOK = false; }
+                        if (manaLand.getGreen() > 0 && !manaNeed.isGreen()) { cardManaOK = false; }
+                        if (manaLand.getColorless() > 0) { cardManaOK = false; } // ignore colorless land (wastes)
+                    }
+                } else {
+                    // cards
+                    // discard any card that have not needed color
+                    if (manaCard.isWhite() && !manaNeed.isWhite()) { cardManaOK = false; }
+                    if (manaCard.isBlue() && !manaNeed.isBlue()) { cardManaOK = false; }
+                    if (manaCard.isBlack() && !manaNeed.isBlack()) { cardManaOK = false; }
+                    if (manaCard.isRed() && !manaNeed.isRed()) { cardManaOK = false; }
+                    if (manaCard.isGreen() && !manaNeed.isGreen()) { cardManaOK = false; }
+                }
+
+                if (cardManaOK) {
+                    cardPool.add(card);
+                    count++;
+                }
             }
+
             tries++;
             if (tries > 4096) { // to avoid infinite loop
                 throw new IllegalStateException("Not enough cards for chosen colors to generate deck: " + allowedColors);
@@ -135,21 +170,20 @@ public class Sets extends HashMap<String, ExpansionSet> {
     }
 
     public static ExpansionSet findSet(String code) {
-        if (fINSTANCE.containsKey(code)) {
-            return fINSTANCE.get(code);
+        if (instance.containsKey(code)) {
+            return instance.get(code);
         }
         return null;
     }
 
     public static void saveDeck(String file, DeckCardLists deck) throws FileNotFoundException {
-        PrintWriter out = new PrintWriter(file);
         Map<String, DeckCardInfo> deckCards = new HashMap<>();
         Map<String, DeckCardInfo> sideboard = new HashMap<>();
-        try {
-            if (deck.getName() != null && deck.getName().length() > 0) {
+        try (PrintWriter out = new PrintWriter(file)) {
+            if (deck.getName() != null && !deck.getName().isEmpty()) {
                 out.println("NAME:" + deck.getName());
             }
-            if (deck.getAuthor() != null && deck.getAuthor().length() > 0) {
+            if (deck.getAuthor() != null && !deck.getAuthor().isEmpty()) {
                 out.println("AUTHOR:" + deck.getAuthor());
             }
             for (DeckCardInfo deckCardInfo : deck.getCards()) {
@@ -169,10 +203,10 @@ public class Sets extends HashMap<String, ExpansionSet> {
             }
 
             // Write out all of the cards
-            for (Map.Entry<String, DeckCardInfo> entry : deckCards.entrySet()) {
+            for (Entry<String, DeckCardInfo> entry : deckCards.entrySet()) {
                 out.printf("%d [%s:%s] %s%n", entry.getValue().getQuantity(), entry.getValue().getSetCode(), entry.getValue().getCardNum(), entry.getValue().getCardName());
             }
-            for (Map.Entry<String, DeckCardInfo> entry : sideboard.entrySet()) {
+            for (Entry<String, DeckCardInfo> entry : sideboard.entrySet()) {
                 out.printf("SB: %d [%s:%s] %s%n", entry.getValue().getQuantity(), entry.getValue().getSetCode(), entry.getValue().getCardNum(), entry.getValue().getCardName());
             }
 
@@ -183,8 +217,6 @@ public class Sets extends HashMap<String, ExpansionSet> {
             out.print("LAYOUT SIDEBOARD:");
             writeCardLayout(out, deck.getSideboardLayout());
             out.print("\n");
-        } finally {
-            out.close();
         }
     }
 
@@ -195,7 +227,7 @@ public class Sets extends HashMap<String, ExpansionSet> {
         List<List<List<DeckCardInfo>>> cardGrid = layout.getCards();
         int height = cardGrid.size();
         int width = (height > 0) ? cardGrid.get(0).size() : 0;
-        out.print("(" + height + "," + width + ")");
+        out.print("(" + height + ',' + width + ')');
         out.print(layout.getSettings());
         out.print("|");
         for (List<List<DeckCardInfo>> row : cardGrid) {

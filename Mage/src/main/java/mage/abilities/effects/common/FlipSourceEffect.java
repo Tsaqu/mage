@@ -11,7 +11,6 @@ import mage.game.permanent.Permanent;
 import mage.game.permanent.token.Token;
 import mage.players.Player;
 
-
 /**
  * @author Loki
  */
@@ -32,14 +31,15 @@ public class FlipSourceEffect extends OneShotEffect {
 
     @Override
     public boolean apply(Game game, Ability source) {
-        Permanent permanent = game.getPermanent(source.getSourceId());
+        Permanent permanent = source.getSourcePermanentIfItStillExists(game);
         Player controller = game.getPlayer(source.getControllerId());
         if (permanent != null && controller != null) {
             if (permanent.flip(game)) {
-                ContinuousEffect effect = new ConditionalContinuousEffect(new CopyTokenEffect(flipToken), FlippedCondition.getInstance(), "");
+                ContinuousEffect effect = new ConditionalContinuousEffect(new CopyTokenEffect(flipToken), FlippedCondition.instance, "");
                 game.addEffect(effect, source);
-                if (!game.isSimulation())
+                if (!game.isSimulation()) {
                     game.informPlayers(new StringBuilder(controller.getLogName()).append(" flips ").append(permanent.getName()).toString());
+                }
                 return true;
             }
         }

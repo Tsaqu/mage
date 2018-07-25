@@ -1,46 +1,20 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.sets;
 
-import mage.constants.SetType;
 import mage.cards.ExpansionSet;
 import mage.constants.Rarity;
+import mage.constants.SetType;
 
 /**
  *
  * @author North
  */
-public class FifthDawn extends ExpansionSet {
+public final class FifthDawn extends ExpansionSet {
 
-    private static final FifthDawn fINSTANCE = new FifthDawn();
+    private static final FifthDawn instance = new FifthDawn();
 
     public static FifthDawn getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     private FifthDawn() {
@@ -85,7 +59,7 @@ public class FifthDawn extends ExpansionSet {
         cards.add(new SetCardInfo("Cackling Imp", 44, Rarity.COMMON, mage.cards.c.CacklingImp.class));
         cards.add(new SetCardInfo("Channel the Suns", 84, Rarity.UNCOMMON, mage.cards.c.ChannelTheSuns.class));
         cards.add(new SetCardInfo("Chimeric Coils", 108, Rarity.UNCOMMON, mage.cards.c.ChimericCoils.class));
-        cards.add(new SetCardInfo("Circle of Protection: Artifacts", 8, Rarity.COMMON, mage.cards.c.CircleOfProtectionArtifacts.class));
+        cards.add(new SetCardInfo("Circle of Protection: Artifacts", 8, Rarity.UNCOMMON, mage.cards.c.CircleOfProtectionArtifacts.class));
         cards.add(new SetCardInfo("Clearwater Goblet", 109, Rarity.RARE, mage.cards.c.ClearwaterGoblet.class));
         cards.add(new SetCardInfo("Clock of Omens", 110, Rarity.UNCOMMON, mage.cards.c.ClockOfOmens.class));
         cards.add(new SetCardInfo("Composite Golem", 111, Rarity.UNCOMMON, mage.cards.c.CompositeGolem.class));
@@ -159,6 +133,7 @@ public class FifthDawn extends ExpansionSet {
         cards.add(new SetCardInfo("Night's Whisper", 55, Rarity.UNCOMMON, mage.cards.n.NightsWhisper.class));
         cards.add(new SetCardInfo("Nim Grotesque", 56, Rarity.UNCOMMON, mage.cards.n.NimGrotesque.class));
         cards.add(new SetCardInfo("Opaline Bracers", 141, Rarity.COMMON, mage.cards.o.OpalineBracers.class));
+        cards.add(new SetCardInfo("Ouphe Vandals", 90, Rarity.UNCOMMON, mage.cards.o.OupheVandals.class));
         cards.add(new SetCardInfo("Paradise Mantle", 142, Rarity.UNCOMMON, mage.cards.p.ParadiseMantle.class));
         cards.add(new SetCardInfo("Pentad Prism", 143, Rarity.COMMON, mage.cards.p.PentadPrism.class));
         cards.add(new SetCardInfo("Plasma Elemental", 34, Rarity.UNCOMMON, mage.cards.p.PlasmaElemental.class));

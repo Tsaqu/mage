@@ -1,30 +1,4 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 
  /*
  * ShowCardsDialog.java
@@ -109,7 +83,7 @@ public class ShowCardsDialog extends MageDialog {
                 java.util.List<UUID> choosableCards = (java.util.List<UUID>) options.get("choosable");
                 cardArea.markCards(choosableCards);
             }
-            if (options.containsKey("queryType") && QueryType.PICK_ABILITY.equals(options.get("queryType"))) {
+            if (options.containsKey("queryType") && options.get("queryType") == QueryType.PICK_ABILITY) {
                 cardArea.setPopupMenu(popupMenu);
             }
         }
@@ -120,30 +94,31 @@ public class ShowCardsDialog extends MageDialog {
             this.cardArea.addCardEventListener(eventListener);
         }
 
-        if (getParent() != MageFrame.getDesktop() /*|| this.isClosed*/) {
-            MageFrame.getDesktop().add(this, JLayeredPane.DEFAULT_LAYER);
-        }
         pack();
 
         this.revalidate();
         this.repaint();
         this.setModal(modal);
 
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (!positioned) {
-                    int width = ShowCardsDialog.this.getWidth();
-                    int height = ShowCardsDialog.this.getHeight();
-                    if (width > 0 && height > 0) {
-                        Point centered = SettingsManager.getInstance().getComponentPosition(width, height);
-                        ShowCardsDialog.this.setLocation(centered.x, centered.y);
-                        positioned = true;
-                        GuiDisplayUtil.keepComponentInsideScreen(centered.x, centered.y, ShowCardsDialog.this);
-                    }
+        // window settings
+        if (this.isModal()){
+            MageFrame.getDesktop().add(this, JLayeredPane.MODAL_LAYER);
+        }else{
+            MageFrame.getDesktop().add(this, JLayeredPane.PALETTE_LAYER);
+        }
+
+        SwingUtilities.invokeLater(() -> {
+            if (!positioned) {
+                int width = ShowCardsDialog.this.getWidth();
+                int height = ShowCardsDialog.this.getHeight();
+                if (width > 0 && height > 0) {
+                    Point centered = SettingsManager.instance.getComponentPosition(width, height);
+                    ShowCardsDialog.this.setLocation(centered.x, centered.y);
+                    positioned = true;
+                    GuiDisplayUtil.keepComponentInsideScreen(centered.x, centered.y, ShowCardsDialog.this);
                 }
-                ShowCardsDialog.this.setVisible(true);
             }
+            ShowCardsDialog.this.setVisible(true);
         });
     }
 

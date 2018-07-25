@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.m;
 
 import java.util.Set;
@@ -37,12 +11,7 @@ import mage.abilities.effects.ReplacementEffectImpl;
 import mage.abilities.keyword.InfectAbility;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
-import mage.constants.CardType;
-import mage.constants.Duration;
-import mage.constants.Layer;
-import mage.constants.Outcome;
-import mage.constants.SubLayer;
-import mage.constants.Zone;
+import mage.constants.*;
 import mage.counters.CounterType;
 import mage.filter.common.FilterCreaturePermanent;
 import mage.game.Game;
@@ -54,13 +23,13 @@ import mage.game.permanent.Permanent;
  *
  * @author BetaSteward
  */
-public class MeliraSylvokOutcast extends CardImpl {
+public final class MeliraSylvokOutcast extends CardImpl {
 
     public MeliraSylvokOutcast(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{1}{G}");
-        this.supertype.add("Legendary");
-        this.subtype.add("Human");
-        this.subtype.add("Scout");
+        this.addSuperType(SuperType.LEGENDARY);
+        this.subtype.add(SubType.HUMAN);
+        this.subtype.add(SubType.SCOUT);
 
         this.power = new MageInt(2);
         this.toughness = new MageInt(2);
@@ -68,7 +37,7 @@ public class MeliraSylvokOutcast extends CardImpl {
         // You can't get poison counters.
         this.addAbility(new SimpleStaticAbility(Zone.BATTLEFIELD, new MeliraSylvokOutcastEffect()));
 
-        // Creatures you control can't have -1/-1 counters placed on them.
+        // Creatures you control can't have -1/-1 counters put on them.
         this.addAbility(new SimpleStaticAbility(Zone.BATTLEFIELD, new MeliraSylvokOutcastEffect2()));
 
         // Creatures your opponents control lose infect.
@@ -123,7 +92,7 @@ class MeliraSylvokOutcastEffect2 extends ReplacementEffectImpl {
 
     public MeliraSylvokOutcastEffect2() {
         super(Duration.WhileOnBattlefield, Outcome.PreventDamage);
-        staticText = "Creatures you control can't have -1/-1 counters placed on them";
+        staticText = "Creatures you control can't have -1/-1 counters put on them";
     }
 
     public MeliraSylvokOutcastEffect2(final MeliraSylvokOutcastEffect2 effect) {
@@ -152,7 +121,7 @@ class MeliraSylvokOutcastEffect2 extends ReplacementEffectImpl {
             if (perm == null) {
                 perm = game.getPermanentEntering(event.getTargetId());
             }
-            if (perm != null && perm.getCardType().contains(CardType.CREATURE) && perm.getControllerId().equals(source.getControllerId())) {
+            if (perm != null && perm.isCreature() && perm.isControlledBy(source.getControllerId())) {
                 return true;
             }
         }

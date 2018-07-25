@@ -1,36 +1,9 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.s;
 
 import java.util.UUID;
 import mage.MageInt;
 import mage.MageItem;
-import mage.MageObject;
 import mage.abilities.Ability;
 import mage.abilities.common.SimpleActivatedAbility;
 import mage.abilities.costs.mana.ManaCostsImpl;
@@ -39,9 +12,10 @@ import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.CardType;
 import mage.constants.Outcome;
+import mage.constants.SubType;
 import mage.constants.Zone;
 import mage.counters.CounterType;
-import mage.filter.FilterPermanent;
+import mage.filter.Filter;
 import mage.filter.common.FilterCreaturePermanent;
 import mage.filter.common.FilterEnchantmentPermanent;
 import mage.filter.predicate.ObjectSourcePlayer;
@@ -63,18 +37,18 @@ import mage.target.common.TargetCreaturePermanent;
  *
  * @author anonymous
  */
-public class SimicGuildmage extends CardImpl {
-    
-    private static final FilterEnchantmentPermanent filter = new FilterEnchantmentPermanent("Aura");
+public final class SimicGuildmage extends CardImpl {
+
+    private static final FilterEnchantmentPermanent auraFilter = new FilterEnchantmentPermanent("Aura");
 
     static {
-        filter.add(new SubtypePredicate("Aura"));
+        auraFilter.add(new SubtypePredicate(SubType.AURA));
     }
 
     public SimicGuildmage(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{G/U}{G/U}");
-        this.subtype.add("Elf");
-        this.subtype.add("Wizard");
+        super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{G/U}{G/U}");
+        this.subtype.add(SubType.ELF);
+        this.subtype.add(SubType.WIZARD);
         this.power = new MageInt(2);
         this.toughness = new MageInt(2);
 
@@ -84,7 +58,7 @@ public class SimicGuildmage extends CardImpl {
                 new FilterCreaturePermanent("creature (you take counter from)"));
         target.setTargetTag(1);
         countersAbility.addTarget(target);
-        
+
         FilterCreaturePermanent filter = new FilterCreaturePermanent(
                 "another target creature with the same controller (counter goes to)");
         filter.add(new AnotherTargetPredicate(2));
@@ -93,12 +67,12 @@ public class SimicGuildmage extends CardImpl {
         target2.setTargetTag(2);
         countersAbility.addTarget(target2);
         this.addAbility(countersAbility);
+
         // {1}{U}: Attach target Aura enchanting a permanent to another permanent with the same controller.
         Ability auraAbility = new SimpleActivatedAbility(Zone.BATTLEFIELD, new MoveAuraEffect(), new ManaCostsImpl("{1}{U}"));
-        auraAbility.addTarget(new TargetPermanent(filter));
+        auraAbility.addTarget(new TargetPermanent(auraFilter));
         this.addAbility(auraAbility);
 
-        
     }
 
     public SimicGuildmage(final SimicGuildmage card) {
@@ -136,11 +110,11 @@ class MoveCounterFromTargetToTargetEffect extends OneShotEffect {
             if (source.getTargets().size() > 1) {
                 toPermanent = game.getPermanent(source.getTargets().get(1).getFirstTarget());
             }
-            if (fromPermanent == null || toPermanent == null || !fromPermanent.getControllerId().equals(toPermanent.getControllerId())) {
+            if (fromPermanent == null || toPermanent == null || !fromPermanent.isControlledBy(toPermanent.getControllerId())) {
                 return false;
             }
             fromPermanent.removeCounters(CounterType.P1P1.createInstance(1), game);
-            toPermanent.addCounters(CounterType.P1P1.createInstance(1), game);
+            toPermanent.addCounters(CounterType.P1P1.createInstance(1), source, game);
             return true;
         }
         return false;
@@ -155,14 +129,14 @@ class SameControllerPredicate implements ObjectSourcePlayerPredicate<ObjectSourc
         StackObject source = game.getStack().getStackObject(input.getSourceId());
         if (source != null) {
             if (source.getStackAbility().getTargets().isEmpty()
-                || source.getStackAbility().getTargets().get(0).getTargets().isEmpty()) {
+                    || source.getStackAbility().getTargets().get(0).getTargets().isEmpty()) {
                 return true;
             }
             Permanent firstTarget = game.getPermanent(
                     source.getStackAbility().getTargets().get(0).getTargets().get(0));
             Permanent inputPermanent = game.getPermanent(input.getObject().getId());
             if (firstTarget != null && inputPermanent != null) {
-                return firstTarget.getControllerId().equals(inputPermanent.getControllerId());
+                return firstTarget.isControlledBy(inputPermanent.getControllerId());
             }
         }
         return true;
@@ -172,7 +146,7 @@ class SameControllerPredicate implements ObjectSourcePlayerPredicate<ObjectSourc
     public String toString() {
         return "Target with the same controller";
     }
-    
+
 }
 
 class MoveAuraEffect extends OneShotEffect {
@@ -194,47 +168,42 @@ class MoveAuraEffect extends OneShotEffect {
     @Override
     public boolean apply(Game game, Ability source) {
         /*
-            5/1/2006	
-            For the second ability, only the Aura is targeted. 
-            When the ability resolves, you choose a permanent to move the Aura onto. 
-            It can’t be the permanent the Aura is already attached to, it must be controlled by the player who controls the permanent the Aura is attached to, and it must be able to be enchanted by the Aura. 
-            (It doesn’t matter who controls the Aura or who controls Simic Guildmage.) 
-            If no such permanent exists, the Aura doesn’t move.         
-        */
-        UUID auraId = getTargetPointer().getFirst(game, source);
-        Permanent aura = game.getPermanent(auraId);
-        Permanent fromPermanent = game.getPermanent(aura.getAttachedTo());
+            5/1/2006
+            For the second ability, only the Aura is targeted.
+            When the ability resolves, you choose a permanent to move the Aura onto.
+            It can't be the permanent the Aura is already attached to, it must be controlled by the player who controls the permanent the Aura is attached to, and it must be able to be enchanted by the Aura.
+            (It doesn't matter who controls the Aura or who controls Simic Guildmage.)
+            If no such permanent exists, the Aura doesn't move.
+         */
+
         Player controller = game.getPlayer(source.getControllerId());
-        if (fromPermanent != null && controller != null) {
-            Boolean passed = true;
-            FilterPermanent filterChoice = new FilterPermanent("a different permanent with the same controller as the target to attach the enchantments to");
+        if (controller != null) {
+            Permanent aura = game.getPermanent(getTargetPointer().getFirst(game, source));
+            if (aura == null) {
+                return true;
+            }
+            Permanent fromPermanent = game.getPermanent(aura.getAttachedTo());
+            if (fromPermanent == null) {
+                return false;
+            }
+            boolean passed = true;
+            Target chosenPermanentToAttachAuras = aura.getSpellAbility().getTargets().get(0).copy();
+            chosenPermanentToAttachAuras.setNotTarget(true);
+            Filter filterChoice = chosenPermanentToAttachAuras.getFilter();
             filterChoice.add(new ControllerIdPredicate(fromPermanent.getControllerId()));
             filterChoice.add(Predicates.not(new PermanentIdPredicate(fromPermanent.getId())));
-
-            Target chosenPermanentToAttachAuras = new TargetPermanent(filterChoice);
-            chosenPermanentToAttachAuras.setNotTarget(true);
-
+            chosenPermanentToAttachAuras.setTargetName("a different " + filterChoice.getMessage() + " with the same controller as the " + filterChoice.getMessage() + " the target aura is attached to");
             if (chosenPermanentToAttachAuras.canChoose(source.getSourceId(), source.getControllerId(), game)
                     && controller.choose(Outcome.Neutral, chosenPermanentToAttachAuras, source.getSourceId(), game)) {
-                Permanent permanentToAttachAuras = game.getPermanent(chosenPermanentToAttachAuras.getFirstTarget());
-                if (permanentToAttachAuras != null) {
-                    if (aura != null && passed) {
-                        // Check the target filter
-                        Target target = aura.getSpellAbility().getTargets().get(0);
-                        if (target instanceof TargetPermanent) {
-                            if (!target.getFilter().match(permanentToAttachAuras, game)) {
-                                passed = false;
-                            }
-                        }
-                        // Check for protection
-                        MageObject auraObject = game.getObject(auraId);
-                        if (permanentToAttachAuras.cantBeAttachedBy(auraObject, game)) {
-                            passed = false;
-                        }
+                Permanent permanentToAttachAura = game.getPermanent(chosenPermanentToAttachAuras.getFirstTarget());
+                if (permanentToAttachAura != null) {
+                    // Check for protection
+                    if (permanentToAttachAura.cantBeAttachedBy(aura, game)) {
+                        passed = false;
                     }
                     if (passed) {
                         fromPermanent.removeAttachment(aura.getId(), game);
-                        permanentToAttachAuras.addAttachment(aura.getId(), game);
+                        permanentToAttachAura.addAttachment(aura.getId(), game);
                         return true;
                     }
                 }

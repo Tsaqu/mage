@@ -27,6 +27,8 @@ import mage.target.TargetAmount;
  */
 public abstract class StackObjImpl implements StackObject {
 
+    protected boolean targetChanged; // for Psychic Battle
+
     /**
      * Choose new targets for a stack Object
      *
@@ -71,12 +73,11 @@ public abstract class StackObjImpl implements StackObject {
      * the change is legal.
      *
      * Example: Arc Trail is a sorcery that reads "Arc Trail deals 2 damage to
-     * target creature or player and 1 damage to another target creature or
-     * player." The current targets of Arc Trail are Runeclaw Bear and Llanowar
-     * Elves, in that order. You cast Redirect, an instant that reads "You may
-     * choose new targets for target spell," targeting Arc Trail. You can change
-     * the first target to Llanowar Elves and change the second target to
-     * Runeclaw Bear.
+     * any target and 1 damage to another target creature or player." The
+     * current targets of Arc Trail are Runeclaw Bear and Llanowar Elves, in
+     * that order. You cast Redirect, an instant that reads "You may choose new
+     * targets for target spell," targeting Arc Trail. You can change the first
+     * target to Llanowar Elves and change the second target to Runeclaw Bear.
      *
      * 114.7. Modal spells and abilities may have different targeting
      * requirements for each mode. An effect that allows a player to change the
@@ -135,7 +136,7 @@ public abstract class StackObjImpl implements StackObject {
 
             }
             if (!newTargetDescription.toString().equals(oldTargetDescription.toString()) && !game.isSimulation()) {
-                game.informPlayers(this.getLogName() + " is now " + newTargetDescription.toString());
+                game.informPlayers(this.getLogName() + " is now " + newTargetDescription);
             }
             return true;
         }
@@ -163,8 +164,9 @@ public abstract class StackObjImpl implements StackObject {
         for (UUID targetId : target.getTargets()) {
             String targetNames = getNamesOftargets(targetId, game);
             // change the target?
+            Outcome outcome = mode.getEffects().isEmpty() ? Outcome.Detriment : mode.getEffects().get(0).getOutcome();
             if (targetNames != null
-                    && (forceChange || targetController.chooseUse(mode.getEffects().get(0).getOutcome(), "Change this target: " + targetNames + "?", ability, game))) {
+                    && (forceChange || targetController.chooseUse(outcome, "Change this target: " + targetNames + '?', ability, game))) {
                 Set<UUID> possibleTargets = target.possibleTargets(this.getSourceId(), getControllerId(), game);
                 // choose exactly one other target - already targeted objects are not counted
                 if (forceChange && possibleTargets != null && possibleTargets.size() > 1) { // controller of spell must be used (e.g. TargetOpponent)
@@ -176,12 +178,12 @@ public abstract class StackObjImpl implements StackObject {
                         iteration++;
                         newTarget.clearChosen();
 
-                        newTarget.chooseTarget(mode.getEffects().get(0).getOutcome(), getControllerId(), ability, game);
+                        newTarget.chooseTarget(outcome, getControllerId(), ability, game);
                         // check target restriction
                         if (newTarget.getFirstTarget() != null && filterNewTarget != null) {
                             Permanent newTargetPermanent = game.getPermanent(newTarget.getFirstTarget());
                             if (newTargetPermanent == null || !filterNewTarget.match(newTargetPermanent, game)) {
-                                game.informPlayer(targetController, "Target does not fullfil the target requirements (" + filterNewTarget.getMessage() + ")");
+                                game.informPlayer(targetController, "Target does not fullfil the target requirements (" + filterNewTarget.getMessage() + ')');
                                 newTarget.clearChosen();
                             }
                         }
@@ -203,7 +205,7 @@ public abstract class StackObjImpl implements StackObject {
                     do {
                         again = false;
                         tempTarget.clearChosen();
-                        if (!tempTarget.chooseTarget(mode.getEffects().get(0).getOutcome(), getControllerId(), ability, game)) {
+                        if (!tempTarget.chooseTarget(outcome, getControllerId(), ability, game)) {
                             if (targetController.chooseUse(Outcome.Benefit, "No target object selected. Reset to original target?", ability, game)) {
                                 // use previous target no target was selected
                                 newTarget.addTarget(targetId, target.getTargetAmount(targetId), ability, game, false);
@@ -211,7 +213,8 @@ public abstract class StackObjImpl implements StackObject {
                                 again = true;
                             }
                         } else // if possible add the alternate Target - it may not be included in the old definition nor in the already selected targets of the new definition
-                         if (newTarget.getTargets().contains(tempTarget.getFirstTarget()) || target.getTargets().contains(tempTarget.getFirstTarget())) {
+                        {
+                            if (newTarget.getTargets().contains(tempTarget.getFirstTarget()) || target.getTargets().contains(tempTarget.getFirstTarget())) {
                                 if (targetController.isHuman()) {
                                     if (targetController.chooseUse(Outcome.Benefit, "This target was already selected from origin spell. Reset to original target?", ability, game)) {
                                         // use previous target no target was selected
@@ -233,13 +236,14 @@ public abstract class StackObjImpl implements StackObject {
                             } else if (newTarget.getFirstTarget() != null && filterNewTarget != null) {
                                 Permanent newTargetPermanent = game.getPermanent(newTarget.getFirstTarget());
                                 if (newTargetPermanent == null || !filterNewTarget.match(newTargetPermanent, game)) {
-                                    game.informPlayer(targetController, "This target does not fullfil the target requirements (" + filterNewTarget.getMessage() + ")");
+                                    game.informPlayer(targetController, "This target does not fullfil the target requirements (" + filterNewTarget.getMessage() + ')');
                                     again = true;
                                 }
                             } else {
                                 // valid target was selected, add it to the new target definition
                                 newTarget.addTarget(tempTarget.getFirstTarget(), target.getTargetAmount(targetId), ability, game, false);
                             }
+                        }
                     } while (again && targetController.canRespond());
                 }
             } // keep the target
@@ -264,4 +268,17 @@ public abstract class StackObjImpl implements StackObject {
         return name;
     }
 
+    @Override
+    public void removePTCDA() {
+    }
+
+    @Override
+    public boolean isTargetChanged() {
+        return targetChanged;
+    }
+
+    @Override
+    public void setTargetChanged(boolean targetChanged) {
+        this.targetChanged = targetChanged;
+    }
 }

@@ -1,46 +1,20 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.sets;
 
 import mage.cards.ExpansionSet;
-import mage.constants.SetType;
 import mage.constants.Rarity;
+import mage.constants.SetType;
 
 /**
  *
  * @author North
  */
-public class Scourge extends ExpansionSet {
+public final class Scourge extends ExpansionSet {
 
-    private static final Scourge fINSTANCE = new Scourge();
+    private static final Scourge instance = new Scourge();
 
     public static Scourge getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     private Scourge() {
@@ -55,6 +29,7 @@ public class Scourge extends ExpansionSet {
         this.numBoosterRare = 1;
         this.ratioBoosterMythic = 0;
         cards.add(new SetCardInfo("Accelerated Mutation", 109, Rarity.COMMON, mage.cards.a.AcceleratedMutation.class));
+        cards.add(new SetCardInfo("Ageless Sentinels", 1, Rarity.RARE, mage.cards.a.AgelessSentinels.class));
         cards.add(new SetCardInfo("Alpha Status", 110, Rarity.UNCOMMON, mage.cards.a.AlphaStatus.class));
         cards.add(new SetCardInfo("Ambush Commander", 111, Rarity.RARE, mage.cards.a.AmbushCommander.class));
         cards.add(new SetCardInfo("Ancient Ooze", 112, Rarity.RARE, mage.cards.a.AncientOoze.class));
@@ -65,18 +40,23 @@ public class Scourge extends ExpansionSet {
         cards.add(new SetCardInfo("Aven Liberator", 4, Rarity.COMMON, mage.cards.a.AvenLiberator.class));
         cards.add(new SetCardInfo("Bladewing's Thrall", 55, Rarity.UNCOMMON, mage.cards.b.BladewingsThrall.class));
         cards.add(new SetCardInfo("Bladewing the Risen", 136, Rarity.RARE, mage.cards.b.BladewingTheRisen.class));
+        cards.add(new SetCardInfo("Bonethorn Valesk", 82, Rarity.COMMON, mage.cards.b.BonethornValesk.class));
         cards.add(new SetCardInfo("Brain Freeze", 29, Rarity.UNCOMMON, mage.cards.b.BrainFreeze.class));
         cards.add(new SetCardInfo("Break Asunder", 113, Rarity.COMMON, mage.cards.b.BreakAsunder.class));
         cards.add(new SetCardInfo("Cabal Conditioning", 56, Rarity.RARE, mage.cards.c.CabalConditioning.class));
-	cards.add(new SetCardInfo("Cabal Interrogator", 57, Rarity.UNCOMMON, mage.cards.c.CabalInterrogator.class));
+        cards.add(new SetCardInfo("Cabal Interrogator", 57, Rarity.UNCOMMON, mage.cards.c.CabalInterrogator.class));
         cards.add(new SetCardInfo("Call to the Grave", 58, Rarity.RARE, mage.cards.c.CallToTheGrave.class));
         cards.add(new SetCardInfo("Carbonize", 83, Rarity.UNCOMMON, mage.cards.c.Carbonize.class));
         cards.add(new SetCardInfo("Carrion Feeder", 59, Rarity.COMMON, mage.cards.c.CarrionFeeder.class));
         cards.add(new SetCardInfo("Chartooth Cougar", 84, Rarity.COMMON, mage.cards.c.ChartoothCougar.class));
+        cards.add(new SetCardInfo("Chill Haunting", 60, Rarity.UNCOMMON, mage.cards.c.ChillHaunting.class));
         cards.add(new SetCardInfo("Claws of Wirewood", 114, Rarity.UNCOMMON, mage.cards.c.ClawsOfWirewood.class));
+        cards.add(new SetCardInfo("Clutch of Undeath", 61, Rarity.COMMON, mage.cards.c.ClutchOfUndeath.class));
         cards.add(new SetCardInfo("Coast Watcher", 30, Rarity.COMMON, mage.cards.c.CoastWatcher.class));
         cards.add(new SetCardInfo("Consumptive Goo", 62, Rarity.RARE, mage.cards.c.ConsumptiveGoo.class));
+        cards.add(new SetCardInfo("Daru Spiritualist", 5, Rarity.COMMON, mage.cards.d.DaruSpiritualist.class));
         cards.add(new SetCardInfo("Daru Warchief", 6, Rarity.UNCOMMON, mage.cards.d.DaruWarchief.class));
+        cards.add(new SetCardInfo("Dawn Elemental", 7, Rarity.RARE, mage.cards.d.DawnElemental.class));
         cards.add(new SetCardInfo("Day of the Dragons", 31, Rarity.RARE, mage.cards.d.DayOfTheDragons.class));
         cards.add(new SetCardInfo("Death's-Head Buzzard", 63, Rarity.COMMON, mage.cards.d.DeathsHeadBuzzard.class));
         cards.add(new SetCardInfo("Decree of Annihilation", 85, Rarity.RARE, mage.cards.d.DecreeOfAnnihilation.class));
@@ -84,7 +64,9 @@ public class Scourge extends ExpansionSet {
         cards.add(new SetCardInfo("Decree of Pain", 64, Rarity.RARE, mage.cards.d.DecreeOfPain.class));
         cards.add(new SetCardInfo("Decree of Savagery", 115, Rarity.RARE, mage.cards.d.DecreeOfSavagery.class));
         cards.add(new SetCardInfo("Decree of Silence", 32, Rarity.RARE, mage.cards.d.DecreeOfSilence.class));
+        cards.add(new SetCardInfo("Dimensional Breach", 9, Rarity.RARE, mage.cards.d.DimensionalBreach.class));
         cards.add(new SetCardInfo("Dispersal Shield", 33, Rarity.COMMON, mage.cards.d.DispersalShield.class));
+        cards.add(new SetCardInfo("Divergent Growth", 116, Rarity.COMMON, mage.cards.d.DivergentGrowth.class));
         cards.add(new SetCardInfo("Dragon Breath", 86, Rarity.COMMON, mage.cards.d.DragonBreath.class));
         cards.add(new SetCardInfo("Dragon Fangs", 117, Rarity.COMMON, mage.cards.d.DragonFangs.class));
         cards.add(new SetCardInfo("Dragon Mage", 87, Rarity.RARE, mage.cards.d.DragonMage.class));
@@ -100,36 +82,49 @@ public class Scourge extends ExpansionSet {
         cards.add(new SetCardInfo("Enrage", 91, Rarity.UNCOMMON, mage.cards.e.Enrage.class));
         cards.add(new SetCardInfo("Eternal Dragon", 12, Rarity.RARE, mage.cards.e.EternalDragon.class));
         cards.add(new SetCardInfo("Extra Arms", 92, Rarity.UNCOMMON, mage.cards.e.ExtraArms.class));
+        cards.add(new SetCardInfo("Faces of the Past", 35, Rarity.RARE, mage.cards.f.FacesOfThePast.class));
         cards.add(new SetCardInfo("Fatal Mutation", 66, Rarity.UNCOMMON, mage.cards.f.FatalMutation.class));
         cards.add(new SetCardInfo("Fierce Empath", 119, Rarity.COMMON, mage.cards.f.FierceEmpath.class));
         cards.add(new SetCardInfo("Final Punishment", 67, Rarity.RARE, mage.cards.f.FinalPunishment.class));
         cards.add(new SetCardInfo("Forgotten Ancient", 120, Rarity.RARE, mage.cards.f.ForgottenAncient.class));
         cards.add(new SetCardInfo("Form of the Dragon", 93, Rarity.RARE, mage.cards.f.FormOfTheDragon.class));
+        cards.add(new SetCardInfo("Force Bubble", 14, Rarity.RARE, mage.cards.f.ForceBubble.class));
+        cards.add(new SetCardInfo("Frontline Strategist", 15, Rarity.COMMON, mage.cards.f.FrontlineStrategist.class));
         cards.add(new SetCardInfo("Frozen Solid", 36, Rarity.COMMON, mage.cards.f.FrozenSolid.class));
         cards.add(new SetCardInfo("Gilded Light", 16, Rarity.UNCOMMON, mage.cards.g.GildedLight.class));
         cards.add(new SetCardInfo("Goblin Brigand", 94, Rarity.COMMON, mage.cards.g.GoblinBrigand.class));
+        cards.add(new SetCardInfo("Goblin Psychopath", 95, Rarity.UNCOMMON, mage.cards.g.GoblinPsychopath.class));
         cards.add(new SetCardInfo("Goblin Warchief", 97, Rarity.UNCOMMON, mage.cards.g.GoblinWarchief.class));
         cards.add(new SetCardInfo("Goblin War Strike", 96, Rarity.COMMON, mage.cards.g.GoblinWarStrike.class));
         cards.add(new SetCardInfo("Grip of Chaos", 98, Rarity.RARE, mage.cards.g.GripOfChaos.class));
+        cards.add(new SetCardInfo("Guilty Conscience", 17, Rarity.COMMON, mage.cards.g.GuiltyConscience.class));
         cards.add(new SetCardInfo("Hindering Touch", 37, Rarity.COMMON, mage.cards.h.HinderingTouch.class));
         cards.add(new SetCardInfo("Hunting Pack", 121, Rarity.UNCOMMON, mage.cards.h.HuntingPack.class));
+        cards.add(new SetCardInfo("Karona's Zealot", 18, Rarity.UNCOMMON, mage.cards.k.KaronasZealot.class));
         cards.add(new SetCardInfo("Karona, False God", 138, Rarity.RARE, mage.cards.k.KaronaFalseGod.class));
         cards.add(new SetCardInfo("Krosan Drover", 122, Rarity.COMMON, mage.cards.k.KrosanDrover.class));
         cards.add(new SetCardInfo("Krosan Warchief", 123, Rarity.UNCOMMON, mage.cards.k.KrosanWarchief.class));
         cards.add(new SetCardInfo("Kurgadon", 124, Rarity.UNCOMMON, mage.cards.k.Kurgadon.class));
+        cards.add(new SetCardInfo("Lethal Vapors", 68, Rarity.RARE, mage.cards.l.LethalVapors.class));
+        cards.add(new SetCardInfo("Lingering Death", 69, Rarity.COMMON, mage.cards.l.LingeringDeath.class));
         cards.add(new SetCardInfo("Long-Term Plans", 38, Rarity.UNCOMMON, mage.cards.l.LongTermPlans.class));
         cards.add(new SetCardInfo("Mercurial Kite", 39, Rarity.COMMON, mage.cards.m.MercurialKite.class));
+        cards.add(new SetCardInfo("Metamorphose", 40, Rarity.UNCOMMON, mage.cards.m.Metamorphose.class));
         cards.add(new SetCardInfo("Mind's Desire", 41, Rarity.RARE, mage.cards.m.MindsDesire.class));
         cards.add(new SetCardInfo("Mischievous Quanar", 42, Rarity.RARE, mage.cards.m.MischievousQuanar.class));
         cards.add(new SetCardInfo("Misguided Rage", 99, Rarity.COMMON, mage.cards.m.MisguidedRage.class));
+        cards.add(new SetCardInfo("Mistform Warchief", 43, Rarity.UNCOMMON, mage.cards.m.MistformWarchief.class));
         cards.add(new SetCardInfo("Nefashu", 70, Rarity.RARE, mage.cards.n.Nefashu.class));
         cards.add(new SetCardInfo("Noble Templar", 19, Rarity.COMMON, mage.cards.n.NobleTemplar.class));
         cards.add(new SetCardInfo("One with Nature", 125, Rarity.UNCOMMON, mage.cards.o.OneWithNature.class));
+        cards.add(new SetCardInfo("Parallel Thoughts", 44, Rarity.RARE, mage.cards.p.ParallelThoughts.class));
         cards.add(new SetCardInfo("Pemmin's Aura", 45, Rarity.UNCOMMON, mage.cards.p.PemminsAura.class));
         cards.add(new SetCardInfo("Primitive Etchings", 126, Rarity.RARE, mage.cards.p.PrimitiveEtchings.class));
+        cards.add(new SetCardInfo("Proteus Machine", 141, Rarity.UNCOMMON, mage.cards.p.ProteusMachine.class));
         cards.add(new SetCardInfo("Putrid Raptor", 71, Rarity.UNCOMMON, mage.cards.p.PutridRaptor.class));
         cards.add(new SetCardInfo("Pyrostatic Pillar", 100, Rarity.UNCOMMON, mage.cards.p.PyrostaticPillar.class));
         cards.add(new SetCardInfo("Rain of Blades", 20, Rarity.UNCOMMON, mage.cards.r.RainOfBlades.class));
+        cards.add(new SetCardInfo("Raven Guild Initiate", 46, Rarity.COMMON, mage.cards.r.RavenGuildInitiate.class));
         cards.add(new SetCardInfo("Raven Guild Master", 47, Rarity.RARE, mage.cards.r.RavenGuildMaster.class));
         cards.add(new SetCardInfo("Reaping the Graves", 72, Rarity.COMMON, mage.cards.r.ReapingTheGraves.class));
         cards.add(new SetCardInfo("Recuperate", 21, Rarity.COMMON, mage.cards.r.Recuperate.class));

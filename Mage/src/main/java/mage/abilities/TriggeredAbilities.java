@@ -1,43 +1,10 @@
 
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.abilities;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import mage.MageObject;
-import mage.cards.Card;
 import mage.constants.Zone;
 import mage.game.Game;
 import mage.game.events.GameEvent;
@@ -46,9 +13,8 @@ import mage.game.permanent.Permanent;
 import mage.game.stack.Spell;
 
 /**
- *
  * @author BetaSteward_at_googlemail.com
- *
+ * <p>
  * This class uses ConcurrentHashMap to avoid ConcurrentModificationExceptions.
  * See ticket https://github.com/magefree/mage/issues/966 and
  * https://github.com/magefree/mage/issues/473
@@ -94,7 +60,7 @@ public class TriggeredAbilities extends ConcurrentHashMap<String, TriggeredAbili
             if (event == null || !game.getContinuousEffects().preventedByRuleModification(event, ability, game, false)) {
                 if (object != null) {
                     boolean controllerSet = false;
-                    if (!ability.getZone().equals(Zone.COMMAND) && event != null
+                    if (ability.getZone() != Zone.COMMAND && event != null
                             && event.getTargetId() != null // && event.getTargetId().equals(ability.getSourceId())
                             && ability.isLeavesTheBattlefieldTrigger()
                             //                            && ((event.getType().equals(EventType.ZONE_CHANGE)
@@ -105,7 +71,10 @@ public class TriggeredAbilities extends ConcurrentHashMap<String, TriggeredAbili
                         // need to check if object was face down for dies and destroy events because the ability triggers in the new zone, zone counter -1 is used
                         Permanent permanent = (Permanent) game.getLastKnownInformation(ability.getSourceId(), Zone.BATTLEFIELD, ability.getSourceObjectZoneChangeCounter() - 1);
                         if (permanent != null) {
-                            if (!ability.getWorksFaceDown() && permanent.isFaceDown(game)) {
+                            if (permanent.isFaceDown(game)
+                                    && !isGainedAbility(ability, permanent) // the face down creature got the ability from an effect => so it should work
+                                    && !ability.getWorksFaceDown()) { // the ability is declared to work also face down
+                                // Not all triggered abilities of face down creatures work if they are faced down
                                 return;
                             }
                             controllerSet = true;
@@ -118,8 +87,6 @@ public class TriggeredAbilities extends ConcurrentHashMap<String, TriggeredAbili
                         } else if (object instanceof Spell) {
                             // needed so that cast triggered abilities have to correct controller (e.g. Ulamog, the Infinite Gyre).
                             ability.setControllerId(((Spell) object).getControllerId());
-                        } else if (object instanceof Card) {
-                            ability.setControllerId(((Card) object).getOwnerId());
                         }
                     }
                 }
@@ -146,6 +113,8 @@ public class TriggeredAbilities extends ConcurrentHashMap<String, TriggeredAbili
     public void add(TriggeredAbility ability, UUID sourceId, MageObject attachedTo) {
         if (sourceId == null) {
             add(ability, attachedTo);
+        } else if (attachedTo == null) {
+            this.put(ability.getId() + "_" + sourceId, ability);
         } else {
             this.add(ability, attachedTo);
             List<UUID> uuidList = new LinkedList<>();
@@ -169,35 +138,24 @@ public class TriggeredAbilities extends ConcurrentHashMap<String, TriggeredAbili
     }
 
     public void removeAbilitiesOfSource(UUID sourceId) {
-        List<String> keysToRemove = new ArrayList<>();
-        for (String key : this.keySet()) {
-            if (key.endsWith(sourceId.toString())) {
-                keysToRemove.add(key);
-            }
-        }
-        for (String key : keysToRemove) {
-            remove(key);
-        }
+        keySet().removeIf(key -> key.endsWith(sourceId.toString()));
     }
 
     public void removeAllGainedAbilities() {
-        for (String key : sources.keySet()) {
-            this.remove(key);
-        }
+        this.keySet().removeAll(sources.keySet());
         sources.clear();
+    }
+
+    public boolean isGainedAbility(TriggeredAbility abilityToCheck, MageObject attachedTo) {
+        return sources.containsKey(getKey(abilityToCheck, attachedTo));
     }
 
     public void removeAbilitiesOfNonExistingSources(Game game) {
         // e.g. Token that had triggered abilities
-        List<String> keysToRemove = new ArrayList<>();
-        for (Entry<String, TriggeredAbility> entry : this.entrySet()) {
-            if (game.getObject(entry.getValue().getSourceId()) == null) {
-                keysToRemove.add(entry.getKey());
-            }
-        }
-        for (String key : keysToRemove) {
-            remove(key);
-        }
+
+        entrySet().removeIf(entry -> game.getObject(entry.getValue().getSourceId()) == null
+                && game.getState().getDesignations().stream().noneMatch(designation -> designation.getId().equals(entry.getValue().getSourceId())));
+
     }
 
     public TriggeredAbilities copy() {

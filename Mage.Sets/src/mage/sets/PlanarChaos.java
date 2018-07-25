@@ -1,46 +1,20 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.sets;
 
-import mage.constants.SetType;
 import mage.cards.ExpansionSet;
 import mage.constants.Rarity;
+import mage.constants.SetType;
 
 /**
  *
  * @author North
  */
-public class PlanarChaos extends ExpansionSet {
+public final class PlanarChaos extends ExpansionSet {
 
-    private static final PlanarChaos fINSTANCE = new PlanarChaos();
+    private static final PlanarChaos instance = new PlanarChaos();
 
     public static PlanarChaos getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     private PlanarChaos() {
@@ -59,6 +33,7 @@ public class PlanarChaos extends ExpansionSet {
         cards.add(new SetCardInfo("Akroma, Angel of Fury", 94, Rarity.RARE, mage.cards.a.AkromaAngelOfFury.class));
         cards.add(new SetCardInfo("Ana Battlemage", 124, Rarity.UNCOMMON, mage.cards.a.AnaBattlemage.class));
         cards.add(new SetCardInfo("Aquamorph Entity", 33, Rarity.COMMON, mage.cards.a.AquamorphEntity.class));
+        cards.add(new SetCardInfo("Auramancer's Guise", 34, Rarity.UNCOMMON, mage.cards.a.AuramancersGuise.class));
         cards.add(new SetCardInfo("Aven Riftwatcher", 1, Rarity.COMMON, mage.cards.a.AvenRiftwatcher.class));
         cards.add(new SetCardInfo("Battering Sliver", 95, Rarity.COMMON, mage.cards.b.BatteringSliver.class));
         cards.add(new SetCardInfo("Benalish Commander", 2, Rarity.RARE, mage.cards.b.BenalishCommander.class));
@@ -86,6 +61,7 @@ public class PlanarChaos extends ExpansionSet {
         cards.add(new SetCardInfo("Deadly Grub", 69, Rarity.COMMON, mage.cards.d.DeadlyGrub.class));
         cards.add(new SetCardInfo("Deadwood Treefolk", 126, Rarity.UNCOMMON, mage.cards.d.DeadwoodTreefolk.class));
         cards.add(new SetCardInfo("Detritivore", 96, Rarity.RARE, mage.cards.d.Detritivore.class));
+        cards.add(new SetCardInfo("Dichotomancy", 38, Rarity.RARE, mage.cards.d.Dichotomancy.class));
         cards.add(new SetCardInfo("Dismal Failure", 39, Rarity.UNCOMMON, mage.cards.d.DismalFailure.class));
         cards.add(new SetCardInfo("Dormant Sliver", 156, Rarity.UNCOMMON, mage.cards.d.DormantSliver.class));
         cards.add(new SetCardInfo("Dreamscape Artist", 40, Rarity.COMMON, mage.cards.d.DreamscapeArtist.class));
@@ -118,9 +94,11 @@ public class PlanarChaos extends ExpansionSet {
         cards.add(new SetCardInfo("Imp's Mischief", 72, Rarity.RARE, mage.cards.i.ImpsMischief.class));
         cards.add(new SetCardInfo("Intet, the Dreamer", 158, Rarity.RARE, mage.cards.i.IntetTheDreamer.class));
         cards.add(new SetCardInfo("Jedit Ojanen of Efrava", 131, Rarity.RARE, mage.cards.j.JeditOjanenOfEfrava.class));
+        cards.add(new SetCardInfo("Jodah's Avenger", 42, Rarity.UNCOMMON, mage.cards.j.JodahsAvenger.class));
         cards.add(new SetCardInfo("Kavu Predator", 132, Rarity.UNCOMMON, mage.cards.k.KavuPredator.class));
         cards.add(new SetCardInfo("Keen Sense", 152, Rarity.UNCOMMON, mage.cards.k.KeenSense.class));
         cards.add(new SetCardInfo("Keldon Marauders", 102, Rarity.COMMON, mage.cards.k.KeldonMarauders.class));
+        cards.add(new SetCardInfo("Kor Dirge", 87, Rarity.UNCOMMON, mage.cards.k.KorDirge.class));
         cards.add(new SetCardInfo("Lavacore Elemental", 103, Rarity.UNCOMMON, mage.cards.l.LavacoreElemental.class));
         cards.add(new SetCardInfo("Life and Limb", 133, Rarity.RARE, mage.cards.l.LifeAndLimb.class));
         cards.add(new SetCardInfo("Magus of the Arena", 104, Rarity.RARE, mage.cards.m.MagusOfTheArena.class));
@@ -130,12 +108,15 @@ public class PlanarChaos extends ExpansionSet {
         cards.add(new SetCardInfo("Magus of the Tabernacle", 8, Rarity.RARE, mage.cards.m.MagusOfTheTabernacle.class));
         cards.add(new SetCardInfo("Malach of the Dawn", 24, Rarity.UNCOMMON, mage.cards.m.MalachOfTheDawn.class));
         cards.add(new SetCardInfo("Mana Tithe", 25, Rarity.COMMON, mage.cards.m.ManaTithe.class));
+        cards.add(new SetCardInfo("Mantle of Leadership", 9, Rarity.UNCOMMON, mage.cards.m.MantleOfLeadership.class));
         cards.add(new SetCardInfo("Melancholy", 88, Rarity.COMMON, mage.cards.m.Melancholy.class));
         cards.add(new SetCardInfo("Merfolk Thaumaturgist", 56, Rarity.COMMON, mage.cards.m.MerfolkThaumaturgist.class));
         cards.add(new SetCardInfo("Mesa Enchantress", 26, Rarity.RARE, mage.cards.m.MesaEnchantress.class));
         cards.add(new SetCardInfo("Midnight Charm", 74, Rarity.COMMON, mage.cards.m.MidnightCharm.class));
         cards.add(new SetCardInfo("Mire Boa", 135, Rarity.COMMON, mage.cards.m.MireBoa.class));
         cards.add(new SetCardInfo("Mirri the Cursed", 75, Rarity.RARE, mage.cards.m.MirriTheCursed.class));
+        cards.add(new SetCardInfo("Molten Firebird", 117, Rarity.RARE, mage.cards.m.MoltenFirebird.class));
+        cards.add(new SetCardInfo("Muck Drubb", 76, Rarity.UNCOMMON, mage.cards.m.MuckDrubb.class));
         cards.add(new SetCardInfo("Mycologist", 27, Rarity.UNCOMMON, mage.cards.m.Mycologist.class));
         cards.add(new SetCardInfo("Necrotic Sliver", 159, Rarity.UNCOMMON, mage.cards.n.NecroticSliver.class));
         cards.add(new SetCardInfo("Needlepeak Spider", 105, Rarity.COMMON, mage.cards.n.NeedlepeakSpider.class));
@@ -160,8 +141,10 @@ public class PlanarChaos extends ExpansionSet {
         cards.add(new SetCardInfo("Rebuff the Wicked", 12, Rarity.UNCOMMON, mage.cards.r.RebuffTheWicked.class));
         cards.add(new SetCardInfo("Reckless Wurm", 120, Rarity.UNCOMMON, mage.cards.r.RecklessWurm.class));
         cards.add(new SetCardInfo("Reflex Sliver", 138, Rarity.COMMON, mage.cards.r.ReflexSliver.class));
+        cards.add(new SetCardInfo("Retether", 13, Rarity.RARE, mage.cards.r.Retether.class));
         cards.add(new SetCardInfo("Revered Dead", 29, Rarity.COMMON, mage.cards.r.ReveredDead.class));
         cards.add(new SetCardInfo("Ridged Kusite", 78, Rarity.COMMON, mage.cards.r.RidgedKusite.class));
+        cards.add(new SetCardInfo("Riftmarked Knight", 14, Rarity.UNCOMMON, mage.cards.r.RiftmarkedKnight.class));
         cards.add(new SetCardInfo("Riptide Pilferer", 60, Rarity.UNCOMMON, mage.cards.r.RiptidePilferer.class));
         cards.add(new SetCardInfo("Roiling Horror", 79, Rarity.RARE, mage.cards.r.RoilingHorror.class));
         cards.add(new SetCardInfo("Rough // Tumble", 114, Rarity.UNCOMMON, mage.cards.r.RoughTumble.class));
@@ -180,6 +163,7 @@ public class PlanarChaos extends ExpansionSet {
         cards.add(new SetCardInfo("Sinew Sliver", 30, Rarity.COMMON, mage.cards.s.SinewSliver.class));
         cards.add(new SetCardInfo("Skirk Shaman", 123, Rarity.COMMON, mage.cards.s.SkirkShaman.class));
         cards.add(new SetCardInfo("Sophic Centaur", 139, Rarity.UNCOMMON, mage.cards.s.SophicCentaur.class));
+        cards.add(new SetCardInfo("Spellshift", 47, Rarity.RARE, mage.cards.s.Spellshift.class));
         cards.add(new SetCardInfo("Spitting Sliver", 80, Rarity.COMMON, mage.cards.s.SpittingSliver.class));
         cards.add(new SetCardInfo("Stingscourger", 107, Rarity.COMMON, mage.cards.s.Stingscourger.class));
         cards.add(new SetCardInfo("Stonecloaker", 19, Rarity.UNCOMMON, mage.cards.s.Stonecloaker.class));
@@ -191,14 +175,19 @@ public class PlanarChaos extends ExpansionSet {
         cards.add(new SetCardInfo("Teneb, the Harvester", 163, Rarity.RARE, mage.cards.t.TenebTheHarvester.class));
         cards.add(new SetCardInfo("Tidewalker", 49, Rarity.UNCOMMON, mage.cards.t.Tidewalker.class));
         cards.add(new SetCardInfo("Timbermare", 140, Rarity.RARE, mage.cards.t.Timbermare.class));
+        cards.add(new SetCardInfo("Timebender", 50, Rarity.UNCOMMON, mage.cards.t.Timebender.class));
         cards.add(new SetCardInfo("Timecrafting", 109, Rarity.UNCOMMON, mage.cards.t.Timecrafting.class));
         cards.add(new SetCardInfo("Torchling", 110, Rarity.RARE, mage.cards.t.Torchling.class));
+        cards.add(new SetCardInfo("Treacherous Urge", 82, Rarity.UNCOMMON, mage.cards.t.TreacherousUrge.class));
         cards.add(new SetCardInfo("Uktabi Drake", 141, Rarity.COMMON, mage.cards.u.UktabiDrake.class));
         cards.add(new SetCardInfo("Urborg, Tomb of Yawgmoth", 165, Rarity.RARE, mage.cards.u.UrborgTombOfYawgmoth.class));
         cards.add(new SetCardInfo("Utopia Vow", 142, Rarity.COMMON, mage.cards.u.UtopiaVow.class));
         cards.add(new SetCardInfo("Vampiric Link", 92, Rarity.COMMON, mage.cards.v.VampiricLink.class));
+        cards.add(new SetCardInfo("Veiling Oddity", 51, Rarity.COMMON, mage.cards.v.VeilingOddity.class));
+        cards.add(new SetCardInfo("Venarian Glimmer", 52, Rarity.UNCOMMON, mage.cards.v.VenarianGlimmer.class));
         cards.add(new SetCardInfo("Vitaspore Thallid", 143, Rarity.COMMON, mage.cards.v.VitasporeThallid.class));
         cards.add(new SetCardInfo("Voidstone Gargoyle", 21, Rarity.RARE, mage.cards.v.VoidstoneGargoyle.class));
+        cards.add(new SetCardInfo("Volcano Hellion", 111, Rarity.RARE, mage.cards.v.VolcanoHellion.class));
         cards.add(new SetCardInfo("Vorosh, the Hunter", 164, Rarity.RARE, mage.cards.v.VoroshTheHunter.class));
         cards.add(new SetCardInfo("Waning Wurm", 83, Rarity.UNCOMMON, mage.cards.w.WaningWurm.class));
         cards.add(new SetCardInfo("Whitemane Lion", 22, Rarity.COMMON, mage.cards.w.WhitemaneLion.class));

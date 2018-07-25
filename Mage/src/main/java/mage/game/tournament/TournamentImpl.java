@@ -1,54 +1,15 @@
-/*
- *  Copyright 2011 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.game.tournament;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import mage.cards.ExpansionSet;
 import mage.cards.decks.Deck;
 import mage.constants.TournamentPlayerState;
 import mage.game.draft.Draft;
 import mage.game.draft.DraftCube;
-import mage.game.events.Listener;
-import mage.game.events.PlayerQueryEvent;
-import mage.game.events.PlayerQueryEventSource;
-import mage.game.events.TableEvent;
+import mage.game.events.*;
 import mage.game.events.TableEvent.EventType;
-import mage.game.events.TableEventSource;
 import mage.game.match.Match;
 import mage.game.match.MatchPlayer;
 import mage.game.result.ResultProtos.MatchPlayerProto;
@@ -57,6 +18,7 @@ import mage.game.result.ResultProtos.MatchQuitStatus;
 import mage.game.result.ResultProtos.TourneyProto;
 import mage.game.result.ResultProtos.TourneyRoundProto;
 import mage.players.Player;
+import mage.players.PlayerType;
 import mage.util.RandomUtil;
 import org.apache.log4j.Logger;
 
@@ -98,7 +60,7 @@ public abstract class TournamentImpl implements Tournament {
     }
 
     @Override
-    public void addPlayer(Player player, String playerType) {
+    public void addPlayer(Player player, PlayerType playerType) {
         players.put(player.getId(), new TournamentPlayer(player, playerType));
     }
 
@@ -183,10 +145,11 @@ public abstract class TournamentImpl implements Tournament {
     }
 
     @Override
-    public void updateDeck(UUID playerId, Deck deck) {
+    public boolean updateDeck(UUID playerId, Deck deck) {
         if (players.containsKey(playerId)) {
-            players.get(playerId).updateDeck(deck);
+            return players.get(playerId).updateDeck(deck);
         }
+        return false;
     }
 
     protected Round createRoundRandom() {
@@ -203,7 +166,7 @@ public abstract class TournamentImpl implements Tournament {
             round.addPairing(new TournamentPairing(player1, player2));
         }
 
-        if (roundPlayers.size() > 0) {
+        if (!roundPlayers.isEmpty()) {
             // player free round - add to bye players of this round
             TournamentPlayer player1 = roundPlayers.get(0);
             round.getPlayerByes().add(player1);
@@ -261,12 +224,12 @@ public abstract class TournamentImpl implements Tournament {
         }
         updateResults();
     }
-    
+
     protected void playMultiplayerRound(MultiplayerRound round) {
         playMultiPlayerMatch(round);
-        
+
         updateResults(); // show points from byes
-    }    
+    }
 
     protected List<TournamentPlayer> getActivePlayers() {
         List<TournamentPlayer> activePlayers = new ArrayList<>();
@@ -299,14 +262,14 @@ public abstract class TournamentImpl implements Tournament {
                     // set player state if he finished the round
                     if (round.getRoundNumber() == rounds.size()) { // for elimination getRoundNumber = 0 so never true here
                         match.setTournamentRound(round.getRoundNumber());
-                        if (tp1.getState().equals(TournamentPlayerState.DUELING)) {
+                        if (tp1.getState() == TournamentPlayerState.DUELING) {
                             if (round.getRoundNumber() == getNumberRounds()) {
                                 tp1.setState(TournamentPlayerState.FINISHED);
                             } else {
                                 tp1.setState(TournamentPlayerState.WAITING);
                             }
                         }
-                        if (tp2.getState().equals(TournamentPlayerState.DUELING)) {
+                        if (tp2.getState() == TournamentPlayerState.DUELING) {
                             if (round.getRoundNumber() == getNumberRounds()) {
                                 tp2.setState(TournamentPlayerState.FINISHED);
                             } else {
@@ -330,7 +293,7 @@ public abstract class TournamentImpl implements Tournament {
                 }
             }
             for (TournamentPlayer tp : round.getPlayerByes()) {
-                tp.setResults(new StringBuilder(tp.getResults()).append("R").append(round.getRoundNumber()).append(" ").append("Bye ").toString());
+                tp.setResults(new StringBuilder(tp.getResults()).append('R').append(round.getRoundNumber()).append(' ').append("Bye ").toString());
                 tp.setPoints(tp.getPoints() + 3);
             }
         }
@@ -338,7 +301,7 @@ public abstract class TournamentImpl implements Tournament {
 
     private static String addRoundResult(int round, TournamentPairing pair, TournamentPlayer tournamentPlayer, TournamentPlayer opponentPlayer) {
         StringBuilder playerResult = new StringBuilder(tournamentPlayer.getResults());
-        playerResult.append("R").append(round).append(" ");
+        playerResult.append('R').append(round).append(' ');
         playerResult.append(getMatchResultString(tournamentPlayer, opponentPlayer, pair.getMatch()));
         return playerResult.toString();
     }
@@ -353,9 +316,9 @@ public abstract class TournamentImpl implements Tournament {
             matchResult.append(mp1.getPlayer().hasIdleTimeout() ? "I" : (mp1.getPlayer().hasTimerTimeout() ? "T" : "Q"));
         }
         if (match.getDraws() > 0) {
-            matchResult.append("-").append(match.getDraws());
+            matchResult.append('-').append(match.getDraws());
         }
-        matchResult.append("-").append(mp2.getWins());
+        matchResult.append('-').append(mp2.getWins());
         if (mp2.hasQuit()) {
             matchResult.append(mp2.getPlayer().hasIdleTimeout() ? "I" : (mp2.getPlayer().hasTimerTimeout() ? "T" : "Q"));
         }
@@ -405,12 +368,7 @@ public abstract class TournamentImpl implements Tournament {
 
                 player.setConstructing();
                 new Thread(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                player.getPlayer().construct(TournamentImpl.this, player.getDeck());
-                            }
-                        }
+                        () -> player.getPlayer().construct(TournamentImpl.this, player.getDeck())
                 ).start();
             }
             // add autosubmit trigger
@@ -462,7 +420,7 @@ public abstract class TournamentImpl implements Tournament {
         options.getMatchOptions().getPlayerTypes().add(pair.getPlayer2().getPlayerType());
         tableEventSource.fireTableEvent(EventType.START_MATCH, pair, options.getMatchOptions());
     }
-    
+
     public void playMultiPlayerMatch(MultiplayerRound round) {
         tableEventSource.fireTableEvent(EventType.START_MULTIPLAYER_MATCH, round, options.getMatchOptions());
     }
@@ -608,10 +566,10 @@ public abstract class TournamentImpl implements Tournament {
 
     private MatchPlayerProto matchToProto(Match match, TournamentPlayer player) {
         MatchPlayer matchPlayer = match.getPlayer(player.getPlayer().getId());
-        MatchQuitStatus quit = !matchPlayer.hasQuit() ? MatchQuitStatus.NO_MATCH_QUIT :
-                matchPlayer.getPlayer().hasIdleTimeout() ? MatchQuitStatus.IDLE_TIMEOUT :
-                matchPlayer.getPlayer().hasTimerTimeout() ? MatchQuitStatus.TIMER_TIMEOUT :
-                MatchQuitStatus.QUIT;
+        MatchQuitStatus quit = !matchPlayer.hasQuit() ? MatchQuitStatus.NO_MATCH_QUIT
+                : matchPlayer.getPlayer().hasIdleTimeout() ? MatchQuitStatus.IDLE_TIMEOUT
+                : matchPlayer.getPlayer().hasTimerTimeout() ? MatchQuitStatus.TIMER_TIMEOUT
+                : MatchQuitStatus.QUIT;
         return MatchPlayerProto.newBuilder()
                 .setName(player.getPlayer().getName())
                 .setHuman(player.getPlayer().isHuman())

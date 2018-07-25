@@ -1,30 +1,4 @@
-/*
-* Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are
-* permitted provided that the following conditions are met:
-*
-*    1. Redistributions of source code must retain the above copyright notice, this list of
-*       conditions and the following disclaimer.
-*
-*    2. Redistributions in binary form must reproduce the above copyright notice, this list
-*       of conditions and the following disclaimer in the documentation and/or other materials
-*       provided with the distribution.
-*
-* THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-* FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*
-* The views and conclusions contained in the software and documentation are those of the
-* authors and should not be interpreted as representing official policies, either expressed
-* or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.abilities.keyword;
 
 import mage.MageObjectReference;
@@ -32,7 +6,6 @@ import mage.abilities.Ability;
 import mage.abilities.common.EntersBattlefieldAllTriggeredAbility;
 import mage.abilities.common.EntersBattlefieldTriggeredAbility;
 import mage.abilities.effects.OneShotEffect;
-import mage.constants.CardType;
 import mage.constants.Outcome;
 import mage.constants.SetTargetPointer;
 import mage.constants.TargetController;
@@ -47,6 +20,7 @@ import mage.game.Game;
 import mage.game.permanent.Permanent;
 import mage.players.Player;
 import mage.target.common.TargetControlledPermanent;
+import mage.util.GameLog;
 
 /**
  * 702.94. Soulbond
@@ -74,9 +48,9 @@ import mage.target.common.TargetControlledPermanent;
  * 702.94d A creature can be paired with only one other creature.
  *
  * 702.94e A paired creature becomes unpaired if any of the following occur:
- * another player gains control of it or the creature it’s paired with; it or
- * the creature it’s paired with stops being a creature; or it or the creature
- * it’s paired with leaves the battlefield.
+ * another player gains control of it or the creature it's paired with; it or
+ * the creature it's paired with stops being a creature; or it or the creature
+ * it's paired with leaves the battlefield.
  *
  * @author LevelX2
  */
@@ -102,9 +76,9 @@ public class SoulbondAbility extends EntersBattlefieldTriggeredAbility {
         boolean self = false;
         boolean other = false;
         for (Permanent permanent : game.getBattlefield().getAllActivePermanents(getControllerId())) {
-            if (permanent.getCardType().contains(CardType.CREATURE)) {
+            if (permanent.isCreature()) {
                 if (permanent.getId().equals(getSourceId())) {
-                    if (permanent.getControllerId().equals(getControllerId())) {
+                    if (permanent.isControlledBy(getControllerId())) {
                         self = true;
                         if (other) {
                             return true;
@@ -158,7 +132,7 @@ class SoulboundEntersSelfEffect extends OneShotEffect {
     @Override
     public boolean apply(Game game, Ability source) {
         Permanent permanent = game.getPermanent(source.getSourceId());
-        if (permanent != null && permanent.getCardType().contains(CardType.CREATURE)) {
+        if (permanent != null && permanent.isCreature()) {
             Player controller = game.getPlayer(permanent.getControllerId());
             if (controller != null) {
                 TargetControlledPermanent target = new TargetControlledPermanent(filter);
@@ -168,7 +142,9 @@ class SoulboundEntersSelfEffect extends OneShotEffect {
                         Permanent chosen = game.getPermanent(target.getFirstTarget());
                         if (chosen != null) {
                             chosen.setPairedCard(new MageObjectReference(permanent, game));
+                            chosen.addInfo("soulbond", "Soulbond to " + GameLog.getColoredObjectIdNameForTooltip(permanent), game);
                             permanent.setPairedCard(new MageObjectReference(chosen, game));
+                            permanent.addInfo("soulbond", "Soulbond to " + GameLog.getColoredObjectIdNameForTooltip(chosen), game);
                             if (!game.isSimulation()) {
                                 game.informPlayers(controller.getLogName() + " soulbonds " + permanent.getLogName() + " with " + chosen.getLogName());
                             }
@@ -219,7 +195,7 @@ class SoulbondEntersOtherAbility extends EntersBattlefieldAllTriggeredAbility {
         // if you control both this creature and another creature and both are unpaired
         if (game.getBattlefield().countAll(filter, getControllerId(), game) > 0) {
             Permanent sourcePermanent = game.getPermanent(getSourceId());
-            if (sourcePermanent != null && sourcePermanent.getControllerId().equals(getControllerId()) && sourcePermanent.getPairedCard() == null) {
+            if (sourcePermanent != null && sourcePermanent.isControlledBy(getControllerId()) && sourcePermanent.getPairedCard() == null) {
                 return true;
             }
         }
@@ -259,11 +235,11 @@ class SoulboundEntersOtherEffect extends OneShotEffect {
     public boolean apply(Game game, Ability source) {
         Permanent permanent = game.getPermanent(source.getSourceId());
         if (permanent != null && permanent.getPairedCard() == null
-                && permanent.getCardType().contains(CardType.CREATURE)) {
+                && permanent.isCreature()) {
             Player controller = game.getPlayer(permanent.getControllerId());
             if (controller != null) {
                 Permanent enteringPermanent = game.getPermanent(getTargetPointer().getFirst(game, source));
-                if (enteringPermanent != null && enteringPermanent.getCardType().contains(CardType.CREATURE) && enteringPermanent.getPairedCard() == null) {
+                if (enteringPermanent != null && enteringPermanent.isCreature() && enteringPermanent.getPairedCard() == null) {
                     enteringPermanent.setPairedCard(new MageObjectReference(permanent, game));
                     permanent.setPairedCard(new MageObjectReference(enteringPermanent, game));
                     if (!game.isSimulation()) {

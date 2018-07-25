@@ -20,7 +20,7 @@ import mage.target.TargetCard;
 /**
  * Created by samuelsandeen on 9/6/16.
  */
-public class ZonesHandler {
+public final class ZonesHandler {
 
     public static boolean cast(ZoneChangeInfo info, Game game) {
         if (maybeRemoveFromSourceZone(info, game)) {
@@ -34,7 +34,7 @@ public class ZonesHandler {
     public static boolean moveCard(ZoneChangeInfo info, Game game) {
         List<ZoneChangeInfo> list = new ArrayList<>();
         list.add(info);
-        return moveCards(list, game).size() > 0;
+        return !moveCards(list, game).isEmpty();
     }
 
     public static List<ZoneChangeInfo> moveCards(List<ZoneChangeInfo> zoneChangeInfos, Game game) {
@@ -52,11 +52,7 @@ public class ZonesHandler {
                 }
             }
         }
-        for (Iterator<ZoneChangeInfo> itr = zoneChangeInfos.iterator(); itr.hasNext();) {
-            if (!maybeRemoveFromSourceZone(itr.next(), game)) {
-                itr.remove();
-            }
-        }
+        zoneChangeInfos.removeIf(zoneChangeInfo -> !maybeRemoveFromSourceZone(zoneChangeInfo, game));
         for (ZoneChangeInfo zoneChangeInfo : zoneChangeInfos) {
             placeInDestinationZone(zoneChangeInfo, game);
             if (game.getPhase() != null) { // moving cards to zones before game started does not need events
@@ -112,7 +108,7 @@ public class ZonesHandler {
                                 "order to put on top of library (last chosen will be topmost)", cards, owner, game)) {
                             game.getPlayer(card.getOwnerId()).getLibrary().putOnTop(card, game);
                         }
-                    } else {
+                    } else { // buttom
                         for (Card card : chooseOrder(
                                 "order to put on bottom of library (last chosen will be bottommost)", cards, owner, game)) {
                             game.getPlayer(card.getOwnerId()).getLibrary().putOnBottom(card, game);
@@ -138,12 +134,15 @@ public class ZonesHandler {
                 case STACK:
                     // There should never be more than one card here.
                     for (Card card : cards.getCards(game)) {
+                        Spell spell;
                         if (info instanceof ZoneChangeInfo.Stack && ((ZoneChangeInfo.Stack) info).spell != null) {
-                            game.getStack().push(((ZoneChangeInfo.Stack) info).spell);
+                            spell = ((ZoneChangeInfo.Stack) info).spell;
                         } else {
-                            game.getStack().push(
-                                    new Spell(card, card.getSpellAbility().copy(), card.getOwnerId(), event.getFromZone()));
+                            spell = new Spell(card, card.getSpellAbility().copy(), card.getOwnerId(), event.getFromZone());
                         }
+                        game.getStack().push(spell);
+                        game.getState().setZone(spell.getId(), Zone.STACK);
+                        game.getState().setZone(card.getId(), Zone.STACK);
                     }
                     break;
                 case BATTLEFIELD:
@@ -188,9 +187,9 @@ public class ZonesHandler {
                 ZoneChangeInfo subInfo = itr.next();
                 if (!maybeRemoveFromSourceZone(subInfo, game)) {
                     itr.remove();
-                } else if (subInfo.event.getTargetId() == meld.getTopHalfCard().getId()) {
+                } else if (Objects.equals(subInfo.event.getTargetId(), meld.getTopHalfCard().getId())) {
                     meld.setTopLastZoneChangeCounter(meld.getTopHalfCard().getZoneChangeCounter(game));
-                } else if (subInfo.event.getTargetId() == meld.getBottomHalfCard().getId()) {
+                } else if (Objects.equals(subInfo.event.getTargetId(), meld.getBottomHalfCard().getId())) {
                     meld.setBottomLastZoneChangeCounter(meld.getBottomHalfCard().getZoneChangeCounter(game));
                 }
             }
@@ -208,8 +207,7 @@ public class ZonesHandler {
             // If we can't find the card we can't remove it.
             return false;
         }
-        // If needed take attributes from the spell (e.g. color of spell was changed)
-        card = takeAttributesFromSpell(card, event, game);
+
         boolean success = false;
         if (info.faceDown) {
             card.setFaceDown(true, game);
@@ -217,6 +215,8 @@ public class ZonesHandler {
         if (!game.replaceEvent(event)) {
             Zone fromZone = event.getFromZone();
             if (event.getToZone() == Zone.BATTLEFIELD) {
+                // If needed take attributes from the spell (e.g. color of spell was changed)
+                card = takeAttributesFromSpell(card, event, game);
                 // controlling player can be replaced so use event player now
                 Permanent permanent;
                 if (card instanceof MeldCard) {
@@ -236,7 +236,6 @@ public class ZonesHandler {
                 if (info.faceDown) {
                     card.setFaceDown(false, game);
                 }
-
                 // make sure the controller of all continuous effects of this card are switched to the current controller
                 game.setScopeRelevant(true);
                 game.getContinuousEffects().setController(permanent.getId(), permanent.getControllerId());
@@ -286,16 +285,12 @@ public class ZonesHandler {
     }
 
     private static Card takeAttributesFromSpell(Card card, ZoneChangeEvent event, Game game) {
-        if (Zone.STACK.equals(event.getFromZone())) {
+        card = card.copy();
+        if (Zone.STACK == event.getFromZone()) {
             Spell spell = game.getStack().getSpell(event.getTargetId());
-            if (spell != null) {
-                boolean doCopy = false;
+            if (spell != null && !spell.isFaceDown(game)) {
                 if (!card.getColor(game).equals(spell.getColor(game))) {
-                    doCopy = true;
-                }
-                if (doCopy) {
                     // the card that is referenced to in the permanent is copied and the spell attributes are set to this copied card
-                    card = card.copy();
                     card.getColor(game).setColor(spell.getColor(game));
                 }
             }

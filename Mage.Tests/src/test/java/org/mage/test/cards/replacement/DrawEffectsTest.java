@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package org.mage.test.cards.replacement;
 
 import mage.constants.PhaseStep;
@@ -52,7 +26,7 @@ public class DrawEffectsTest extends CardTestPlayerBase {
         setStopAt(2, PhaseStep.PRECOMBAT_MAIN);
         execute();
 
-        Assert.assertEquals("Player B has to have 4 cards in hand", 8, playerB.getHand().size());
+        Assert.assertEquals("Player B has to have 8 cards in hand", 8, playerB.getHand().size());
 
     }
 
@@ -66,7 +40,7 @@ public class DrawEffectsTest extends CardTestPlayerBase {
     public void testNotionThief() {
         addCard(Zone.BATTLEFIELD, playerA, "Island", 6);
         // Flash
-        // If an opponent would draw a card except the first one he or she draws in each of his or her draw steps, instead that player skips that draw and you draw a card.
+        // If an opponent would draw a card except the first one he or she draws in each of their draw steps, instead that player skips that draw and you draw a card.
         addCard(Zone.BATTLEFIELD, playerA, "Notion Thief", 1);
 
         // Target player draws four cards.
@@ -92,9 +66,9 @@ public class DrawEffectsTest extends CardTestPlayerBase {
         skipInitShuffling();
         addCard(Zone.BATTLEFIELD, playerA, "Mountain", 5);
         // Flash
-        // If an opponent would draw a card except the first one he or she draws in each of his or her draw steps, instead that player skips that draw and you draw a card.
+        // If an opponent would draw a card except the first one he or she draws in each of their draw steps, instead that player skips that draw and you draw a card.
         addCard(Zone.BATTLEFIELD, playerA, "Notion Thief", 1);
-        // Each player discards his or her hand, then draws seven cards.
+        // Each player discards their hand, then draws seven cards.
         // Miracle {1}{R}
         addCard(Zone.HAND, playerA, "Reforge the Soul", 1);
 
@@ -109,5 +83,25 @@ public class DrawEffectsTest extends CardTestPlayerBase {
         assertGraveyardCount(playerB, "Mountain", 1);
         assertHandCount(playerA, 14);
         assertHandCount(playerB, 0);
+    }
+
+    @Test
+    public void WordsOfWilding() {
+        addCard(Zone.BATTLEFIELD, playerA, "Island", 4);
+        // {1}: The next time you would draw a card this turn, create a 2/2 green Bear creature token instead.
+        addCard(Zone.BATTLEFIELD, playerA, "Words of Wilding", 1);
+
+        // Draw two cards.
+        addCard(Zone.HAND, playerA, "Counsel of the Soratami", 1); // Sorcery {2}{U}
+
+        activateAbility(1, PhaseStep.UPKEEP, playerA, "{1}");
+        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Counsel of the Soratami");
+
+        setStopAt(1, PhaseStep.BEGIN_COMBAT);
+        execute();
+
+        assertGraveyardCount(playerA, "Counsel of the Soratami", 1);
+        assertPermanentCount(playerA, "Bear", 1);
+        assertHandCount(playerA, 1);
     }
 }

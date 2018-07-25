@@ -20,11 +20,7 @@ public class CantAttackAloneAttachedEffect extends RestrictionEffect {
 
     public CantAttackAloneAttachedEffect(AttachmentType attachmentType) {
         super(Duration.WhileOnBattlefield);
-        if (attachmentType.equals(AttachmentType.AURA)) {
-            this.staticText = "Enchanted creature can't attack alone";
-        } else {
-            this.staticText = "Equipped creature can't attack alone";
-        }
+        this.staticText = attachmentType.verb() + " creature can't attack alone";
     }
 
     public CantAttackAloneAttachedEffect(final CantAttackAloneAttachedEffect effect) {
@@ -44,10 +40,7 @@ public class CantAttackAloneAttachedEffect extends RestrictionEffect {
     @Override
     public boolean applies(Permanent permanent, Ability source, Game game) {
         Permanent attachment = game.getPermanent(source.getSourceId());
-        if (attachment != null && attachment.getAttachedTo() != null
-                && permanent.getId().equals(attachment.getAttachedTo())) {
-            return true;
-        }
-        return false;
+        return attachment != null && attachment.getAttachedTo() != null
+                && permanent.getId().equals(attachment.getAttachedTo());
     }
 }

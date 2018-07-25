@@ -1,36 +1,8 @@
-/*
-* Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are
-* permitted provided that the following conditions are met:
-*
-*    1. Redistributions of source code must retain the above copyright notice, this list of
-*       conditions and the following disclaimer.
-*
-*    2. Redistributions in binary form must reproduce the above copyright notice, this list
-*       of conditions and the following disclaimer in the documentation and/or other materials
-*       provided with the distribution.
-*
-* THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-* FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*
-* The views and conclusions contained in the software and documentation are those of the
-* authors and should not be interpreted as representing official policies, either expressed
-* or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.game;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import mage.cards.decks.DeckValidator;
 import mage.constants.TableState;
 import mage.game.events.Listener;
@@ -40,9 +12,9 @@ import mage.game.match.Match;
 import mage.game.result.ResultProtos.TableProto;
 import mage.game.tournament.Tournament;
 import mage.players.Player;
+import mage.players.PlayerType;
 
 /**
- *
  * @author BetaSteward_at_googlemail.com
  */
 public class Table implements Serializable {
@@ -62,29 +34,32 @@ public class Table implements Serializable {
     private Match match;
     private Tournament tournament;
     private TableRecorder recorder;
+    private Set<String> bannedUsernames;
+    private boolean isPlaneChase;
 
+    @FunctionalInterface
     public interface TableRecorder {
 
         void record(Table table);
-    };
+    }
 
     protected TableEventSource tableEventSource = new TableEventSource();
 
-    public Table(UUID roomId, String gameType, String name, String controllerName, DeckValidator validator, List<String> playerTypes, TableRecorder recorder, Tournament tournament) {
-        this(roomId, gameType, name, controllerName, validator, playerTypes, recorder);
+    public Table(UUID roomId, String gameType, String name, String controllerName, DeckValidator validator, List<PlayerType> playerTypes, TableRecorder recorder, Tournament tournament, Set<String> bannedUsernames, boolean isPlaneChase) {
+        this(roomId, gameType, name, controllerName, validator, playerTypes, recorder, bannedUsernames, isPlaneChase);
         this.tournament = tournament;
         this.isTournament = true;
         setState(TableState.WAITING);
     }
 
-    public Table(UUID roomId, String gameType, String name, String controllerName, DeckValidator validator, List<String> playerTypes, TableRecorder recorder, Match match) {
-        this(roomId, gameType, name, controllerName, validator, playerTypes, recorder);
+    public Table(UUID roomId, String gameType, String name, String controllerName, DeckValidator validator, List<PlayerType> playerTypes, TableRecorder recorder, Match match, Set<String> bannedUsernames, boolean isPlaneChase) {
+        this(roomId, gameType, name, controllerName, validator, playerTypes, recorder, bannedUsernames, isPlaneChase);
         this.match = match;
         this.isTournament = false;
         setState(TableState.WAITING);
     }
 
-    protected Table(UUID roomId, String gameType, String name, String controllerName, DeckValidator validator, List<String> playerTypes, TableRecorder recorder) {
+    protected Table(UUID roomId, String gameType, String name, String controllerName, DeckValidator validator, List<PlayerType> playerTypes, TableRecorder recorder, Set<String> bannedUsernames, boolean isPlaneChase) {
         tableId = UUID.randomUUID();
         this.roomId = roomId;
         this.numSeats = playerTypes.size();
@@ -95,12 +70,14 @@ public class Table implements Serializable {
         createSeats(playerTypes);
         this.validator = validator;
         this.recorder = recorder;
+        this.bannedUsernames = new HashSet<>(bannedUsernames);
+        this.isPlaneChase = isPlaneChase;
     }
 
-    private void createSeats(List<String> playerTypes) {
+    private void createSeats(List<PlayerType> playerTypes) {
         int i = 0;
         seats = new Seat[numSeats];
-        for (String playerType : playerTypes) {
+        for (PlayerType playerType : playerTypes) {
             seats[i] = new Seat(playerType);
             i++;
         }
@@ -140,10 +117,9 @@ public class Table implements Serializable {
     /**
      * All activities of the table end (only replay of games (if active) and
      * display tournament results)
-     *
      */
     public void closeTable() {
-        if (!getState().equals(TableState.WAITING) && !getState().equals(TableState.READY_TO_START)) {
+        if (getState() != TableState.WAITING && getState() != TableState.READY_TO_START) {
             setState(TableState.FINISHED); // otherwise the table can be removed completely
         }
         this.validator = null;
@@ -151,7 +127,6 @@ public class Table implements Serializable {
 
     /**
      * Complete remove of the table, release all objects
-     *
      */
     public void cleanUp() {
         if (match != null) {
@@ -206,9 +181,9 @@ public class Table implements Serializable {
         return numSeats;
     }
 
-    public Seat getNextAvailableSeat(String playerType) {
+    public Seat getNextAvailableSeat(PlayerType playerType) {
         for (int i = 0; i < numSeats; i++) {
-            if (seats[i].getPlayer() == null && seats[i].getPlayerType().equals(playerType)) {
+            if (seats[i].getPlayer() == null && seats[i].getPlayerType() == (playerType)) {
                 return seats[i];
             }
         }
@@ -229,7 +204,7 @@ public class Table implements Serializable {
             Player player = seats[i].getPlayer();
             if (player != null && player.getId().equals(playerId)) {
                 seats[i].setPlayer(null);
-                if (getState().equals(TableState.READY_TO_START)) {
+                if (getState() == TableState.READY_TO_START) {
                     setState(TableState.WAITING);
                 }
                 break;
@@ -305,6 +280,10 @@ public class Table implements Serializable {
         } else {
             return match.getEndTime();
         }
+    }
+
+    public boolean userIsBanned(String username) {
+        return bannedUsernames.contains(username);
     }
 
     public TableProto toProto() {

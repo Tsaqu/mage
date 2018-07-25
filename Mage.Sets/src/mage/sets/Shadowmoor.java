@@ -1,48 +1,21 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.sets;
 
-import mage.cards.t.Torture;
-import mage.constants.SetType;
 import mage.cards.ExpansionSet;
+import mage.cards.t.Torture;
 import mage.constants.Rarity;
-import mage.cards.CardGraphicInfo;
+import mage.constants.SetType;
 
 /**
  *
  * @author North
  */
-public class Shadowmoor extends ExpansionSet {
+public final class Shadowmoor extends ExpansionSet {
 
-    private static final Shadowmoor fINSTANCE = new Shadowmoor();
+    private static final Shadowmoor instance = new Shadowmoor();
 
     public static Shadowmoor getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     private Shadowmoor() {
@@ -129,10 +102,10 @@ public class Shadowmoor extends ExpansionSet {
         cards.add(new SetCardInfo("Flame Javelin", 92, Rarity.UNCOMMON, mage.cards.f.FlameJavelin.class));
         cards.add(new SetCardInfo("Flourishing Defenses", 114, Rarity.UNCOMMON, mage.cards.f.FlourishingDefenses.class));
         cards.add(new SetCardInfo("Flow of Ideas", 38, Rarity.UNCOMMON, mage.cards.f.FlowOfIdeas.class));
-        cards.add(new SetCardInfo("Forest", 298, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 299, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 300, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 301, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Forest", 298, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 299, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 300, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 301, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Fossil Find", 206, Rarity.UNCOMMON, mage.cards.f.FossilFind.class));
         cards.add(new SetCardInfo("Foxfire Oak", 115, Rarity.COMMON, mage.cards.f.FoxfireOak.class));
         cards.add(new SetCardInfo("Fracturing Gust", 227, Rarity.RARE, mage.cards.f.FracturingGust.class));
@@ -173,10 +146,10 @@ public class Shadowmoor extends ExpansionSet {
         cards.add(new SetCardInfo("Inkfathom Witch", 168, Rarity.UNCOMMON, mage.cards.i.InkfathomWitch.class));
         cards.add(new SetCardInfo("Inquisitor's Snare", 8, Rarity.COMMON, mage.cards.i.InquisitorsSnare.class));
         cards.add(new SetCardInfo("Intimidator Initiate", 96, Rarity.COMMON, mage.cards.i.IntimidatorInitiate.class));
-        cards.add(new SetCardInfo("Island", 286, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 287, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 288, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 289, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Island", 286, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 287, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 288, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 289, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Isleback Spawn", 40, Rarity.RARE, mage.cards.i.IslebackSpawn.class));
         cards.add(new SetCardInfo("Jaws of Stone", 97, Rarity.UNCOMMON, mage.cards.j.JawsOfStone.class));
         cards.add(new SetCardInfo("Juvenile Gloomwidow", 121, Rarity.COMMON, mage.cards.j.JuvenileGloomwidow.class));
@@ -215,10 +188,10 @@ public class Shadowmoor extends ExpansionSet {
         cards.add(new SetCardInfo("Moonring Island", 276, Rarity.UNCOMMON, mage.cards.m.MoonringIsland.class));
         cards.add(new SetCardInfo("Morselhoarder", 212, Rarity.COMMON, mage.cards.m.Morselhoarder.class));
         cards.add(new SetCardInfo("Mossbridge Troll", 123, Rarity.RARE, mage.cards.m.MossbridgeTroll.class));
-        cards.add(new SetCardInfo("Mountain", 294, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 295, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 296, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 297, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Mountain", 294, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 295, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 296, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 297, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Mudbrawler Cohort", 100, Rarity.COMMON, mage.cards.m.MudbrawlerCohort.class));
         cards.add(new SetCardInfo("Mudbrawler Raiders", 213, Rarity.COMMON, mage.cards.m.MudbrawlerRaiders.class));
         cards.add(new SetCardInfo("Murderous Redcap", 192, Rarity.UNCOMMON, mage.cards.m.MurderousRedcap.class));
@@ -236,10 +209,10 @@ public class Shadowmoor extends ExpansionSet {
         cards.add(new SetCardInfo("Parapet Watchers", 45, Rarity.COMMON, mage.cards.p.ParapetWatchers.class));
         cards.add(new SetCardInfo("Pili-Pala", 258, Rarity.COMMON, mage.cards.p.PiliPala.class));
         cards.add(new SetCardInfo("Plague of Vermin", 73, Rarity.RARE, mage.cards.p.PlagueOfVermin.class));
-        cards.add(new SetCardInfo("Plains", 282, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 283, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 284, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 285, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Plains", 282, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 283, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 284, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 285, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Plumeveil", 145, Rarity.UNCOMMON, mage.cards.p.Plumeveil.class));
         cards.add(new SetCardInfo("Poison the Well", 193, Rarity.COMMON, mage.cards.p.PoisonTheWell.class));
         cards.add(new SetCardInfo("Polluted Bonds", 74, Rarity.RARE, mage.cards.p.PollutedBonds.class));
@@ -306,10 +279,10 @@ public class Shadowmoor extends ExpansionSet {
         cards.add(new SetCardInfo("Steel of the Godhead", 150, Rarity.COMMON, mage.cards.s.SteelOfTheGodhead.class));
         cards.add(new SetCardInfo("Strip Bare", 24, Rarity.COMMON, mage.cards.s.StripBare.class));
         cards.add(new SetCardInfo("Sunken Ruins", 280, Rarity.RARE, mage.cards.s.SunkenRuins.class));
-        cards.add(new SetCardInfo("Swamp", 290, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 291, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 292, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 293, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Swamp", 290, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 291, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 292, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 293, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Swans of Bryn Argoll", 151, Rarity.RARE, mage.cards.s.SwansOfBrynArgoll.class));
         cards.add(new SetCardInfo("Sygg, River Cutthroat", 176, Rarity.RARE, mage.cards.s.SyggRiverCutthroat.class));
         cards.add(new SetCardInfo("Tatterkite", 264, Rarity.UNCOMMON, mage.cards.t.Tatterkite.class));

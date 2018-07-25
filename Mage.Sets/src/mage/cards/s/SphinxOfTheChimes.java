@@ -1,38 +1,10 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.s;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
-import mage.constants.CardType;
 import mage.MageInt;
 import mage.abilities.Ability;
 import mage.abilities.common.SimpleActivatedAbility;
@@ -44,6 +16,9 @@ import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.cards.Cards;
 import mage.cards.CardsImpl;
+import mage.cards.SplitCard;
+import mage.constants.CardType;
+import mage.constants.SubType;
 import mage.constants.Zone;
 import mage.filter.FilterCard;
 import mage.filter.common.FilterNonlandCard;
@@ -56,11 +31,11 @@ import mage.target.common.TargetCardInHand;
  *
  * @author LevelX2
  */
-public class SphinxOfTheChimes extends CardImpl {
+public final class SphinxOfTheChimes extends CardImpl {
 
     public SphinxOfTheChimes(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{4}{U}{U}");
-        this.subtype.add("Sphinx");
+        super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{4}{U}{U}");
+        this.subtype.add(SubType.SPHINX);
 
         this.power = new MageInt(5);
         this.toughness = new MageInt(6);
@@ -128,27 +103,24 @@ class TargetTwoNonLandCardsWithSameNameInHand extends TargetCardInHand {
                 Card chosenCard = cardsToCheck.get(entry.getKey(), game);
                 if (chosenCard != null) {
                     for (UUID cardToCheck : cardsToCheck) {
-                        if (!cardToCheck.equals(chosenCard.getId()) && chosenCard.getName().equals(game.getCard(cardToCheck).getName()))
-                        {
+                        if (!cardToCheck.equals(chosenCard.getId()) && chosenCard.getName().equals(game.getCard(cardToCheck).getName())) {
                             newPossibleTargets.add(cardToCheck);
                         }
                     }
                 }
             }
-        } 
-        else
-        {
+        } else {
             for (UUID cardToCheck : cardsToCheck) {
                 FilterCard nameFilter = new FilterCard();
-                nameFilter.add(new NamePredicate(game.getCard(cardToCheck).getName()));
+                Card card = game.getCard(cardToCheck);
+                nameFilter.add(new NamePredicate(card.isSplitCard() ? ((SplitCard) card).getLeftHalfCard().getName() : card.getName()));
                 if (cardsToCheck.count(nameFilter, game) > 1) {
-                   newPossibleTargets.add(cardToCheck);
+                    newPossibleTargets.add(cardToCheck);
                 }
             }
         }
         return newPossibleTargets;
     }
-
 
     @Override
     public boolean canChoose(UUID sourceControllerId, Game game) {
@@ -158,11 +130,11 @@ class TargetTwoNonLandCardsWithSameNameInHand extends TargetCardInHand {
             cardsToCheck.add(card.getId());
         }
         int possibleCards = 0;
-        for (UUID cardToCheck : cardsToCheck) {
+        for (Card card : cardsToCheck.getCards(game)) {
             FilterCard nameFilter = new FilterCard();
-            nameFilter.add(new NamePredicate(game.getCard(cardToCheck).getName()));
+            nameFilter.add(new NamePredicate(card.isSplitCard() ? ((SplitCard) card).getLeftHalfCard().getName() : card.getName()));
             if (cardsToCheck.count(nameFilter, game) > 1) {
-               ++possibleCards;
+                ++possibleCards;
             }
         }
         return possibleCards > 0;
@@ -180,11 +152,11 @@ class TargetTwoNonLandCardsWithSameNameInHand extends TargetCardInHand {
                     }
                 } else {
                     FilterCard nameFilter = new FilterCard();
-                    nameFilter.add(new NamePredicate(card.getName()));
+                    nameFilter.add(new NamePredicate(card.isSplitCard() ? ((SplitCard) card).getLeftHalfCard().getName() : card.getName()));
                     Player player = game.getPlayer(card.getOwnerId());
                     if (player.getHand().getCards(nameFilter, game).size() > 1) {
                         return true;
-                   }
+                    }
                 }
             }
         }

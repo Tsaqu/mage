@@ -1,46 +1,9 @@
-/*
- * Copyright 2012 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.client.cards;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.List;
-import java.util.UUID;
-import javax.swing.JLayeredPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
 import mage.cards.MageCard;
 import mage.client.plugins.impl.Plugins;
+import mage.client.util.ClientEventType;
 import mage.client.util.Event;
 import mage.client.util.GUISizeHelper;
 import mage.client.util.Listener;
@@ -50,14 +13,21 @@ import mage.view.CardsView;
 import mage.view.SimpleCardView;
 import org.mage.card.arcane.CardPanel;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.List;
+import java.util.UUID;
+
 public class CardArea extends JPanel implements MouseListener {
 
-    protected CardEventSource cardEventSource = new CardEventSource();
+    protected final CardEventSource cardEventSource = new CardEventSource();
 
     private boolean reloaded = false;
     private final javax.swing.JLayeredPane cardArea;
     private final javax.swing.JScrollPane scrollPane;
-    private int yTextOffset;
+    private int yCardCaptionOffsetPercent = 0; // card caption offset (use for moving card caption view center, below mana icons -- for more good UI)
     private Dimension cardDimension;
     private int verticalCardOffset;
 
@@ -72,8 +42,6 @@ public class CardArea extends JPanel implements MouseListener {
         setGUISize();
         cardArea = new JLayeredPane();
         scrollPane.setViewportView(cardArea);
-        yTextOffset = 10;
-
     }
 
     public void cleanUp() {
@@ -89,7 +57,7 @@ public class CardArea extends JPanel implements MouseListener {
         setGUISize();
         for (Component component : cardArea.getComponents()) {
             if (component instanceof CardPanel) {
-                ((CardPanel) component).setBounds(0, 0, cardDimension.width, cardDimension.height);
+                component.setBounds(0, 0, cardDimension.width, cardDimension.height);
             }
         }
     }
@@ -107,10 +75,10 @@ public class CardArea extends JPanel implements MouseListener {
         this.reloaded = true;
         cardArea.removeAll();
         if (showCards != null && showCards.size() < 10) {
-            yTextOffset = 10;
+            yCardCaptionOffsetPercent = 8; // TODO: need to test
             loadCardsFew(showCards, bigCard, gameId);
         } else {
-            yTextOffset = 0;
+            yCardCaptionOffsetPercent = 0;
             loadCardsMany(showCards, bigCard, gameId);
         }
         cardArea.revalidate();
@@ -122,8 +90,10 @@ public class CardArea extends JPanel implements MouseListener {
     public void loadCardsNarrow(CardsView showCards, BigCard bigCard, UUID gameId) {
         this.reloaded = true;
         cardArea.removeAll();
-        yTextOffset = 0;
+
+        yCardCaptionOffsetPercent = 0; // TODO: need to test
         loadCardsMany(showCards, bigCard, gameId);
+
         cardArea.revalidate();
 
         this.revalidate();
@@ -148,7 +118,7 @@ public class CardArea extends JPanel implements MouseListener {
             tmp.setAbility(card); // cross-reference, required for ability picker
             card = tmp;
         }
-        MageCard cardPanel = Plugins.getInstance().getMageCard(card, bigCard, cardDimension, gameId, true, true);
+        MageCard cardPanel = Plugins.instance.getMageCard(card, bigCard, cardDimension, gameId, true, true);
 
         cardPanel.setBounds(rectangle);
         cardPanel.addMouseListener(this);
@@ -156,14 +126,17 @@ public class CardArea extends JPanel implements MouseListener {
         cardArea.moveToFront(cardPanel);
         cardPanel.update(card);
         cardPanel.setCardBounds(rectangle.x, rectangle.y, cardDimension.width, cardDimension.height);
-        cardPanel.setTextOffset(yTextOffset);
+
+        // new card have same settings as current view
+        cardPanel.setCardCaptionTopOffset(yCardCaptionOffsetPercent);
+
         cardPanel.showCardTitle();
     }
 
     private void loadCardsMany(CardsView showCards, BigCard bigCard, UUID gameId) {
         int rowsOfCards = 20;
         int columns = 1;
-        if (showCards != null && showCards.size() > 0) {
+        if (showCards != null && !showCards.isEmpty()) {
             Rectangle rectangle = new Rectangle(cardDimension.width, cardDimension.height);
             int count = 0;
             for (CardView card : showCards.values()) {
@@ -240,15 +213,15 @@ public class CardArea extends JPanel implements MouseListener {
                 e.consume();
                 if (obj instanceof Card) {
                     if (e.isAltDown()) {
-                        cardEventSource.altDoubleClick(((Card) obj).getOriginal(), "alt-double-click");
+                        cardEventSource.fireEvent(((Card) obj).getOriginal(), ClientEventType.ALT_DOUBLE_CLICK);
                     } else {
-                        cardEventSource.doubleClick(((Card) obj).getOriginal(), "double-click");
+                        cardEventSource.fireEvent(((Card) obj).getOriginal(), ClientEventType.DOUBLE_CLICK);
                     }
                 } else if (obj instanceof MageCard) {
                     if (e.isAltDown()) {
-                        cardEventSource.altDoubleClick(((MageCard) obj).getOriginal(), "alt-double-click");
+                        cardEventSource.fireEvent(((MageCard) obj).getOriginal(), ClientEventType.ALT_DOUBLE_CLICK);
                     } else {
-                        cardEventSource.doubleClick(((MageCard) obj).getOriginal(), "double-click");
+                        cardEventSource.fireEvent(((MageCard) obj).getOriginal(),ClientEventType.DOUBLE_CLICK);
                     }
                 }
             }
@@ -270,14 +243,14 @@ public class CardArea extends JPanel implements MouseListener {
                 checkMenu(e, null);
             }
         } else {
-            cardEventSource.actionConsumedEvent("action-consumed");
+            cardEventSource.fireEvent(ClientEventType.ACTION_CONSUMED);
         }
     }
 
     private void checkMenu(MouseEvent Me, SimpleCardView card) {
         if (Me.isPopupTrigger()) {
             Me.consume();
-            cardEventSource.showPopupMenuEvent(card, Me.getComponent(), Me.getX(), Me.getY(), "show-popup-menu");
+            cardEventSource.fireEvent(card, Me.getComponent(), Me.getX(), Me.getY(), ClientEventType.SHOW_POP_UP_MENU);
         }
     }
 

@@ -1,48 +1,20 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.sets;
 
 import mage.cards.ExpansionSet;
-import mage.constants.SetType;
 import mage.constants.Rarity;
-import mage.cards.CardGraphicInfo;
+import mage.constants.SetType;
 
 /**
  *
  * @author LevelX2
  */
+public final class Archenemy extends ExpansionSet {
 
-public class Archenemy extends ExpansionSet {
-
-    private static final Archenemy fINSTANCE = new Archenemy();
+    private static final Archenemy instance = new Archenemy();
 
     public static Archenemy getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     private Archenemy() {
@@ -89,9 +61,9 @@ public class Archenemy extends ExpansionSet {
         cards.add(new SetCardInfo("Fires of Yavimaya", 86, Rarity.UNCOMMON, mage.cards.f.FiresOfYavimaya.class));
         cards.add(new SetCardInfo("Flameblast Dragon", 38, Rarity.RARE, mage.cards.f.FlameblastDragon.class));
         cards.add(new SetCardInfo("Fog", 56, Rarity.COMMON, mage.cards.f.Fog.class));
-        cards.add(new SetCardInfo("Forest", 148, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 149, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 150, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Forest", 148, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 149, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 150, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Forgotten Ancient", 57, Rarity.RARE, mage.cards.f.ForgottenAncient.class));
         cards.add(new SetCardInfo("Furnace Whelp", 39, Rarity.UNCOMMON, mage.cards.f.FurnaceWhelp.class));
         cards.add(new SetCardInfo("Gathan Raiders", 40, Rarity.COMMON, mage.cards.g.GathanRaiders.class));
@@ -106,9 +78,9 @@ public class Archenemy extends ExpansionSet {
         cards.add(new SetCardInfo("Infectious Horror", 18, Rarity.COMMON, mage.cards.i.InfectiousHorror.class));
         cards.add(new SetCardInfo("Inferno Trap", 43, Rarity.UNCOMMON, mage.cards.i.InfernoTrap.class));
         cards.add(new SetCardInfo("Infest", 19, Rarity.UNCOMMON, mage.cards.i.Infest.class));
-        cards.add(new SetCardInfo("Island", 139, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 140, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 141, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Island", 139, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 140, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 141, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Juggernaut", 109, Rarity.UNCOMMON, mage.cards.j.Juggernaut.class));
         cards.add(new SetCardInfo("Kaervek the Merciless", 88, Rarity.RARE, mage.cards.k.KaervekTheMerciless.class));
         cards.add(new SetCardInfo("Kamahl, Fist of Krosa", 61, Rarity.RARE, mage.cards.k.KamahlFistOfKrosa.class));
@@ -130,16 +102,16 @@ public class Archenemy extends ExpansionSet {
         cards.add(new SetCardInfo("Mistvein Borderpost", 90, Rarity.COMMON, mage.cards.m.MistveinBorderpost.class));
         cards.add(new SetCardInfo("Molimo, Maro-Sorcerer", 64, Rarity.RARE, mage.cards.m.MolimoMaroSorcerer.class));
         cards.add(new SetCardInfo("Mosswort Bridge", 130, Rarity.RARE, mage.cards.m.MosswortBridge.class));
-        cards.add(new SetCardInfo("Mountain", 145, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 146, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 147, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Mountain", 145, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 146, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 147, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Nantuko Monastery", 131, Rarity.UNCOMMON, mage.cards.n.NantukoMonastery.class));
         cards.add(new SetCardInfo("Obelisk of Esper", 113, Rarity.COMMON, mage.cards.o.ObeliskOfEsper.class));
         cards.add(new SetCardInfo("Oblivion Ring", 3, Rarity.COMMON, mage.cards.o.OblivionRing.class));
         cards.add(new SetCardInfo("Pale Recluse", 91, Rarity.COMMON, mage.cards.p.PaleRecluse.class));
         cards.add(new SetCardInfo("Path to Exile", 4, Rarity.UNCOMMON, mage.cards.p.PathToExile.class));
-        cards.add(new SetCardInfo("Plains", 137, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 138, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Plains", 137, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 138, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Plummet", 65, Rarity.COMMON, mage.cards.p.Plummet.class));
         cards.add(new SetCardInfo("Primal Command", 66, Rarity.RARE, mage.cards.p.PrimalCommand.class));
         cards.add(new SetCardInfo("Rakdos Carnarium", 132, Rarity.COMMON, mage.cards.r.RakdosCarnarium.class));
@@ -167,9 +139,9 @@ public class Archenemy extends ExpansionSet {
         cards.add(new SetCardInfo("Spin into Myth", 8, Rarity.UNCOMMON, mage.cards.s.SpinIntoMyth.class));
         cards.add(new SetCardInfo("Sundering Titan", 118, Rarity.RARE, mage.cards.s.SunderingTitan.class));
         cards.add(new SetCardInfo("Sun Droplet", 117, Rarity.UNCOMMON, mage.cards.s.SunDroplet.class));
-        cards.add(new SetCardInfo("Swamp", 142, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 143, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 144, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Swamp", 142, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 143, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 144, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Synod Centurion", 119, Rarity.UNCOMMON, mage.cards.s.SynodCenturion.class));
         cards.add(new SetCardInfo("Synod Sanctum", 120, Rarity.UNCOMMON, mage.cards.s.SynodSanctum.class));
         cards.add(new SetCardInfo("Taurean Mauler", 49, Rarity.RARE, mage.cards.t.TaureanMauler.class));

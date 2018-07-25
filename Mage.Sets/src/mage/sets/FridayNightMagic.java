@@ -1,34 +1,6 @@
-/*
-* Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are
-* permitted provided that the following conditions are met:
-*
-*    1. Redistributions of source code must retain the above copyright notice, this list of
-*       conditions and the following disclaimer.
-*
-*    2. Redistributions in binary form must reproduce the above copyright notice, this list
-*       of conditions and the following disclaimer in the documentation and/or other materials
-*       provided with the distribution.
-*
-* THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-* FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*
-* The views and conclusions contained in the software and documentation are those of the
-* authors and should not be interpreted as representing official policies, either expressed
-* or implied, of BetaSteward_at_googlemail.com.
-*/
 
 package mage.sets;
 
-import mage.cards.CardGraphicInfo;
 import mage.cards.ExpansionSet;
 import mage.constants.Rarity;
 import mage.constants.SetType;
@@ -37,12 +9,12 @@ import mage.constants.SetType;
  *
  * @author fireshoes
  */
-public class FridayNightMagic extends ExpansionSet {
+public final class FridayNightMagic extends ExpansionSet {
 
-    private static final FridayNightMagic fINSTANCE = new FridayNightMagic();
+    private static final FridayNightMagic instance = new FridayNightMagic();
 
     public static FridayNightMagic getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     private FridayNightMagic() {
@@ -52,6 +24,7 @@ public class FridayNightMagic extends ExpansionSet {
         cards.add(new SetCardInfo("Abzan Beastmaster", 180, Rarity.UNCOMMON, mage.cards.a.AbzanBeastmaster.class));
         cards.add(new SetCardInfo("Accumulated Knowledge", 51, Rarity.COMMON, mage.cards.a.AccumulatedKnowledge.class));
         cards.add(new SetCardInfo("Acidic Slime", 145, Rarity.UNCOMMON, mage.cards.a.AcidicSlime.class));
+        cards.add(new SetCardInfo("Aether Hub", 205, Rarity.SPECIAL, mage.cards.a.AetherHub.class));
         cards.add(new SetCardInfo("Albino Troll", 20, Rarity.UNCOMMON, mage.cards.a.AlbinoTroll.class));
         cards.add(new SetCardInfo("Anathemancer", 122, Rarity.UNCOMMON, mage.cards.a.Anathemancer.class));
         cards.add(new SetCardInfo("Ancient Grudge", 144, Rarity.COMMON, mage.cards.a.AncientGrudge.class));
@@ -116,6 +89,7 @@ public class FridayNightMagic extends ExpansionSet {
         cards.add(new SetCardInfo("Fact or Fiction", 61, Rarity.UNCOMMON, mage.cards.f.FactOrFiction.class));
         cards.add(new SetCardInfo("Fanatic of Xenagos", 173, Rarity.UNCOMMON, mage.cards.f.FanaticOfXenagos.class));
         cards.add(new SetCardInfo("Farseek", 154, Rarity.COMMON, mage.cards.f.Farseek.class));
+        cards.add(new SetCardInfo("Fatal Push", 208, Rarity.SPECIAL, mage.cards.f.FatalPush.class));
         cards.add(new SetCardInfo("Fiery Temper", 198, Rarity.UNCOMMON, mage.cards.f.FieryTemper.class));
         cards.add(new SetCardInfo("Fireblast", 18, Rarity.COMMON, mage.cards.f.Fireblast.class));
         cards.add(new SetCardInfo("Firebolt", 80, Rarity.UNCOMMON, mage.cards.f.Firebolt.class));
@@ -126,6 +100,7 @@ public class FridayNightMagic extends ExpansionSet {
         cards.add(new SetCardInfo("Forbid", 27, Rarity.UNCOMMON, mage.cards.f.Forbid.class));
         cards.add(new SetCardInfo("Forbidden Alchemy", 146, Rarity.COMMON, mage.cards.f.ForbiddenAlchemy.class));
         cards.add(new SetCardInfo("Force Spike", 91, Rarity.COMMON, mage.cards.f.ForceSpike.class));
+        cards.add(new SetCardInfo("Fortune's Favor", 201, Rarity.COMMON, mage.cards.f.FortunesFavor.class));
         cards.add(new SetCardInfo("Frenzied Goblin", 176, Rarity.UNCOMMON, mage.cards.f.FrenziedGoblin.class));
         cards.add(new SetCardInfo("Frost Walker", 181, Rarity.UNCOMMON, mage.cards.f.FrostWalker.class));
         cards.add(new SetCardInfo("Gatekeeper of Malakir", 126, Rarity.UNCOMMON, mage.cards.g.GatekeeperOfMalakir.class));
@@ -138,13 +113,14 @@ public class FridayNightMagic extends ExpansionSet {
         cards.add(new SetCardInfo("Goblin Bombardment", 37, Rarity.UNCOMMON, mage.cards.g.GoblinBombardment.class));
         cards.add(new SetCardInfo("Goblin Legionnaire", 85, Rarity.COMMON, mage.cards.g.GoblinLegionnaire.class));
         cards.add(new SetCardInfo("Goblin Ringleader", 87, Rarity.UNCOMMON, mage.cards.g.GoblinRingleader.class));
-        cards.add(new SetCardInfo("Goblin Warchief", 72, Rarity.UNCOMMON, mage.cards.g.GoblinWarchief.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Goblin Warchief", 192, Rarity.UNCOMMON, mage.cards.g.GoblinWarchief.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Goblin Warchief", 72, Rarity.UNCOMMON, mage.cards.g.GoblinWarchief.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Goblin Warchief", 192, Rarity.UNCOMMON, mage.cards.g.GoblinWarchief.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Go for the Throat", 138, Rarity.UNCOMMON, mage.cards.g.GoForTheThroat.class));
         cards.add(new SetCardInfo("Grisly Salvage", 162, Rarity.COMMON, mage.cards.g.GrislySalvage.class));
         cards.add(new SetCardInfo("Hordeling Outburst", 178, Rarity.UNCOMMON, mage.cards.h.HordelingOutburst.class));
         cards.add(new SetCardInfo("Icy Manipulator", 67, Rarity.UNCOMMON, mage.cards.i.IcyManipulator.class));
         cards.add(new SetCardInfo("Impulse", 17, Rarity.COMMON, mage.cards.i.Impulse.class));
+        cards.add(new SetCardInfo("Incendiary Flow", 202, Rarity.SPECIAL, mage.cards.i.IncendiaryFlow.class));
         cards.add(new SetCardInfo("Isochron Scepter", 102, Rarity.UNCOMMON, mage.cards.i.IsochronScepter.class));
         cards.add(new SetCardInfo("Izzet Charm", 157, Rarity.UNCOMMON, mage.cards.i.IzzetCharm.class));
         cards.add(new SetCardInfo("Jace's Ingenuity", 134, Rarity.UNCOMMON, mage.cards.j.JacesIngenuity.class));
@@ -190,7 +166,9 @@ public class FridayNightMagic extends ExpansionSet {
         cards.add(new SetCardInfo("Reanimate", 53, Rarity.UNCOMMON, mage.cards.r.Reanimate.class));
         cards.add(new SetCardInfo("Reliquary Tower", 153, Rarity.UNCOMMON, mage.cards.r.ReliquaryTower.class));
         cards.add(new SetCardInfo("Remand", 92, Rarity.UNCOMMON, mage.cards.r.Remand.class));
+        cards.add(new SetCardInfo("Renegade Rallier", 207, Rarity.SPECIAL, mage.cards.r.RenegadeRallier.class));
         cards.add(new SetCardInfo("Resurrection", 97, Rarity.UNCOMMON, mage.cards.r.Resurrection.class));
+        cards.add(new SetCardInfo("Reverse Engineer", 206, Rarity.SPECIAL, mage.cards.r.ReverseEngineer.class));
         cards.add(new SetCardInfo("Rhox War Monk", 133, Rarity.UNCOMMON, mage.cards.r.RhoxWarMonk.class));
         cards.add(new SetCardInfo("Rift Bolt", 125, Rarity.COMMON, mage.cards.r.RiftBolt.class));
         cards.add(new SetCardInfo("Rise from the Tides", 197, Rarity.UNCOMMON, mage.cards.r.RiseFromTheTides.class));
@@ -204,6 +182,7 @@ public class FridayNightMagic extends ExpansionSet {
         cards.add(new SetCardInfo("Searing Spear", 152, Rarity.COMMON, mage.cards.s.SearingSpear.class));
         cards.add(new SetCardInfo("Serrated Arrows", 101, Rarity.UNCOMMON, mage.cards.s.SerratedArrows.class));
         cards.add(new SetCardInfo("Serum Visions", 183, Rarity.COMMON, mage.cards.s.SerumVisions.class));
+        cards.add(new SetCardInfo("Servo Exhibition", 203, Rarity.SPECIAL, mage.cards.s.ServoExhibition.class));
         cards.add(new SetCardInfo("Shock", 6, Rarity.COMMON, mage.cards.s.Shock.class));
         cards.add(new SetCardInfo("Shrapnel Blast", 103, Rarity.UNCOMMON, mage.cards.s.ShrapnelBlast.class));
         cards.add(new SetCardInfo("Silver Knight", 46, Rarity.UNCOMMON, mage.cards.s.SilverKnight.class));
@@ -234,6 +213,7 @@ public class FridayNightMagic extends ExpansionSet {
         cards.add(new SetCardInfo("Tormod's Crypt", 93, Rarity.UNCOMMON, mage.cards.t.TormodsCrypt.class));
         cards.add(new SetCardInfo("Treetop Village", 50, Rarity.UNCOMMON, mage.cards.t.TreetopVillage.class));
         cards.add(new SetCardInfo("Ultimate Price", 185, Rarity.UNCOMMON, mage.cards.u.UltimatePrice.class));
+        cards.add(new SetCardInfo("Unlicensed Disintegration", 204, Rarity.SPECIAL, mage.cards.u.UnlicensedDisintegration.class));
         cards.add(new SetCardInfo("Volcanic Geyser", 4, Rarity.UNCOMMON, mage.cards.v.VolcanicGeyser.class));
         cards.add(new SetCardInfo("Wall of Blossoms", 23, Rarity.UNCOMMON, mage.cards.w.WallOfBlossoms.class));
         cards.add(new SetCardInfo("Wall of Omens", 130, Rarity.UNCOMMON, mage.cards.w.WallOfOmens.class));

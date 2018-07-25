@@ -1,47 +1,18 @@
-/*
- *  Copyright 2011 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.abilities.effects.common.continuous;
 
-import java.util.UUID;
 import mage.abilities.Ability;
 import mage.abilities.Mode;
 import mage.abilities.effects.ContinuousEffectImpl;
-import mage.cards.repository.CardRepository;
-import mage.constants.CardType;
-import mage.constants.Duration;
-import mage.constants.Layer;
-import mage.constants.Outcome;
-import mage.constants.SubLayer;
+import mage.constants.*;
 import mage.game.Game;
 import mage.game.permanent.Permanent;
+import mage.game.permanent.token.TokenImpl;
 import mage.game.permanent.token.Token;
 import mage.target.Target;
 import mage.util.CardUtil;
+
+import java.util.UUID;
 
 /**
  * @author BetaSteward_at_googlemail.com
@@ -88,22 +59,22 @@ public class BecomesCreatureTargetEffect extends ContinuousEffectImpl {
                     case TypeChangingEffects_4:
                         if (sublayer == SubLayer.NA) {
                             if (loseAllAbilities) {
-                                permanent.getSubtype(game).retainAll(CardRepository.instance.getLandTypes());
+                                permanent.getSubtype(game).retainAll(SubType.getLandTypes(false));
                                 permanent.getSubtype(game).addAll(token.getSubtype(game));
                             } else {
-                                if (token.getSubtype(game).size() > 0) {
-                                    for (String subtype : token.getSubtype(game)) {
-                                        if (!permanent.getSubtype(game).contains(subtype)) {
+                                if (!token.getSubtype(game).isEmpty()) {
+                                    for (SubType subtype : token.getSubtype(game)) {
+                                        if (!permanent.hasSubtype(subtype, game)) {
                                             permanent.getSubtype(game).add(subtype);
                                         }
                                     }
 
                                 }
                             }
-                            if (token.getCardType().size() > 0) {
+                            if (!token.getCardType().isEmpty()) {
                                 for (CardType t : token.getCardType()) {
                                     if (!permanent.getCardType().contains(t)) {
-                                        permanent.getCardType().add(t);
+                                        permanent.addCardType(t);
                                     }
                                 }
                             }
@@ -128,7 +99,7 @@ public class BecomesCreatureTargetEffect extends ContinuousEffectImpl {
                             permanent.removeAllAbilities(source.getSourceId(), game);
                         }
                         if (sublayer == SubLayer.NA) {
-                            if (token.getAbilities().size() > 0) {
+                            if (!token.getAbilities().isEmpty()) {
                                 for (Ability ability : token.getAbilities()) {
                                     permanent.addAbility(ability, source.getSourceId(), game);
                                 }
@@ -144,7 +115,7 @@ public class BecomesCreatureTargetEffect extends ContinuousEffectImpl {
                 result = true;
             }
         }
-        if (!result && this.duration.equals(Duration.Custom)) {
+        if (!result && this.duration == Duration.Custom) {
             this.discard();
         }
         return result;
@@ -184,7 +155,7 @@ public class BecomesCreatureTargetEffect extends ContinuousEffectImpl {
             sb.append(" becomes a ");
         }
         sb.append(token.getDescription());
-        sb.append(" ").append(duration.toString());
+        sb.append(' ').append(duration.toString());
         if (addStillALandText) {
             if (target.getMaxNumberOfTargets() > 1) {
                 sb.append(". They're still lands");

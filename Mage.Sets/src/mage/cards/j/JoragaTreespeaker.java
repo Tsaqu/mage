@@ -1,37 +1,8 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- * 
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- * 
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- * 
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- * 
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 
 package mage.cards.j;
 
 import java.util.UUID;
-import mage.constants.CardType;
-import mage.constants.Duration;
-import mage.constants.Zone;
 import mage.MageInt;
 import mage.Mana;
 import mage.abilities.Abilities;
@@ -40,13 +11,16 @@ import mage.abilities.Ability;
 import mage.abilities.common.SimpleStaticAbility;
 import mage.abilities.costs.common.TapSourceCost;
 import mage.abilities.costs.mana.ManaCostsImpl;
-import mage.abilities.effects.common.BasicManaEffect;
 import mage.abilities.effects.common.continuous.GainAbilityControlledEffect;
 import mage.abilities.keyword.LevelUpAbility;
 import mage.abilities.keyword.LevelerCardBuilder;
 import mage.abilities.mana.SimpleManaAbility;
 import mage.cards.CardSetInfo;
 import mage.cards.LevelerCard;
+import mage.constants.CardType;
+import mage.constants.Duration;
+import mage.constants.SubType;
+import mage.constants.Zone;
 import mage.filter.common.FilterControlledCreaturePermanent;
 import mage.filter.predicate.mageobject.SubtypePredicate;
 
@@ -55,18 +29,18 @@ import mage.filter.predicate.mageobject.SubtypePredicate;
  *
  * @author BetaSteward_at_googlemail.com, noxx
  */
-public class JoragaTreespeaker extends LevelerCard {
+public final class JoragaTreespeaker extends LevelerCard {
 
     private static final FilterControlledCreaturePermanent filter = new FilterControlledCreaturePermanent("Elves");
 
     static {
-        filter.add(new SubtypePredicate("Elf"));
+        filter.add(new SubtypePredicate(SubType.ELF));
     }
 
     public JoragaTreespeaker(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{G}");
-        this.subtype.add("Elf");
-        this.subtype.add("Druid");
+        this.subtype.add(SubType.ELF);
+        this.subtype.add(SubType.DRUID);
 
         this.color.setGreen(true);
         this.power = new MageInt(1);
@@ -77,18 +51,16 @@ public class JoragaTreespeaker extends LevelerCard {
 
         // LEVEL 1-4
         // 1/2
-        // {T}: Add {G}{G} to your mana pool.
-        Abilities<Ability> abilities1 = new AbilitiesImpl<Ability>();
+        // {T}: Add {G}{G}.
+        Abilities<Ability> abilities1 = new AbilitiesImpl<>();
         abilities1.add(new SimpleManaAbility(Zone.BATTLEFIELD, Mana.GreenMana(2), new TapSourceCost()));
 
         // LEVEL 5+
         // 1/4
-        // Elves you control have "{T}: Add {G}{G} to your mana pool."
-        Abilities<Ability> abilities2 = new AbilitiesImpl<Ability>();
+        // Elves you control have "{T}: Add {G}{G}."
+        Abilities<Ability> abilities2 = new AbilitiesImpl<>();
         abilities2.add(new SimpleStaticAbility(Zone.BATTLEFIELD,
-                new GainAbilityControlledEffect(new SimpleManaAbility(Zone.BATTLEFIELD,
-                    new BasicManaEffect(Mana.GreenMana(2)),
-                    new TapSourceCost()),
+                new GainAbilityControlledEffect(new SimpleManaAbility(Zone.BATTLEFIELD, Mana.GreenMana(2), new TapSourceCost()),
                 Duration.WhileOnBattlefield, filter)));
 
         this.addAbilities(LevelerCardBuilder.construct(

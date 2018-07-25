@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.filter.predicate;
 
 import mage.game.Game;
@@ -52,7 +26,7 @@ public final class Predicates {
      * @return 
      */
     public static <T> Predicate<T> not(Predicate<T> predicate) {
-        return new NotPredicate<>(predicate);
+        return new NotPredicate<T>(predicate);
     }
 
     /**
@@ -65,7 +39,7 @@ public final class Predicates {
      * @return      
      */
     public static <T> Predicate<T> and(Iterable<? extends Predicate<? super T>> components) {
-        return new AndPredicate<>(defensiveCopy(components));
+        return new AndPredicate<T>(defensiveCopy(components));
     }
 
     /**
@@ -78,7 +52,7 @@ public final class Predicates {
      * @return 
      */
     public static <T> Predicate<T> and(Predicate<? super T>... components) {
-        return new AndPredicate<>(defensiveCopy(components));
+        return new AndPredicate<T>(defensiveCopy(components));
     }
 
     /**
@@ -91,7 +65,7 @@ public final class Predicates {
      * @return 
      */
     public static <T> Predicate<T> and(Predicate<? super T> first, Predicate<? super T> second) {
-        return new AndPredicate<>(Predicates.<T>asList(checkNotNull(first), checkNotNull(second)));
+        return new AndPredicate<T>(Predicates.<T>asList(checkNotNull(first), checkNotNull(second)));
     }
 
     /**
@@ -104,7 +78,7 @@ public final class Predicates {
      * @return 
      */
     public static <T> Predicate<T> or(Iterable<? extends Predicate<? super T>> components) {
-        return new OrPredicate<>(defensiveCopy(components));
+        return new OrPredicate<T>(defensiveCopy(components));
     }
 
     /**
@@ -117,7 +91,7 @@ public final class Predicates {
      * @return 
      */
     public static <T> Predicate<T> or(Predicate<? super T>... components) {
-        return new OrPredicate<>(defensiveCopy(components));
+        return new OrPredicate<T>(defensiveCopy(components));
     }
 
     /**
@@ -129,7 +103,7 @@ public final class Predicates {
      * @return 
      */
     public static <T> Predicate<T> or(Predicate<? super T> first, Predicate<? super T> second) {
-        return new OrPredicate<>(Predicates.<T>asList(first, second));
+        return new OrPredicate<T>(Predicates.<T>asList(first, second));
     }
 
     /**
@@ -150,7 +124,7 @@ public final class Predicates {
 
         @Override
         public String toString() {
-            return "Not(" + predicate.toString() + ")";
+            return "Not(" + predicate.toString() + ')';
         }
         private static final long serialVersionUID = 0;
     }
@@ -168,17 +142,13 @@ public final class Predicates {
 
         @Override
         public boolean apply(T t, Game game) {
-            for (int i = 0; i < components.size(); i++) {
-                if (!components.get(i).apply(t, game)) {
-                    return false;
-                }
-            }
-            return true;
+            return components.stream().allMatch(predicate -> predicate.apply(t, game));
+
         }
 
         @Override
         public String toString() {
-            return "And(" + commaJoin(components) + ")";
+            return "And(" + commaJoin(components) + ')';
         }
         private static final long serialVersionUID = 0;
     }
@@ -196,17 +166,12 @@ public final class Predicates {
 
         @Override
         public boolean apply(T t, Game game) {
-            for (int i = 0; i < components.size(); i++) {
-                if (components.get(i).apply(t, game)) {
-                    return true;
-                }
-            }
-            return false;
+            return components.stream().anyMatch(predicate -> predicate.apply(t, game));
         }
 
         @Override
         public String toString() {
-            return "Or(" + commaJoin(components) + ")";
+            return "Or(" + commaJoin(components) + ')';
         }
         private static final long serialVersionUID = 0;
     }
@@ -221,7 +186,7 @@ public final class Predicates {
     }
 
     static <T> List<T> defensiveCopy(Iterable<T> iterable) {
-        ArrayList<T> list = new ArrayList<>();
+        ArrayList<T> list = new ArrayList<T>();
         for (T element : iterable) {
             list.add(checkNotNull(element));
         }
@@ -244,8 +209,8 @@ public final class Predicates {
 
     private static String commaJoin(List components) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < components.size(); i++) {
-            sb.append(components.get(i).toString());
+        for (Object component : components) {
+            sb.append(component.toString());
         }
         sb.deleteCharAt(sb.length() - 1);
         return sb.toString();

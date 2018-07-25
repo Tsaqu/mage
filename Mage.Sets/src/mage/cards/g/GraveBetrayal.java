@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.g;
 
 import java.util.UUID;
@@ -33,34 +7,32 @@ import mage.abilities.DelayedTriggeredAbility;
 import mage.abilities.TriggeredAbilityImpl;
 import mage.abilities.common.delayed.AtTheBeginOfNextEndStepDelayedTriggeredAbility;
 import mage.abilities.effects.ContinuousEffect;
-import mage.abilities.effects.ContinuousEffectImpl;
 import mage.abilities.effects.Effect;
 import mage.abilities.effects.OneShotEffect;
+import mage.abilities.effects.ReplacementEffectImpl;
+import mage.abilities.effects.common.continuous.BecomesBlackZombieAdditionEffect;
 import mage.cards.Card;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
-import mage.constants.CardType;
-import mage.constants.Duration;
-import mage.constants.Layer;
-import mage.constants.Outcome;
-import mage.constants.SubLayer;
-import mage.constants.Zone;
+import mage.constants.*;
 import mage.counters.CounterType;
 import mage.game.Game;
+import mage.game.events.EntersTheBattlefieldEvent;
 import mage.game.events.GameEvent;
 import mage.game.events.GameEvent.EventType;
 import mage.game.events.ZoneChangeEvent;
 import mage.game.permanent.Permanent;
+import mage.players.Player;
 import mage.target.targetpointer.FixedTarget;
 
 /**
  *
  * @author LevelX2
  */
-public class GraveBetrayal extends CardImpl {
+public final class GraveBetrayal extends CardImpl {
 
     public GraveBetrayal(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.ENCHANTMENT},"{5}{B}{B}");
+        super(ownerId, setInfo, new CardType[]{CardType.ENCHANTMENT}, "{5}{B}{B}");
 
         // Whenever a creature you don't control dies, return it to the battlefield under
         // your control with an additional +1/+1 counter on it at the beginning of the
@@ -103,7 +75,7 @@ class GraveBetrayalTriggeredAbility extends TriggeredAbilityImpl {
         if (((ZoneChangeEvent) event).getToZone() == Zone.GRAVEYARD
                 && ((ZoneChangeEvent) event).getFromZone() == Zone.BATTLEFIELD) {
             Permanent permanent = (Permanent) game.getLastKnownInformation(event.getTargetId(), Zone.BATTLEFIELD);
-            if (permanent != null && !permanent.getControllerId().equals(this.getControllerId()) && permanent.getCardType().contains(CardType.CREATURE)) {
+            if (permanent != null && !permanent.isControlledBy(this.getControllerId()) && permanent.isCreature()) {
                 Card card = (Card) game.getObject(permanent.getId());
                 if (card != null) {
                     Effect effect = new GraveBetrayalEffect();
@@ -141,60 +113,40 @@ class GraveBetrayalEffect extends OneShotEffect {
 
     @Override
     public boolean apply(Game game, Ability source) {
-        Card card = game.getCard(targetPointer.getFirst(game, source));
-        if (card != null) {
-            Zone currentZone = game.getState().getZone(card.getId());
-            if (card.putOntoBattlefield(game, currentZone, source.getSourceId(), source.getControllerId())) {
-                Permanent creature = game.getPermanent(card.getId());
-                creature.addCounters(CounterType.P1P1.createInstance(), game);
-                ContinuousEffect effect = new GraveBetrayalContiniousEffect();
-                effect.setTargetPointer(new FixedTarget(creature.getId()));
+        Player controller = game.getPlayer(source.getControllerId());
+        if (controller != null) {
+            Card card = game.getCard(targetPointer.getFirst(game, source));
+            if (card != null) {
+                ContinuousEffect effect = new GraveBetrayalReplacementEffect();
+                effect.setTargetPointer(new FixedTarget(card.getId()));
                 game.addEffect(effect, source);
-                return true;
+                controller.moveCards(card, Zone.BATTLEFIELD, source, game);
             }
+            return true;
         }
         return false;
     }
 
 }
 
-class GraveBetrayalContiniousEffect extends ContinuousEffectImpl {
+class GraveBetrayalReplacementEffect extends ReplacementEffectImpl {
 
-    public GraveBetrayalContiniousEffect() {
-        super(Duration.Custom, Outcome.Neutral);
-        staticText = "That creature is a black Zombie in addition to its other colors and types";
+    GraveBetrayalReplacementEffect() {
+        super(Duration.EndOfStep, Outcome.BoostCreature);
     }
 
-    public GraveBetrayalContiniousEffect(final GraveBetrayalContiniousEffect effect) {
+    GraveBetrayalReplacementEffect(GraveBetrayalReplacementEffect effect) {
         super(effect);
     }
 
     @Override
-    public GraveBetrayalContiniousEffect copy() {
-        return new GraveBetrayalContiniousEffect(this);
+    public boolean checksEventType(GameEvent event, Game game) {
+        return event.getType() == GameEvent.EventType.ENTERS_THE_BATTLEFIELD;
     }
 
     @Override
-    public boolean apply(Layer layer, SubLayer sublayer, Ability source, Game game) {
-        Permanent creature = game.getPermanent(targetPointer.getFirst(game, source));
-        if (creature != null) {
-            switch (layer) {
-                case TypeChangingEffects_4:
-                    if (sublayer == SubLayer.NA) {
-                        creature.getSubtype(game).add("Zombie");
-                    }
-                    break;
-                case ColorChangingEffects_5:
-                    if (sublayer == SubLayer.NA) {
-                        creature.getColor(game).setBlack(true);
-                    }
-                    break;
-            }
-            return true;
-        } else {
-            this.used = true;
-        }
-        return false;
+    public boolean applies(GameEvent event, Ability source, Game game) {
+        return event.getTargetId().equals(getTargetPointer().getFirst(game, source));
     }
 
     @Override
@@ -203,8 +155,20 @@ class GraveBetrayalContiniousEffect extends ContinuousEffectImpl {
     }
 
     @Override
-    public boolean hasLayer(Layer layer) {
-        return layer == Layer.ColorChangingEffects_5 || layer == Layer.TypeChangingEffects_4;
+    public boolean replaceEvent(GameEvent event, Ability source, Game game) {
+        Permanent creature = ((EntersTheBattlefieldEvent) event).getTarget();
+        if (creature != null) {
+            creature.addCounters(CounterType.P1P1.createInstance(), source, game, event.getAppliedEffects());
+            ContinuousEffect effect = new BecomesBlackZombieAdditionEffect();
+            effect.setTargetPointer(new FixedTarget(creature.getId(), creature.getZoneChangeCounter(game) + 1));
+            game.addEffect(effect, source);
+            discard();
+        }
+        return false;
     }
 
+    @Override
+    public GraveBetrayalReplacementEffect copy() {
+        return new GraveBetrayalReplacementEffect(this);
+    }
 }

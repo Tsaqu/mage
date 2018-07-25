@@ -136,7 +136,7 @@ public class CloudshiftTest extends CardTestPlayerBase {
     @Test
     public void testThatCardIsHandledAsNewInstanceAfterCloudshift() {
         // Whenever another creature enters the battlefield under your control, you gain life equal to that creature's toughness.
-        // {1}{G}{W}, {T}: Populate. (Put a token onto the battlefield that's a copy of a creature token you control.)
+        // {1}{G}{W}, {T}: Populate. (Create a tokenonto the battlefield that's a copy of a creature token you control.)
         addCard(Zone.BATTLEFIELD, playerA, "Trostani, Selesnya's Voice");
         addCard(Zone.BATTLEFIELD, playerA, "Forest", 4);
         addCard(Zone.BATTLEFIELD, playerA, "Plains", 4);
@@ -339,7 +339,7 @@ public class CloudshiftTest extends CardTestPlayerBase {
      * of the end step even if Flickerwisp is no longer on the battlefield.
      * 8/1/2008 If the permanent that returns to the battlefield has any
      * abilities that trigger at the beginning of the end step, those abilities
-     * won’t trigger that turn.
+     * won't trigger that turn.
      */
     @Test
     public void testDoubleFlickerwisp() {

@@ -19,6 +19,7 @@ import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.CardType;
 import mage.constants.Outcome;
+import mage.constants.SuperType;
 import mage.constants.Zone;
 import mage.filter.FilterCard;
 import mage.filter.predicate.Predicates;
@@ -33,11 +34,11 @@ import mage.util.CardUtil;
  *
  * @author nick.myers
  */
-public class SkyshipWeatherlight extends CardImpl {
+public final class SkyshipWeatherlight extends CardImpl {
 
     public SkyshipWeatherlight(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.ARTIFACT},"{4}");
-        this.supertype.add("Legendary");
+        super(ownerId, setInfo, new CardType[]{CardType.ARTIFACT}, "{4}");
+        addSuperType(SuperType.LEGENDARY);
 
         // When Skyship Weatherlight enters the battlefield, search your library for any number of artifact and/or creature cards and exile them. Then shuffle your library.
         this.addAbility(new EntersBattlefieldTriggeredAbility(new SkyshipWeatherlightEffect(), false));
@@ -72,7 +73,7 @@ class SkyshipWeatherlightEffect extends SearchEffect {
     public SkyshipWeatherlightEffect() {
 
         super(new TargetCardInLibrary(0, Integer.MAX_VALUE, filter), Outcome.Neutral);
-        this.staticText = "search your library for any number of artifact and/or creature cards and remove them from the game. Then shuffle your library";
+        this.staticText = "search your library for any number of artifact and/or creature cards and exile them. Then shuffle your library";
 
     }
 
@@ -92,7 +93,7 @@ class SkyshipWeatherlightEffect extends SearchEffect {
         if (sourceObject != null && controller != null) {
             if (controller.searchLibrary(target, game)) {
                 UUID exileZone = CardUtil.getExileZoneId(game, source.getSourceId(), source.getSourceObjectZoneChangeCounter());
-                if (target.getTargets().size() > 0) {
+                if (!target.getTargets().isEmpty()) {
                     for (UUID cardID : target.getTargets()) {
                         Card card = controller.getLibrary().getCard(cardID, game);
                         if (card != null) {
@@ -113,7 +114,7 @@ class SkyshipWeatherlightEffect2 extends OneShotEffect {
 
     public SkyshipWeatherlightEffect2() {
         super(Outcome.ReturnToHand);
-        this.staticText = "Choose a card at random that was removed from the game with {this}. Put that card into your hand";
+        this.staticText = "Choose a card at random that was exiled with {this}. Put that card into its owner's hand";
     }
 
     public SkyshipWeatherlightEffect2(final SkyshipWeatherlightEffect2 effect) {

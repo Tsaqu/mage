@@ -11,9 +11,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBase;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author noxx
@@ -179,6 +176,9 @@ public class PhantasmalImageTest extends CardTestPlayerBase {
     @Test
     public void testCopyEntersTapped() {
         addCard(Zone.BATTLEFIELD, playerA, "Island", 2);
+        // You may have Phantasmal Image enter the battlefield as a copy of any creature
+        // on the battlefield, except it's an Illusion in addition to its other types and
+        // it gains "When this creature becomes the target of a spell or ability, sacrifice it."
         addCard(Zone.HAND, playerA, "Phantasmal Image");
         addCard(Zone.BATTLEFIELD, playerB, "Geralf's Messenger");
 
@@ -450,8 +450,8 @@ public class PhantasmalImageTest extends CardTestPlayerBase {
      * Example: Two creatures are on the battlefield along with an artifact that
      * has the ability “Whenever a creature dies, you gain 1 life.” Someone
      * plays a spell that destroys all artifacts, creatures, and enchantments.
-     * The artifact’s ability triggers twice, even though the artifact goes to
-     * its owner’s graveyard at the same time as the creatures.
+     * The artifact's ability triggers twice, even though the artifact goes to
+     * its owner's graveyard at the same time as the creatures.
      *
      */
     @Test

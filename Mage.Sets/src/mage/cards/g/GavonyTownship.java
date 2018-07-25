@@ -14,12 +14,12 @@ import mage.constants.Zone;
 import mage.counters.CounterType;
 import mage.filter.common.FilterControlledCreaturePermanent;
 
-public class GavonyTownship extends CardImpl {
+public final class GavonyTownship extends CardImpl {
 
     public GavonyTownship(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId,setInfo,new CardType[]{CardType.LAND},null);
 
-        // {T}: Add {1} to your mana pool.
+        // {T}: Add {1}.
         this.addAbility(new ColorlessManaAbility());
 
         // {2}{G}{W}, {T}: Put a +1/+1 counter on each creature you control.

@@ -1,39 +1,7 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.w;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import mage.abilities.Ability;
 import mage.abilities.effects.OneShotEffect;
 import mage.cards.CardImpl;
@@ -54,13 +22,13 @@ import mage.util.RandomUtil;
  *
  * @author LevelX2
  */
-public class WhimsOfTheFates extends CardImpl {
+public final class WhimsOfTheFates extends CardImpl {
 
     public WhimsOfTheFates(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId,setInfo,new CardType[]{CardType.SORCERY},"{5}{R}");
 
 
-        // Starting with you, each player separates all permanents he or she controls into three piles. Then each player chooses one of his or her piles at random and sacrifices those permanents.
+        // Starting with you, each player separates all permanents he or she controls into three piles. Then each player chooses one of their piles at random and sacrifices those permanents.
         this.getSpellAbility().addEffect(new WhimsOfTheFateEffect());
     }
 
@@ -79,7 +47,7 @@ class WhimsOfTheFateEffect extends OneShotEffect {
 
     public WhimsOfTheFateEffect() {
         super(Outcome.Detriment);
-        this.staticText = "Starting with you, each player separates all permanents he or she controls into three piles. Then each player chooses one of his or her piles at random and sacrifices those permanents.";
+        this.staticText = "Starting with you, each player separates all permanents he or she controls into three piles. Then each player chooses one of their piles at random and sacrifices those permanents.";
     }
 
     public WhimsOfTheFateEffect(final WhimsOfTheFateEffect effect) {
@@ -122,7 +90,7 @@ class WhimsOfTheFateEffect extends OneShotEffect {
                 if (currentPlayer != null && game.getState().getPlayersInRange(controller.getId(), game).contains(currentPlayer.getId())) {
                     Map<Integer, Set<UUID>> playerPiles = new HashMap<>();
                     for (int i = 1; i < 4; i++) {
-                        playerPiles.put(i, new LinkedHashSet<UUID>());
+                        playerPiles.put(i, new LinkedHashSet<>());
                     }
                     playerPermanents.put(currentPlayer.getId(), playerPiles);
                     for (int i = 1; i < 3; i++) {
@@ -144,7 +112,7 @@ class WhimsOfTheFateEffect extends OneShotEffect {
                             for (UUID permanentId : target.getTargets()) {
                                 Permanent permanent = game.getPermanent(permanentId);
                                 if (permanent != null) {
-                                    message.append(permanent.getName()).append(" ");
+                                    message.append(permanent.getName()).append(' ');
                                 }
                             }
                         }
@@ -157,7 +125,7 @@ class WhimsOfTheFateEffect extends OneShotEffect {
                     for (Permanent permanent : game.getState().getBattlefield().getAllActivePermanents(currentPlayer.getId())) {
                         if (!playerPiles.get(1).contains(permanent.getId()) && !playerPiles.get(2).contains(permanent.getId())) {
                             playerPiles.get(3).add(permanent.getId());
-                            message.append(permanent.getName()).append(" ");
+                            message.append(permanent.getName()).append(' ');
                         }
                     }
                     if (playerPiles.get(3).isEmpty()) {

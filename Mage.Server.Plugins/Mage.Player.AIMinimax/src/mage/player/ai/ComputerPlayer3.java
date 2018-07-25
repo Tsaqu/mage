@@ -1,36 +1,9 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- * 
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- * 
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- * 
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- * 
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 
 package mage.player.ai;
 
 import mage.constants.PhaseStep;
 import mage.constants.RangeOfInfluence;
-import mage.abilities.Ability;
 import mage.game.Game;
 import mage.game.combat.Combat;
 import mage.game.combat.CombatGroup;
@@ -77,7 +50,7 @@ public class ComputerPlayer3 extends ComputerPlayer2 implements Player {
                 pass(game);
                 return false;
             case PRECOMBAT_MAIN:
-                if (game.getActivePlayerId().equals(playerId)) {
+                if (game.isActivePlayer(playerId)) {
                     if (actions.isEmpty()) {
                         calculatePreCombatActions(game);
                     }
@@ -91,7 +64,7 @@ public class ComputerPlayer3 extends ComputerPlayer2 implements Player {
                 pass(game);
                 return false;
             case DECLARE_ATTACKERS:
-                if (!game.getActivePlayerId().equals(playerId)) {
+                if (!game.isActivePlayer(playerId)) {
                     if (actions.isEmpty()) {
                         calculatePreCombatActions(game);
                     }
@@ -108,7 +81,7 @@ public class ComputerPlayer3 extends ComputerPlayer2 implements Player {
                 pass(game);
                 return false;
             case POSTCOMBAT_MAIN:
-                if (game.getActivePlayerId().equals(playerId)) {
+                if (game.isActivePlayer(playerId)) {
                     if (actions.isEmpty()) {
                         calculatePostCombatActions(game);
                     }
@@ -139,9 +112,9 @@ public class ComputerPlayer3 extends ComputerPlayer2 implements Player {
             else
                 addActions(root, Integer.MIN_VALUE, Integer.MAX_VALUE);
             logger.info(name + " simulated " + nodeCount + " nodes in " + thinkTime/1000000000.0 + "s - average " + nodeCount/(thinkTime/1000000000.0) + " nodes/s");
-            if (root.children.size() > 0) {
+            if (!root.children.isEmpty()) {
                 root = root.children.get(0);
-                actions = new LinkedList<Ability>(root.abilities);
+                actions = new LinkedList<>(root.abilities);
                 combat = root.combat;
                 if (logger.isDebugEnabled())
                     logger.debug("adding pre-combat actions:" + actions);
@@ -163,9 +136,9 @@ public class ComputerPlayer3 extends ComputerPlayer2 implements Player {
             else
                 addActions(root, Integer.MIN_VALUE, Integer.MAX_VALUE);
             logger.info(name + " simulated " + nodeCount + " nodes in " + thinkTime/1000000000.0 + "s - average " + nodeCount/(thinkTime/1000000000.0) + " nodes/s");
-            if (root.children.size() > 0) {
+            if (!root.children.isEmpty()) {
                 root = root.children.get(0);
-                actions = new LinkedList<Ability>(root.abilities);
+                actions = new LinkedList<>(root.abilities);
                 combat = root.combat;
                 if (logger.isDebugEnabled())
                     logger.debug("adding post-combat actions:" + actions);
@@ -185,11 +158,11 @@ public class ComputerPlayer3 extends ComputerPlayer2 implements Player {
             logger.debug(indent(node.depth) + "interrupted");
             return GameStateEvaluator.evaluate(playerId, game);
         }
-        if (node.depth > maxDepth || game.gameOver(null)) {
+        if (node.depth > maxDepth || game.checkIfGameIsOver()) {
             logger.debug(indent(node.depth) + "simulating -- reached end state");
             val = GameStateEvaluator.evaluate(playerId, game);
         }
-        else if (node.getChildren().size() > 0) {
+        else if (!node.getChildren().isEmpty()) {
             logger.debug(indent(node.depth) + "simulating -- somthing added children:" + node.getChildren().size());
             val = minimaxAB(node, alpha, beta);
         }
@@ -205,13 +178,13 @@ public class ComputerPlayer3 extends ComputerPlayer2 implements Player {
                 }
             }
 
-            if (game.gameOver(null)) {
+            if (game.checkIfGameIsOver()) {
                 val = GameStateEvaluator.evaluate(playerId, game);
             }
             else if (stepFinished) {
                 logger.debug(indent(node.depth) + "step finished");
                 int testScore = GameStateEvaluator.evaluate(playerId, game);
-                if (game.getActivePlayerId().equals(playerId)) {
+                if (game.isActivePlayer(playerId)) {
                     if (testScore < currentScore) {
                         // if score at end of step is worse than original score don't check further
                         logger.debug(indent(node.depth) + "simulating -- abandoning check, no immediate benefit");
@@ -238,7 +211,7 @@ public class ComputerPlayer3 extends ComputerPlayer2 implements Player {
                         val = GameStateEvaluator.evaluate(playerId, game);
                 }
             }
-            else if (node.getChildren().size() > 0) {
+            else if (!node.getChildren().isEmpty()) {
                 logger.debug(indent(node.depth) + "simulating -- trigger added children:" + node.getChildren().size());
                 val = minimaxAB(node, alpha, beta);
             }
@@ -388,7 +361,7 @@ public class ComputerPlayer3 extends ComputerPlayer2 implements Player {
                 }
                 Game sim = game.copy();
                 for (CombatGroup group: engagement.getGroups()) {
-                    if (group.getAttackers().size() > 0) {
+                    if (!group.getAttackers().isEmpty()) {
                         UUID attackerId = group.getAttackers().get(0);
                         for (UUID blockerId: group.getBlockers()) {
                             sim.getPlayer(defenderId).declareBlocker(defenderId, blockerId, attackerId, sim);
@@ -409,7 +382,7 @@ public class ComputerPlayer3 extends ComputerPlayer2 implements Player {
                 sim.fireEvent(GameEvent.getEvent(GameEvent.EventType.DECLARE_BLOCKERS_STEP_POST, sim.getActivePlayerId(), sim.getActivePlayerId()));
                 Combat simCombat = sim.getCombat().copy();
                 finishCombat(sim);
-                if (sim.gameOver(null)) {
+                if (sim.checkIfGameIsOver()) {
                     val = GameStateEvaluator.evaluate(playerId, sim);
                 }
                 else if (!counter) {
@@ -451,7 +424,7 @@ public class ComputerPlayer3 extends ComputerPlayer2 implements Player {
             return GameStateEvaluator.evaluate(playerId, game);
         }
         Integer val = null;
-        if (!game.gameOver(null)) {
+        if (!game.checkIfGameIsOver()) {
             logger.debug(indent(node.depth) + "simulating -- ending turn");
             simulateToEnd(game);
             game.getState().setActivePlayerId(game.getState().getPlayerList(game.getActivePlayerId()).getNext());
@@ -479,7 +452,7 @@ public class ComputerPlayer3 extends ComputerPlayer2 implements Player {
             logger.debug("interrupted");
             return;
         }
-        if (!game.gameOver(null)) {
+        if (!game.checkIfGameIsOver()) {
             game.getPhase().setStep(step);
             if (!step.skipStep(game, game.getActivePlayerId())) {
                 step.beginStep(game, game.getActivePlayerId());
@@ -527,7 +500,7 @@ public class ComputerPlayer3 extends ComputerPlayer2 implements Player {
             logger.debug("interrupted");
             return;
         }
-        if (!game.gameOver(null)) {
+        if (!game.checkIfGameIsOver()) {
             game.getTurn().getPhase().endPhase(game, game.getActivePlayerId());
             game.getTurn().setPhase(new EndPhase());
             if (game.getTurn().getPhase().beginPhase(game, game.getActivePlayerId())) {

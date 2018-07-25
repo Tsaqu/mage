@@ -1,45 +1,9 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.players;
 
 import java.io.Serializable;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 import mage.cards.Card;
 import mage.constants.Zone;
 import mage.filter.FilterCard;
@@ -47,7 +11,6 @@ import mage.game.Game;
 import mage.util.RandomUtil;
 
 /**
- *
  * @author BetaSteward_at_googlemail.com
  */
 public class Library implements Serializable {
@@ -74,7 +37,7 @@ public class Library implements Serializable {
     public void shuffle() {
         UUID[] shuffled = library.toArray(new UUID[0]);
         for (int n = shuffled.length - 1; n > 0; n--) {
-            int r = RandomUtil.nextInt(n);;
+            int r = RandomUtil.nextInt(n + 1);
             UUID temp = shuffled[n];
             shuffled[n] = shuffled[r];
             shuffled[r] = temp;
@@ -138,7 +101,7 @@ public class Library implements Serializable {
     }
 
     public void putOnTop(Card card, Game game) {
-        if (card.getOwnerId().equals(playerId)) {
+        if (card.isOwnedBy(playerId)) {
             card.setZone(Zone.LIBRARY, game);
             library.addFirst(card.getId());
         } else {
@@ -146,12 +109,25 @@ public class Library implements Serializable {
         }
     }
 
-    public void putOnBottom(Card card, Game game) {
-        if (card.getOwnerId().equals(playerId)) {
-            card.setZone(Zone.LIBRARY, game);
-            if (library.contains(card.getId())) {
-                library.remove(card.getId());
+    public void putCardToTopXPos(Card card, int pos, Game game) {
+        if (card != null && pos > -1) {
+            LinkedList<Card> save = new LinkedList<>();
+            int idx = 1;
+            while (hasCards() && idx < pos) {
+                idx++;
+                save.add(removeFromTop(game));
             }
+            putOnTop(card, game);
+            while (!save.isEmpty()) {
+                putOnTop(save.removeLast(), game);
+            }
+        }
+    }
+
+    public void putOnBottom(Card card, Game game) {
+        if (card.isOwnedBy(playerId)) {
+            card.setZone(Zone.LIBRARY, game);
+            library.remove(card.getId());
             library.add(card.getId());
         } else {
             game.getPlayer(card.getOwnerId()).getLibrary().putOnBottom(card, game);
@@ -181,12 +157,14 @@ public class Library implements Serializable {
         return new ArrayList<>(library);
     }
 
+    /**
+     * Returns the cards of the library in a list ordered from top to buttom
+     *
+     * @param game
+     * @return
+     */
     public List<Card> getCards(Game game) {
-        List<Card> cards = new ArrayList<>();
-        for (UUID cardId : library) {
-            cards.add(game.getCard(cardId));
-        }
-        return cards;
+        return library.stream().map(game::getCard).collect(Collectors.toList());
     }
 
     public Set<Card> getTopCards(Game game, int amount) {
@@ -208,21 +186,13 @@ public class Library implements Serializable {
         Map<String, Card> cards = new HashMap<>();
         for (UUID cardId : library) {
             Card card = game.getCard(cardId);
-            if (!cards.containsKey(card.getName())) {
-                cards.put(card.getName(), card);
-            }
+            cards.putIfAbsent(card.getName(), card);
         }
         return cards.values();
     }
 
     public int count(FilterCard filter, Game game) {
-        int result = 0;
-        for (UUID card : library) {
-            if (filter.match(game.getCard(card), game)) {
-                result++;
-            }
-        }
-        return result;
+        return (int) library.stream().filter(cardId -> filter.match(game.getCard(cardId), game)).count();
     }
 
     public boolean isEmptyDraw() {
@@ -255,6 +225,10 @@ public class Library implements Serializable {
             }
         }
         return null;
+    }
+
+    public boolean hasCards() {
+        return size() > 0;
     }
 
     public void reset() {

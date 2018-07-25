@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.l;
 
 import java.util.UUID;
@@ -35,7 +9,10 @@ import mage.abilities.effects.OneShotEffect;
 import mage.cards.Card;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
+import mage.cards.Cards;
+import mage.cards.CardsImpl;
 import mage.constants.CardType;
+import mage.constants.SubType;
 import mage.constants.Outcome;
 import mage.constants.Zone;
 import mage.filter.FilterCard;
@@ -48,17 +25,17 @@ import mage.target.common.TargetCardInGraveyard;
  *
  * @author LevelX2
  */
-public class LoamingShaman extends CardImpl {
+public final class LoamingShaman extends CardImpl {
 
     public LoamingShaman(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{2}{G}");
-        this.subtype.add("Centaur");
-        this.subtype.add("Shaman");
+        super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{2}{G}");
+        this.subtype.add(SubType.CENTAUR);
+        this.subtype.add(SubType.SHAMAN);
 
         this.power = new MageInt(3);
         this.toughness = new MageInt(2);
 
-        // When Loaming Shaman enters the battlefield, target player shuffles any number of target cards from his or her graveyard into his or her library.
+        // When Loaming Shaman enters the battlefield, target player shuffles any number of target cards from their graveyard into their library.
         Ability ability = new EntersBattlefieldTriggeredAbility(new LoamingShamanEffect(), false);
         ability.addTarget(new TargetPlayer());
         ability.addTarget(new LoamingShamanTargetCardsInGraveyard(0, Integer.MAX_VALUE, new FilterCard("cards in target player's graveyard")));
@@ -79,7 +56,7 @@ class LoamingShamanEffect extends OneShotEffect {
 
     public LoamingShamanEffect() {
         super(Outcome.Benefit);
-        this.staticText = "target player shuffles any number of target cards from his or her graveyard into his or her library";
+        this.staticText = "target player shuffles any number of target cards from their graveyard into their library";
     }
 
     public LoamingShamanEffect(final LoamingShamanEffect effect) {
@@ -95,12 +72,8 @@ class LoamingShamanEffect extends OneShotEffect {
     public boolean apply(Game game, Ability source) {
         Player targetPlayer = game.getPlayer(source.getFirstTarget());
         if (targetPlayer != null) {
-            for (UUID targetCard : source.getTargets().get(1).getTargets()) {
-                Card card = targetPlayer.getGraveyard().get(targetCard, game);
-                if (card != null) {
-                    card.moveToZone(Zone.LIBRARY, source.getSourceId(), game, true);
-                }
-            }
+            Cards cards = new CardsImpl(source.getTargets().get(1).getTargets());
+            targetPlayer.moveCards(cards, Zone.LIBRARY, source, game);
             targetPlayer.shuffleLibrary(source, game);
             return true;
         }
@@ -112,7 +85,6 @@ class LoamingShamanTargetCardsInGraveyard extends TargetCardInGraveyard {
 
     public LoamingShamanTargetCardsInGraveyard(int minNumTargets, int maxNumTargets, FilterCard filter) {
         super(minNumTargets, maxNumTargets, filter);
-        this.targetName = filter.getMessage();
     }
 
     public LoamingShamanTargetCardsInGraveyard(final LoamingShamanTargetCardsInGraveyard target) {
@@ -127,10 +99,10 @@ class LoamingShamanTargetCardsInGraveyard extends TargetCardInGraveyard {
         if (firstTarget != null) {
             Card card = game.getCard(firstTarget);
             if (card == null || targetCard == null
-                    || !card.getOwnerId().equals(targetCard.getOwnerId())) {
+                    || !card.isOwnedBy(targetCard.getOwnerId())) {
                 return false;
             }
-        } else if (targetCard == null || !targetCard.getOwnerId().equals(targetPlayerId)) {
+        } else if (targetCard == null || !targetCard.isOwnedBy(targetPlayerId)) {
             return false;
         }
         return super.canTarget(id, source, game);

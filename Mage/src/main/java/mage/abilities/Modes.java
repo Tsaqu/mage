@@ -1,30 +1,4 @@
-/*
- *  Copyright 2011 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.abilities;
 
 import java.util.ArrayList;
@@ -38,6 +12,8 @@ import mage.abilities.costs.OptionalAdditionalModeSourceCosts;
 import mage.cards.Card;
 import mage.constants.Outcome;
 import mage.constants.TargetController;
+import mage.filter.Filter;
+import mage.filter.FilterPlayer;
 import mage.game.Game;
 import mage.players.Player;
 import mage.target.common.TargetOpponent;
@@ -49,13 +25,15 @@ import mage.target.common.TargetOpponent;
 public class Modes extends LinkedHashMap<UUID, Mode> {
 
     private Mode currentMode; // the current mode of the selected modes
-    private final ArrayList<UUID> selectedModes = new ArrayList<>();
+    private final List<UUID> selectedModes = new ArrayList<>();
     private int minModes;
     private int maxModes;
     private TargetController modeChooser;
     private boolean eachModeMoreThanOnce; // each mode can be selected multiple times during one choice
     private boolean eachModeOnlyOnce; // state if each mode can be chosen only once as long as the source object exists
-    private final LinkedHashMap<UUID, Mode> duplicateModes = new LinkedHashMap<>();
+    private final Map<UUID, Mode> duplicateModes = new LinkedHashMap<>();
+    private OptionalAdditionalModeSourceCosts optionalAdditionalModeSourceCosts = null; // only set if costs have to be paid
+    private Filter maxModesFilter = null; // calculates the max number of available modes
 
     public Modes() {
         this.currentMode = new Mode();
@@ -87,6 +65,8 @@ public class Modes extends LinkedHashMap<UUID, Mode> {
         this.modeChooser = modes.modeChooser;
         this.eachModeOnlyOnce = modes.eachModeOnlyOnce;
         this.eachModeMoreThanOnce = modes.eachModeMoreThanOnce;
+        this.optionalAdditionalModeSourceCosts = modes.optionalAdditionalModeSourceCosts;
+        this.maxModesFilter = modes.maxModesFilter; // can't change so no copy needed
     }
 
     public Modes copy() {
@@ -133,7 +113,7 @@ public class Modes extends LinkedHashMap<UUID, Mode> {
         return null;
     }
 
-    public ArrayList<UUID> getSelectedModes() {
+    public List<UUID> getSelectedModes() {
         return selectedModes;
     }
 
@@ -147,6 +127,14 @@ public class Modes extends LinkedHashMap<UUID, Mode> {
 
     public void setMaxModes(int maxModes) {
         this.maxModes = maxModes;
+    }
+
+    public Filter getMaxModesFilter() {
+        return maxModesFilter;
+    }
+
+    public void setMaxModesFilter(Filter maxModesFilter) {
+        this.maxModesFilter = maxModesFilter;
     }
 
     public int getMaxModes() {
@@ -186,7 +174,7 @@ public class Modes extends LinkedHashMap<UUID, Mode> {
             if (card != null) {
                 for (Ability modeModifyingAbility : card.getAbilities()) {
                     if (modeModifyingAbility instanceof OptionalAdditionalModeSourceCosts) {
-                        ((OptionalAdditionalModeSourceCosts) modeModifyingAbility).addOptionalAdditionalModeCosts(source, game);
+                        ((OptionalAdditionalModeSourceCosts) modeModifyingAbility).changeModes(source, game);
                     }
                 }
             }
@@ -205,13 +193,13 @@ public class Modes extends LinkedHashMap<UUID, Mode> {
                 if (isEachModeOnlyOnce()) {
                     setAlreadySelectedModes(selectedModes, source, game);
                 }
-                return selectedModes.size() > 0;
+                return !selectedModes.isEmpty();
             }
 
             // 700.2d
             // Some spells and abilities specify that a player other than their controller chooses a mode for it.
-            // In that case, the other player does so when the spell or ability’s controller normally would do so.
-            // If there is more than one other player who could make such a choice, the spell or ability’s controller decides which of those players will make the choice.
+            // In that case, the other player does so when the spell or ability's controller normally would do so.
+            // If there is more than one other player who could make such a choice, the spell or ability's controller decides which of those players will make the choice.
             UUID playerId = null;
             if (modeChooser == TargetController.OPPONENT) {
                 TargetOpponent targetOpponent = new TargetOpponent();
@@ -228,7 +216,22 @@ public class Modes extends LinkedHashMap<UUID, Mode> {
 
             // player chooses modes manually
             this.currentMode = null;
-            while (this.selectedModes.size() < this.getMaxModes()) {
+            int currentMaxModes = this.getMaxModes();
+            if (getMaxModesFilter() != null) {
+                if (maxModesFilter instanceof FilterPlayer) {
+                    currentMaxModes = 0;
+                    for (UUID targetPlayerId : game.getState().getPlayersInRange(source.getControllerId(), game)) {
+                        Player targetPlayer = game.getPlayer(targetPlayerId);
+                        if (((FilterPlayer) maxModesFilter).match(targetPlayer, source.getSourceId(), source.getControllerId(), game)) {
+                            currentMaxModes++;
+                        }
+                    }
+                    if (currentMaxModes > this.getMaxModes()) {
+                        currentMaxModes = this.getMaxModes();
+                    }
+                }
+            }
+            while (this.selectedModes.size() < currentMaxModes) {
                 Mode choice = player.chooseMode(this, source, game);
                 if (choice == null) {
                     if (isEachModeOnlyOnce()) {
@@ -263,7 +266,7 @@ public class Modes extends LinkedHashMap<UUID, Mode> {
      * @param source
      * @param game
      */
-    private void setAlreadySelectedModes(ArrayList<UUID> selectedModes, Ability source, Game game) {
+    private void setAlreadySelectedModes(List<UUID> selectedModes, Ability source, Game game) {
         for (UUID modeId : selectedModes) {
             String key = getKey(source, game, modeId);
             game.getState().setValue(key, true);
@@ -335,7 +338,9 @@ public class Modes extends LinkedHashMap<UUID, Mode> {
             return this.getMode().getEffects().getText(this.getMode());
         }
         StringBuilder sb = new StringBuilder();
-        if (this.getMinModes() == 1 && this.getMaxModes() == 3) {
+        if (this.getMaxModesFilter() != null) {
+            sb.append("choose one or more. Each mode must target ").append(getMaxModesFilter().getMessage());
+        } else if (this.getMinModes() == 1 && this.getMaxModes() == 3) {
             sb.append("choose one or more ");
         } else if (this.getMinModes() == 1 && this.getMaxModes() == 2) {
             sb.append("choose one or both ");
@@ -383,6 +388,14 @@ public class Modes extends LinkedHashMap<UUID, Mode> {
 
     public void setEachModeMoreThanOnce(boolean eachModeMoreThanOnce) {
         this.eachModeMoreThanOnce = eachModeMoreThanOnce;
+    }
+
+    public OptionalAdditionalModeSourceCosts getAdditionalCost() {
+        return optionalAdditionalModeSourceCosts;
+    }
+
+    public void setAdditionalCost(OptionalAdditionalModeSourceCosts optionalAdditionalModeSourceCosts) {
+        this.optionalAdditionalModeSourceCosts = optionalAdditionalModeSourceCosts;
     }
 
 }

@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.a;
 
 import java.util.UUID;
@@ -39,13 +13,10 @@ import mage.abilities.effects.Effect;
 import mage.abilities.effects.OneShotEffect;
 import mage.abilities.effects.common.continuous.LoseCreatureTypeSourceEffect;
 import mage.abilities.keyword.IndestructibleAbility;
+import mage.cards.Card;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
-import mage.constants.CardType;
-import mage.constants.ColoredManaSymbol;
-import mage.constants.Outcome;
-import mage.constants.TargetController;
-import mage.constants.Zone;
+import mage.constants.*;
 import mage.filter.common.FilterCreaturePermanent;
 import mage.filter.predicate.other.OwnerPredicate;
 import mage.filter.predicate.permanent.AnotherPredicate;
@@ -53,7 +24,6 @@ import mage.game.Game;
 import mage.game.events.GameEvent;
 import mage.game.events.GameEvent.EventType;
 import mage.game.events.ZoneChangeEvent;
-import mage.game.permanent.Permanent;
 import mage.players.Player;
 import mage.target.common.TargetOpponent;
 
@@ -61,7 +31,7 @@ import mage.target.common.TargetOpponent;
  *
  * @author LevelX2
  */
-public class AthreosGodOfPassage extends CardImpl {
+public final class AthreosGodOfPassage extends CardImpl {
 
     private static final FilterCreaturePermanent filter = new FilterCreaturePermanent("another creature you own");
 
@@ -71,9 +41,9 @@ public class AthreosGodOfPassage extends CardImpl {
     }
 
     public AthreosGodOfPassage(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.ENCHANTMENT,CardType.CREATURE},"{1}{W}{B}");
-        this.supertype.add("Legendary");
-        this.subtype.add("God");
+        super(ownerId, setInfo, new CardType[]{CardType.ENCHANTMENT, CardType.CREATURE}, "{1}{W}{B}");
+        addSuperType(SuperType.LEGENDARY);
+        this.subtype.add(SubType.GOD);
 
         this.power = new MageInt(5);
         this.toughness = new MageInt(4);
@@ -122,7 +92,7 @@ class AthreosGodOfPassageReturnEffect extends OneShotEffect {
         Player controller = game.getPlayer(source.getControllerId());
         if (controller != null) {
             UUID creatureId = (UUID) this.getValue("creatureId");
-            Permanent creature = game.getPermanentOrLKIBattlefield(creatureId);
+            Card creature = game.getCard(creatureId);
             if (creature != null) {
                 Player opponent = game.getPlayer(source.getFirstTarget());
                 boolean paid = false;
@@ -136,8 +106,8 @@ class AthreosGodOfPassageReturnEffect extends OneShotEffect {
                     }
                 }
                 if (opponent == null || !paid) {
-                    if (game.getState().getZone(creature.getId()).equals(Zone.GRAVEYARD)) {
-                        controller.moveCards(game.getCard(creatureId), Zone.HAND, source, game);
+                    if (game.getState().getZone(creature.getId()) == Zone.GRAVEYARD) {
+                        controller.moveCards(creature, Zone.HAND, source, game);
                     }
                 }
             }
@@ -174,9 +144,8 @@ class AthreosDiesCreatureTriggeredAbility extends TriggeredAbilityImpl {
     @Override
     public boolean checkTrigger(GameEvent event, Game game) {
         ZoneChangeEvent zEvent = (ZoneChangeEvent) event;
-        if (zEvent.getFromZone().equals(Zone.BATTLEFIELD) && zEvent.getToZone().equals(Zone.GRAVEYARD)) {
-            Permanent permanent = (Permanent) game.getLastKnownInformation(event.getTargetId(), Zone.BATTLEFIELD);
-            if (permanent != null && filter.match(permanent, sourceId, controllerId, game)) {
+        if (zEvent.getFromZone() == Zone.BATTLEFIELD && zEvent.getToZone() == Zone.GRAVEYARD) {
+            if (zEvent.getTarget() != null && filter.match(zEvent.getTarget(), sourceId, controllerId, game)) {
                 for (Effect effect : this.getEffects()) {
                     effect.setValue("creatureId", event.getTargetId());
                 }

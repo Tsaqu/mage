@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.abilities.effects.common.continuous;
 
 import java.util.ArrayList;
@@ -89,7 +63,7 @@ public class BecomesFaceDownCreatureEffect extends ContinuousEffectImpl implemen
         this.objectReference = objectReference;
         this.zoneChangeCounter = Integer.MIN_VALUE;
         if (turnFaceUpCosts != null) {
-            this.turnFaceUpAbility = new TurnFaceUpAbility(turnFaceUpCosts, faceDownType.equals(FaceDownType.MEGAMORPHED));
+            this.turnFaceUpAbility = new TurnFaceUpAbility(turnFaceUpCosts, faceDownType == FaceDownType.MEGAMORPHED);
         }
         staticText = "{this} becomes a 2/2 face-down creature, with no text, no name, no subtypes, and no mana cost";
         foundPermanent = false;
@@ -124,7 +98,7 @@ public class BecomesFaceDownCreatureEffect extends ContinuousEffectImpl implemen
     @Override
     public void init(Ability source, Game game) {
         super.init(source, game);
-        if (faceDownType.equals(FaceDownType.MANUAL)) {
+        if (faceDownType == FaceDownType.MANUAL) {
             Permanent permanent;
             if (objectReference != null) {
                 permanent = objectReference.getPermanent(game);
@@ -163,9 +137,9 @@ public class BecomesFaceDownCreatureEffect extends ContinuousEffectImpl implemen
             switch (layer) {
                 case TypeChangingEffects_4:
                     permanent.setName("");
-                    permanent.getSupertype().clear();
+                    permanent.getSuperType().clear();
                     permanent.getCardType().clear();
-                    permanent.getCardType().add(CardType.CREATURE);
+                    permanent.addCardType(CardType.CREATURE);
                     permanent.getSubtype(game).clear();
                     break;
                 case ColorChangingEffects_5:
@@ -196,11 +170,11 @@ public class BecomesFaceDownCreatureEffect extends ContinuousEffectImpl implemen
                     break;
                 case PTChangingEffects_7:
                     if (sublayer == SubLayer.SetPT_7b) {
-//                        permanent.getPower().setValue(2);
-//                        permanent.getToughness().setValue(2);
+                        permanent.getPower().setValue(2);
+                        permanent.getToughness().setValue(2);
                     }
             }
-        } else if (duration.equals(Duration.Custom) && foundPermanent == true) {
+        } else if (duration == Duration.Custom && foundPermanent == true) {
             discard();
         }
         return true;

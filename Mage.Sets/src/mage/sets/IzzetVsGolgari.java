@@ -1,47 +1,20 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.sets;
 
 import mage.cards.ExpansionSet;
-import mage.constants.SetType;
 import mage.constants.Rarity;
-import mage.cards.CardGraphicInfo;
+import mage.constants.SetType;
 
 /**
  *
  * @author LevelX2
  */
+public final class IzzetVsGolgari extends ExpansionSet {
 
-public class IzzetVsGolgari extends ExpansionSet {
-    private static final IzzetVsGolgari fINSTANCE = new IzzetVsGolgari();
+    private static final IzzetVsGolgari instance = new IzzetVsGolgari();
 
     public static IzzetVsGolgari getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     private IzzetVsGolgari() {
@@ -63,10 +36,10 @@ public class IzzetVsGolgari extends ExpansionSet {
         cards.add(new SetCardInfo("Feast or Famine", 72, Rarity.COMMON, mage.cards.f.FeastOrFamine.class));
         cards.add(new SetCardInfo("Fire // Ice", 32, Rarity.UNCOMMON, mage.cards.f.FireIce.class));
         cards.add(new SetCardInfo("Force Spike", 14, Rarity.COMMON, mage.cards.f.ForceSpike.class));
-        cards.add(new SetCardInfo("Forest", 87, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 88, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 89, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 90, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Forest", 87, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 88, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 89, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 90, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Forgotten Cave", 33, Rarity.COMMON, mage.cards.f.ForgottenCave.class));
         cards.add(new SetCardInfo("Galvanoth", 10, Rarity.RARE, mage.cards.g.Galvanoth.class));
         cards.add(new SetCardInfo("Gelectrode", 5, Rarity.UNCOMMON, mage.cards.g.Gelectrode.class));
@@ -82,10 +55,10 @@ public class IzzetVsGolgari extends ExpansionSet {
         cards.add(new SetCardInfo("Greater Mossdog", 59, Rarity.COMMON, mage.cards.g.GreaterMossdog.class));
         cards.add(new SetCardInfo("Grim Flowering", 75, Rarity.UNCOMMON, mage.cards.g.GrimFlowering.class));
         cards.add(new SetCardInfo("Invoke the Firemind", 31, Rarity.RARE, mage.cards.i.InvokeTheFiremind.class));
-        cards.add(new SetCardInfo("Island", 37, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 38, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 39, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 40, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Island", 37, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 38, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 39, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 40, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Isochron Scepter", 16, Rarity.UNCOMMON, mage.cards.i.IsochronScepter.class));
         cards.add(new SetCardInfo("Izzet Boilerworks", 34, Rarity.COMMON, mage.cards.i.IzzetBoilerworks.class));
         cards.add(new SetCardInfo("Izzet Charm", 21, Rarity.UNCOMMON, mage.cards.i.IzzetCharm.class));
@@ -99,10 +72,10 @@ public class IzzetVsGolgari extends ExpansionSet {
         cards.add(new SetCardInfo("Life from the Loam", 69, Rarity.RARE, mage.cards.l.LifeFromTheLoam.class));
         cards.add(new SetCardInfo("Lonely Sandbar", 35, Rarity.COMMON, mage.cards.l.LonelySandbar.class));
         cards.add(new SetCardInfo("Magma Spray", 15, Rarity.COMMON, mage.cards.m.MagmaSpray.class));
-        cards.add(new SetCardInfo("Mountain", 41, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 42, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 43, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 44, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Mountain", 41, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 42, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 43, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 44, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Nightmare Void", 73, Rarity.UNCOMMON, mage.cards.n.NightmareVoid.class));
         cards.add(new SetCardInfo("Nivix, Aerie of the Firemind", 36, Rarity.UNCOMMON, mage.cards.n.NivixAerieOfTheFiremind.class));
         cards.add(new SetCardInfo("Niv-Mizzet, the Firemind", 1, Rarity.MYTHIC, mage.cards.n.NivMizzetTheFiremind.class));
@@ -126,10 +99,10 @@ public class IzzetVsGolgari extends ExpansionSet {
         cards.add(new SetCardInfo("Stinkweed Imp", 54, Rarity.COMMON, mage.cards.s.StinkweedImp.class));
         cards.add(new SetCardInfo("Street Spasm", 30, Rarity.UNCOMMON, mage.cards.s.StreetSpasm.class));
         cards.add(new SetCardInfo("Svogthos, the Restless Tomb", 81, Rarity.UNCOMMON, mage.cards.s.SvogthosTheRestlessTomb.class));
-        cards.add(new SetCardInfo("Swamp", 83, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 84, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 85, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 86, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Swamp", 83, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 84, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 85, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 86, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Thunderheads", 23, Rarity.UNCOMMON, mage.cards.t.Thunderheads.class));
         cards.add(new SetCardInfo("Train of Thought", 19, Rarity.COMMON, mage.cards.t.TrainOfThought.class));
         cards.add(new SetCardInfo("Tranquil Thicket", 82, Rarity.COMMON, mage.cards.t.TranquilThicket.class));

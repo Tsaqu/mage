@@ -1,30 +1,4 @@
-/*
- *  Copyright 2011 BetaSteward_at_googlemail.com. All rights reserved.
- * 
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- * 
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- * 
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- * 
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.abilities.effects.common;
 
 import java.util.UUID;
@@ -44,6 +18,7 @@ import mage.players.Player;
 public class DamagePlayersEffect extends OneShotEffect {
     private DynamicValue amount;
     private TargetController controller;
+    private String sourceName = "{source}";
 
     public DamagePlayersEffect(int amount) {
         this(Outcome.Damage, new StaticValue(amount));
@@ -51,6 +26,13 @@ public class DamagePlayersEffect extends OneShotEffect {
 
     public DamagePlayersEffect(int amount, TargetController controller) {
         this(Outcome.Damage, new StaticValue(amount), controller);
+    }
+
+    public DamagePlayersEffect(int amount, TargetController controller, String whoDealDamageName) {
+        this(Outcome.Damage, new StaticValue(amount), controller);
+
+        this.sourceName = whoDealDamageName;
+        setText(); // TODO: replace to @Override public String getText()
     }
 
     public DamagePlayersEffect(Outcome outcome, DynamicValue amount) {
@@ -69,6 +51,7 @@ public class DamagePlayersEffect extends OneShotEffect {
         super(effect);
         this.amount = effect.amount;
         this.controller = effect.controller;
+        this.sourceName = effect.sourceName;
     }
 
     @Override
@@ -103,7 +86,7 @@ public class DamagePlayersEffect extends OneShotEffect {
 
     private void setText()
     {
-        StringBuilder sb = new StringBuilder("{source} deals ").append(amount.toString());
+        StringBuilder sb = new StringBuilder().append(this.sourceName).append(" deals ").append(amount.toString());
         switch (controller) {
             case ANY:
                 sb.append(" damage to each player");

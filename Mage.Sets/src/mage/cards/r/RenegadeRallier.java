@@ -1,0 +1,62 @@
+
+package mage.cards.r;
+
+import java.util.UUID;
+import mage.MageInt;
+import mage.abilities.Ability;
+import mage.abilities.common.EntersBattlefieldTriggeredAbility;
+import mage.abilities.condition.common.RevoltCondition;
+import mage.abilities.decorator.ConditionalInterveningIfTriggeredAbility;
+import mage.abilities.effects.common.ReturnFromGraveyardToBattlefieldTargetEffect;
+import mage.cards.CardImpl;
+import mage.cards.CardSetInfo;
+import mage.constants.AbilityWord;
+import mage.constants.CardType;
+import mage.constants.SubType;
+import mage.constants.ComparisonType;
+import mage.filter.common.FilterPermanentCard;
+import mage.filter.predicate.mageobject.ConvertedManaCostPredicate;
+import mage.target.common.TargetCardInYourGraveyard;
+import mage.watchers.common.RevoltWatcher;
+
+/**
+ *
+ * @author fireshoes
+ */
+public final class RenegadeRallier extends CardImpl {
+
+    private static final FilterPermanentCard filter = new FilterPermanentCard("permanent card with converted mana cost 2 or less from your graveyard");
+
+    static {
+        filter.add(new ConvertedManaCostPredicate(ComparisonType.FEWER_THAN, 3));
+    }
+
+    public RenegadeRallier(UUID ownerId, CardSetInfo setInfo) {
+        super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{1}{G}{W}");
+
+        this.subtype.add(SubType.HUMAN);
+        this.subtype.add(SubType.WARRIOR);
+        this.power = new MageInt(3);
+        this.toughness = new MageInt(2);
+
+        // <i>Revolt</i> &mdash; When Renegade Rallier enters the battlefield, if a permanent you controlled left the battlefield this turn,
+        // return target permanent card with converted mana cost 2 or less from your graveyard to your battlefield.
+        Ability ability = new ConditionalInterveningIfTriggeredAbility(new EntersBattlefieldTriggeredAbility(
+                new ReturnFromGraveyardToBattlefieldTargetEffect(), false), RevoltCondition.instance,
+                "<i>Revolt</i> &mdash; When {this} enters the battlefield, if a permanent you controlled left"
+                + " the battlefield this turn, return target permanent card with converted mana cost 2 or less from your graveyard to your battlefield.");
+        ability.setAbilityWord(AbilityWord.REVOLT);
+        ability.addTarget(new TargetCardInYourGraveyard(filter));
+        ability.addWatcher(new RevoltWatcher());
+        this.addAbility(ability);
+    }
+
+    public RenegadeRallier(final RenegadeRallier card) {
+        super(card);
+    }
+
+    @Override
+    public RenegadeRallier copy() {
+        return new RenegadeRallier(this);
+    }
+}

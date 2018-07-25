@@ -1,30 +1,4 @@
-/*
- *  Copyright 2011 BetaSteward_at_googlemail.com. All rights reserved.
- * 
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- * 
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- * 
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- * 
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.player.ai;
 
 import mage.constants.PhaseStep;
@@ -215,7 +189,7 @@ public class ComputerPlayerMCTS extends ComputerPlayer implements Player {
         UUID opponentId = game.getCombat().getDefenders().iterator().next();
         for (UUID attackerId: combat.getAttackers()) {
             this.declareAttacker(attackerId, opponentId, game, false);
-            sb.append(game.getPermanent(attackerId).getName()).append(",");
+            sb.append(game.getPermanent(attackerId).getName()).append(',');
         }
         logger.info(sb.toString());
         MCTSNode.logHitMiss();
@@ -233,9 +207,9 @@ public class ComputerPlayerMCTS extends ComputerPlayer implements Player {
                 sb.append(game.getPermanent(groups.get(i).getAttackers().get(0)).getName()).append(" with: ");
                 for (UUID blockerId: combat.getGroups().get(i).getBlockers()) {
                     this.declareBlocker(this.getId(), blockerId, groups.get(i).getAttackers().get(0), game);
-                    sb.append(game.getPermanent(blockerId).getName()).append(",");
+                    sb.append(game.getPermanent(blockerId).getName()).append(',');
                 }
-                sb.append("|");
+                sb.append('|');
             }
         }
         logger.info(sb.toString());
@@ -374,7 +348,7 @@ public class ComputerPlayerMCTS extends ComputerPlayer implements Player {
                 thinkTime = maxThinkTime / 2;
             }
         }
-        else if (game.getActivePlayerId().equals(playerId) && (curStep == PhaseStep.PRECOMBAT_MAIN || curStep == PhaseStep.POSTCOMBAT_MAIN) && game.getStack().isEmpty()) {
+        else if (game.isActivePlayer(playerId) && (curStep == PhaseStep.PRECOMBAT_MAIN || curStep == PhaseStep.POSTCOMBAT_MAIN) && game.getStack().isEmpty()) {
             if (nodeSizeRatio < THINK_MIN_RATIO) {
                 thinkTime = maxThinkTime;
             }
@@ -448,7 +422,7 @@ public class ComputerPlayerMCTS extends ComputerPlayer implements Player {
         StringBuilder sb = new StringBuilder();
         sb.append(game.getTurn().getValue(game.getTurnNum()));
         for (Player player: game.getPlayers().values()) {
-            sb.append("[player ").append(player.getName()).append(":").append(player.getLife()).append("]");
+            sb.append("[player ").append(player.getName()).append(':').append(player.getLife()).append(']');
         }
         logger.info(sb.toString());        
     }

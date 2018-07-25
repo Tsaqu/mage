@@ -1,48 +1,20 @@
-/*
- * Copyright 2011 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.sets;
 
-import mage.constants.SetType;
 import mage.cards.ExpansionSet;
-
 import mage.constants.Rarity;
-import mage.cards.CardGraphicInfo;
+import mage.constants.SetType;
 
 /**
  *
  * @author magenoxx_at_gmail.com
  */
-public class ReturnToRavnica extends ExpansionSet {
+public final class ReturnToRavnica extends ExpansionSet {
 
-    private static final ReturnToRavnica fINSTANCE = new ReturnToRavnica();
+    private static final ReturnToRavnica instance = new ReturnToRavnica();
 
     public static ReturnToRavnica getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     private ReturnToRavnica() {
@@ -140,11 +112,11 @@ public class ReturnToRavnica extends ExpansionSet {
         cards.add(new SetCardInfo("Fall of the Gavel", 161, Rarity.UNCOMMON, mage.cards.f.FallOfTheGavel.class));
         cards.add(new SetCardInfo("Fencing Ace", 11, Rarity.UNCOMMON, mage.cards.f.FencingAce.class));
         cards.add(new SetCardInfo("Firemind's Foresight", 162, Rarity.RARE, mage.cards.f.FiremindsForesight.class));
-        cards.add(new SetCardInfo("Forest", 270, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 271, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 272, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 273, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 274, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Forest", 270, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 271, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 272, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 273, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 274, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Frostburn Weird", 215, Rarity.COMMON, mage.cards.f.FrostburnWeird.class));
         cards.add(new SetCardInfo("Gatecreeper Vine", 124, Rarity.COMMON, mage.cards.g.GatecreeperVine.class));
         cards.add(new SetCardInfo("Giant Growth", 125, Rarity.COMMON, mage.cards.g.GiantGrowth.class));
@@ -174,11 +146,11 @@ public class ReturnToRavnica extends ExpansionSet {
         cards.add(new SetCardInfo("Hypersonic Dragon", 170, Rarity.RARE, mage.cards.h.HypersonicDragon.class));
         cards.add(new SetCardInfo("Inaction Injunction", 41, Rarity.COMMON, mage.cards.i.InactionInjunction.class));
         cards.add(new SetCardInfo("Inspiration", 42, Rarity.COMMON, mage.cards.i.Inspiration.class));
-        cards.add(new SetCardInfo("Island", 255, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 256, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 257, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 258, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 259, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Island", 255, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 256, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 257, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 258, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 259, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Isperia's Skywatch", 43, Rarity.COMMON, mage.cards.i.IsperiasSkywatch.class));
         cards.add(new SetCardInfo("Isperia, Supreme Judge", 171, Rarity.MYTHIC, mage.cards.i.IsperiaSupremeJudge.class));
         cards.add(new SetCardInfo("Izzet Charm", 172, Rarity.UNCOMMON, mage.cards.i.IzzetCharm.class));
@@ -205,11 +177,11 @@ public class ReturnToRavnica extends ExpansionSet {
         cards.add(new SetCardInfo("Minotaur Aggressor", 100, Rarity.UNCOMMON, mage.cards.m.MinotaurAggressor.class));
         cards.add(new SetCardInfo("Mizzium Mortars", 101, Rarity.RARE, mage.cards.m.MizziumMortars.class));
         cards.add(new SetCardInfo("Mizzium Skin", 45, Rarity.COMMON, mage.cards.m.MizziumSkin.class));
-        cards.add(new SetCardInfo("Mountain", 265, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 266, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 267, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 268, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 269, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Mountain", 265, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 266, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 267, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 268, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 269, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Necropolis Regent", 71, Rarity.MYTHIC, mage.cards.n.NecropolisRegent.class));
         cards.add(new SetCardInfo("New Prahv Guildmage", 181, Rarity.UNCOMMON, mage.cards.n.NewPrahvGuildmage.class));
         cards.add(new SetCardInfo("Nivix Guildmage", 182, Rarity.UNCOMMON, mage.cards.n.NivixGuildmage.class));
@@ -224,11 +196,11 @@ public class ReturnToRavnica extends ExpansionSet {
         cards.add(new SetCardInfo("Perilous Shadow", 74, Rarity.COMMON, mage.cards.p.PerilousShadow.class));
         cards.add(new SetCardInfo("Phantom General", 16, Rarity.UNCOMMON, mage.cards.p.PhantomGeneral.class));
         cards.add(new SetCardInfo("Pithing Needle", 231, Rarity.RARE, mage.cards.p.PithingNeedle.class));
-        cards.add(new SetCardInfo("Plains", 250, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 251, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 252, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 253, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 254, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Plains", 250, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 251, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 252, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 253, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 254, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Precinct Captain", 17, Rarity.RARE, mage.cards.p.PrecinctCaptain.class));
         cards.add(new SetCardInfo("Psychic Spiral", 47, Rarity.UNCOMMON, mage.cards.p.PsychicSpiral.class));
         cards.add(new SetCardInfo("Pursuit of Flight", 102, Rarity.COMMON, mage.cards.p.PursuitOfFlight.class));
@@ -289,11 +261,11 @@ public class ReturnToRavnica extends ExpansionSet {
         cards.add(new SetCardInfo("Sunspire Griffin", 25, Rarity.COMMON, mage.cards.s.SunspireGriffin.class));
         cards.add(new SetCardInfo("Supreme Verdict", 201, Rarity.RARE, mage.cards.s.SupremeVerdict.class));
         cards.add(new SetCardInfo("Survey the Wreckage", 107, Rarity.COMMON, mage.cards.s.SurveyTheWreckage.class));
-        cards.add(new SetCardInfo("Swamp", 260, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 261, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 262, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 263, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 264, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Swamp", 260, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 261, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 262, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 263, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 264, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Swift Justice", 26, Rarity.COMMON, mage.cards.s.SwiftJustice.class));
         cards.add(new SetCardInfo("Syncopate", 54, Rarity.UNCOMMON, mage.cards.s.Syncopate.class));
         cards.add(new SetCardInfo("Tablet of the Guilds", 235, Rarity.UNCOMMON, mage.cards.t.TabletOfTheGuilds.class));

@@ -6,41 +6,42 @@
 package mage.game;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import mage.ObjectColor;
 import mage.cards.Card;
+import mage.util.SubTypeList;
 
 /**
- * This class saves changed attributes of cards (e.g. in graveyard, exile or player hands or libraries).
- * 
+ * This class saves changed attributes of cards (e.g. in graveyard, exile or
+ * player hands or libraries).
+ *
  * @author LevelX2
  */
-public class CardAttribute  implements Serializable {
-    
-    protected ObjectColor color;
-    protected List<String> subtype;
+public class CardAttribute implements Serializable {
 
-    public CardAttribute(Card card) {
+    protected ObjectColor color;
+    protected SubTypeList subtype;
+
+    public CardAttribute(Card card, Game game) {
         color = card.getColor(null).copy();
-        subtype = new ArrayList<String>(card.getSubtype(null));
+        subtype = new SubTypeList();
+        subtype.addAll(card.getSubtype(game));
     }
 
     public CardAttribute(CardAttribute cardAttribute) {
         this.color = cardAttribute.color;
         this.subtype = cardAttribute.subtype;
     }
-    
+
     public CardAttribute copy() {
         return new CardAttribute(this);
     }
-    
+
     public ObjectColor getColor() {
-       return color;
+        return color;
     }
-    
-    public List<String> getSubtype() {
+
+    public SubTypeList getSubtype() {
         return subtype;
     }
-    
+
 }

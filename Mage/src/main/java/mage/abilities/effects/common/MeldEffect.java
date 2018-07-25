@@ -1,32 +1,7 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.abilities.effects.common;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import mage.abilities.Ability;
@@ -82,23 +57,26 @@ public class MeldEffect extends OneShotEffect {
             if (meldWithList.isEmpty()) {
                 return false; // possible permanent has left the battlefield meanwhile
             }
-            UUID meldWithId;
+            UUID meldWithId = null;
             if (meldWithList.size() == 1) {
                 meldWithId = meldWithList.iterator().next();
             } else {
-                controller.choose(Outcome.BoostCreature, target, sourceId, game);
-                meldWithId = target.getFirstTarget();
+                if (controller.choose(Outcome.BoostCreature, target, sourceId, game)) {
+                    meldWithId = target.getFirstTarget();
+                }
             }
             // Exile the two permanents to meld.
             Permanent sourcePermanent = game.getPermanent(sourceId);
             Permanent meldWithPermanent = game.getPermanent(meldWithId);
             if (sourcePermanent != null && meldWithPermanent != null) {
-                sourcePermanent.moveToExile(null, "", sourceId, game);
-                meldWithPermanent.moveToExile(null, "", sourceId, game);
+                Set<Card> toExile = new HashSet<>();
+                toExile.add(sourcePermanent);
+                toExile.add(meldWithPermanent);
+                controller.moveCards(toExile, Zone.EXILED, source, game);
                 // Create the meld card and move it to the battlefield.
                 Card sourceCard = game.getExile().getCard(sourceId, game);
                 Card meldWithCard = game.getExile().getCard(meldWithId, game);
-                if (!sourceCard.isCopy() && !meldWithCard.isCopy()) {
+                if (sourceCard != null && !sourceCard.isCopy() && meldWithCard != null && !meldWithCard.isCopy()) {
                     meldCard.setOwnerId(controller.getId());
                     meldCard.setTopHalfCard(meldWithCard, game);
                     meldCard.setBottomHalfCard(sourceCard, game);
@@ -106,7 +84,7 @@ public class MeldEffect extends OneShotEffect {
                     game.addMeldCard(meldCard.getId(), meldCard);
                     game.getState().addCard(meldCard);
                     meldCard.setZone(Zone.EXILED, game);
-                    meldCard.moveToZone(Zone.BATTLEFIELD, sourceId, game, false);
+                    controller.moveCards(meldCard, Zone.BATTLEFIELD, source, game);
                 }
                 return true;
             }

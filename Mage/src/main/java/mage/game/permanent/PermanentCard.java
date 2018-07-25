@@ -1,33 +1,8 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.game.permanent;
 
 import java.util.UUID;
+import mage.MageObject;
 import mage.abilities.Abilities;
 import mage.abilities.Ability;
 import mage.abilities.costs.mana.ManaCost;
@@ -44,6 +19,7 @@ import mage.game.events.ZoneChangeEvent;
 public class PermanentCard extends PermanentImpl {
 
     protected int maxLevelCounters;
+    // A copy of the origin card that was cast (this is not the original card, so it's possible to chnage some attribute to this blueprint to change attributes to the permanent if it enters the battlefield with e.g. a subtype)
     protected Card card;
     // the number this permanent instance had
     protected int zoneChangeCounter;
@@ -114,7 +90,7 @@ public class PermanentCard extends PermanentImpl {
         this.cardType.clear();
         this.cardType.addAll(card.getCardType());
         this.color = card.getColor(null).copy();
-        this.frameColor = card.getFrameColor(null).copy();
+        this.frameColor = card.getFrameColor(game).copy();
         this.frameStyle = card.getFrameStyle();
         this.manaCost = card.getManaCost().copy();
         if (card instanceof PermanentCard) {
@@ -122,8 +98,9 @@ public class PermanentCard extends PermanentImpl {
         }
         this.subtype.clear();
         this.subtype.addAll(card.getSubtype(game));
+        this.isAllCreatureTypes = card.isAllCreatureTypes();
         this.supertype.clear();
-        this.supertype.addAll(card.getSupertype());
+        supertype.addAll(card.getSuperType());
         this.expansionSetCode = card.getExpansionSetCode();
         this.rarity = card.getRarity();
         this.cardNumber = card.getCardNumber();
@@ -139,6 +116,11 @@ public class PermanentCard extends PermanentImpl {
         }
         this.flipCard = card.isFlipCard();
         this.flipCardName = card.getFlipCardName();
+    }
+
+    @Override
+    public MageObject getBasicMageObject(Game game) {
+        return card;
     }
 
     public Card getCard() {
@@ -196,11 +178,14 @@ public class PermanentCard extends PermanentImpl {
     @Override
     public int getConvertedManaCost() {
         if (isTransformed()) {
-            // 711.4b While a double-faced permanent’s back face is up, it has only the characteristics of its back face.
+            // 711.4b While a double-faced permanent's back face is up, it has only the characteristics of its back face.
             // However, its converted mana cost is calculated using the mana cost of its front face. This is a change from previous rules.
             // If a permanent is copying the back face of a double-faced card (even if the card representing that copy
             // is itself a double-faced card), the converted mana cost of that permanent is 0.
             return getCard().getConvertedManaCost();
+        }
+        if (faceDown) { // game not neccessary
+            return getManaCost().convertedManaCost();
         }
         return super.getConvertedManaCost();
 

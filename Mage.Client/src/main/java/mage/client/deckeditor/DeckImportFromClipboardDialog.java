@@ -1,5 +1,7 @@
 package mage.client.deckeditor;
 
+import mage.util.StreamUtils;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.BufferedWriter;
@@ -23,18 +25,8 @@ public class DeckImportFromClipboardDialog extends JDialog {
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
-        buttonOK.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onOK();
-            }
-        });
-        buttonCancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        });
+        buttonOK.addActionListener(e -> onOK());
+        buttonCancel.addActionListener(e -> onCancel());
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -45,24 +37,20 @@ public class DeckImportFromClipboardDialog extends JDialog {
         });
 
         // Close on "ESC"
-        contentPane.registerKeyboardAction(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
     private void onOK() {
+        BufferedWriter bw = null;
         try {
             File temp = File.createTempFile("cbimportdeck", ".txt");
-            BufferedWriter bw = new BufferedWriter(new FileWriter(temp));
+            bw = new BufferedWriter(new FileWriter(temp));
             bw.write(txtDeckList.getText());
-            bw.close();
-
             tmpPath = temp.getPath();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            StreamUtils.closeQuietly(bw);
         }
 
         dispose();
@@ -94,21 +82,15 @@ public class DeckImportFromClipboardDialog extends JDialog {
                             javax.swing.border.TitledBorder.TOP, new java.awt.Font("Dialog", java.awt.Font.PLAIN, 12),
                             java.awt.Color.BLACK), contentPane.getBorder()));
 
-            contentPane.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-                @Override
-                public void propertyChange(java.beans.PropertyChangeEvent e) {
-                    if ("border".equals(e.getPropertyName())) {
-                        throw new RuntimeException();
-                    }
+            contentPane.addPropertyChangeListener(e -> {
+                if ("border".equals(e.getPropertyName())) {
+                    throw new RuntimeException();
                 }
             });
 
-            contentPane.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-                @Override
-                public void propertyChange(java.beans.PropertyChangeEvent e) {
-                    if ("border".equals(e.getPropertyName())) {
-                        throw new RuntimeException();
-                    }
+            contentPane.addPropertyChangeListener(e -> {
+                if ("border".equals(e.getPropertyName())) {
+                    throw new RuntimeException();
                 }
             });
 
@@ -162,7 +144,8 @@ public class DeckImportFromClipboardDialog extends JDialog {
                 txtDeckList.setMinimumSize(new Dimension(250, 400));
                 txtDeckList.setPreferredSize(new Dimension(550, 400));
                 txtDeckList.setText("// Example:\n//1 Library of Congress\n//1 Cryptic Gateway\n//1 Azami, Lady of Scrolls\n// NB: This is slow as, and will lock your screen :)");
-                panel3.add(txtDeckList, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
+                JScrollPane txtScrollableDeckList = new JScrollPane(txtDeckList);
+                panel3.add(txtScrollableDeckList, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
                         GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                         new Insets(0, 0, 0, 0), 0, 0));
             }

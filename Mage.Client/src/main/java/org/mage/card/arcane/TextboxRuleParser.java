@@ -18,11 +18,11 @@ import org.apache.log4j.Logger;
  *
  * @author StravantUser
  */
-public class TextboxRuleParser {
+public final class TextboxRuleParser {
 
     private static final Logger LOGGER = Logger.getLogger(CardPanel.class);
 
-    private static final Pattern BasicManaAbility = Pattern.compile("\\{T\\}: Add \\{(\\w)\\} to your mana pool\\.");
+    private static final Pattern BasicManaAbility = Pattern.compile("\\{T\\}: Add \\{(\\w)\\}\\.");
     private static final Pattern LevelAbilityPattern = Pattern.compile("Level (\\d+)-?(\\d*)(\\+?)");
     private static final Pattern LoyaltyAbilityPattern = Pattern.compile("^(\\+|\\-)(\\d+|X): ");
     private static final Pattern SimpleKeywordPattern = Pattern.compile("^(\\w+( \\w+)?)\\s*(\\([^\\)]*\\))?\\s*$");
@@ -186,10 +186,10 @@ public class TextboxRuleParser {
                                     if (levelMatch.find()) {
                                         try {
                                             levelFrom = Integer.parseInt(levelMatch.group(1));
-                                            if (!levelMatch.group(2).equals("")) {
+                                            if (!levelMatch.group(2).isEmpty()) {
                                                 levelTo = Integer.parseInt(levelMatch.group(2));
                                             }
-                                            if (!levelMatch.group(3).equals("")) {
+                                            if (!levelMatch.group(3).isEmpty()) {
                                                 levelTo = TextboxLevelRule.AND_HIGHER;
                                             }
                                             isLeveler = true;

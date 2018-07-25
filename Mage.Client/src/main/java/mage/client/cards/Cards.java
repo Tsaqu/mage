@@ -1,30 +1,4 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 
  /*
  * Cards.java
@@ -37,8 +11,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -100,7 +72,7 @@ public class Cards extends javax.swing.JPanel {
             jScrollPane1.getViewport().setOpaque(false);
             jScrollPane1.setBorder(EMPTY_BORDER);
         }
-        if (Plugins.getInstance().isCardPluginLoaded()) {
+        if (Plugins.instance.isCardPluginLoaded()) {
             cardArea.setLayout(null);
         }
         cardArea.setBorder(EMPTY_BORDER);
@@ -210,7 +182,7 @@ public class Cards extends javax.swing.JPanel {
                 tmp.setIsAbility(true);
                 tmp.overrideTargets(card.getTargets());
                 tmp.overrideId(card.getId());
-                tmp.setAbilityType(((StackAbilityView) card).getAbilityType());
+                tmp.setAbilityType(card.getAbilityType());
                 card = tmp;
             } else {
                 card.setAbilityType(null);
@@ -227,7 +199,7 @@ public class Cards extends javax.swing.JPanel {
         }
 
         if (!isVisibleIfEmpty) {
-            cardArea.setVisible(cards.size() > 0);
+            cardArea.setVisible(!cards.isEmpty());
         }
 
         sizeCards(getCardDimension());
@@ -258,14 +230,14 @@ public class Cards extends javax.swing.JPanel {
         this.cardDimension = dimension;
         for (Component component : cardArea.getComponents()) {
             if (component instanceof CardPanel) {
-                ((CardPanel) component).setBounds(0, 0, dimension.width, dimension.height);
+                component.setBounds(0, 0, dimension.width, dimension.height);
             }
         }
         layoutCards();
     }
 
     private void addCard(CardView card, BigCard bigCard, UUID gameId) {
-        MageCard mageCard = Plugins.getInstance().getMageCard(card, bigCard, getCardDimension(), gameId, true, true);
+        MageCard mageCard = Plugins.instance.getMageCard(card, bigCard, getCardDimension(), gameId, true, true);
         if (zone != null) {
             mageCard.setZone(zone);
         }
@@ -358,12 +330,7 @@ public class Cards extends javax.swing.JPanel {
             }
         }
         // sort the cards
-        Collections.sort(cardsToLayout, new Comparator<CardPanel>() {
-            @Override
-            public int compare(CardPanel cp1, CardPanel cp2) {
-                return Integer.valueOf(cp1.getLocation().x).compareTo(cp2.getLocation().x);
-            }
-        });
+        cardsToLayout.sort((cp1, cp2) -> Integer.valueOf(cp1.getLocation().x).compareTo(cp2.getLocation().x));
         // relocate the cards
         int dx = 0;
         for (Component component : cardsToLayout) {

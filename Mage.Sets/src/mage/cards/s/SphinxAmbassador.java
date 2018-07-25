@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.s;
 
 import java.util.Collection;
@@ -42,6 +16,7 @@ import mage.choices.Choice;
 import mage.choices.ChoiceImpl;
 import mage.constants.CardType;
 import mage.constants.Outcome;
+import mage.constants.SubType;
 import mage.constants.Zone;
 import mage.game.Game;
 import mage.game.permanent.Permanent;
@@ -52,17 +27,17 @@ import mage.target.common.TargetCardInLibrary;
  *
  * @author North
  */
-public class SphinxAmbassador extends CardImpl {
+public final class SphinxAmbassador extends CardImpl {
 
     public SphinxAmbassador(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{5}{U}{U}");
-        this.subtype.add("Sphinx");
+        super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{5}{U}{U}");
+        this.subtype.add(SubType.SPHINX);
 
         this.power = new MageInt(5);
         this.toughness = new MageInt(5);
 
         this.addAbility(FlyingAbility.getInstance());
-        // Whenever Sphinx Ambassador deals combat damage to a player, search that player's library for a card, then that player names a card. If you searched for a creature card that isn't the named card, you may put it onto the battlefield under your control. Then that player shuffles his or her library.
+        // Whenever Sphinx Ambassador deals combat damage to a player, search that player's library for a card, then that player names a card. If you searched for a creature card that isn't the named card, you may put it onto the battlefield under your control. Then that player shuffles their library.
         this.addAbility(new DealsCombatDamageToAPlayerTriggeredAbility(new SphinxAmbassadorEffect(), false, true));
     }
 
@@ -80,7 +55,7 @@ class SphinxAmbassadorEffect extends OneShotEffect {
 
     public SphinxAmbassadorEffect() {
         super(Outcome.PutCreatureInPlay);
-        this.staticText = "search that player's library for a card, then that player names a card. If you searched for a creature card that isn't the named card, you may put it onto the battlefield under your control. Then that player shuffles his or her library";
+        this.staticText = "search that player's library for a card, then that player names a card. If you searched for a creature card that isn't the named card, you may put it onto the battlefield under your control. Then that player shuffles their library";
     }
 
     public SphinxAmbassadorEffect(final SphinxAmbassadorEffect effect) {
@@ -106,7 +81,7 @@ class SphinxAmbassadorEffect extends OneShotEffect {
                 TreeSet<String> choices = new TreeSet<>();
                 Collection<Card> cards = game.getCards();
                 for (Card gameCard : cards) {
-                    if (gameCard.getOwnerId().equals(targetPlayer.getId())) {
+                    if (gameCard.isOwnedBy(targetPlayer.getId())) {
                         choices.add(gameCard.getName());
                     }
                 }
@@ -114,16 +89,14 @@ class SphinxAmbassadorEffect extends OneShotEffect {
                 Choice cardChoice = new ChoiceImpl();
                 cardChoice.setChoices(choices);
                 cardChoice.clearChoice();
-                while (!targetPlayer.choose(Outcome.Benefit, cardChoice, game)) {
-                    if (!targetPlayer.canRespond()) {
-                        return false;
-                    }
+                if (!targetPlayer.choose(Outcome.Benefit, cardChoice, game)) {
+                    return false;
                 }
                 String cardName = cardChoice.getChoice();
 
-                game.informPlayers(new StringBuilder(sourcePermanent.getName()).append(", named card: [").append(cardName).append("]").toString());
-                if (!card.getName().equals(cardName) && card.getCardType().contains(CardType.CREATURE)) {
-                    if (controller.chooseUse(outcome, new StringBuilder("Put ").append(card.getName()).append(" onto the battlefield?").toString(), source, game)) {
+                game.informPlayers(sourcePermanent.getName() + ", named card: [" + cardName + ']');
+                if (!card.getName().equals(cardName) && card.isCreature()) {
+                    if (controller.chooseUse(outcome, "Put " + card.getName() + " onto the battlefield?", source, game)) {
                         controller.moveCards(card, Zone.BATTLEFIELD, source, game);
                     }
                 }

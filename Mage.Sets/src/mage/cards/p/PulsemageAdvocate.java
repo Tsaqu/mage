@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.p;
 
 import java.util.UUID;
@@ -40,10 +14,11 @@ import mage.cards.Cards;
 import mage.cards.CardsImpl;
 import mage.constants.CardType;
 import mage.constants.Outcome;
+import mage.constants.SubType;
 import mage.constants.TargetController;
 import mage.constants.Zone;
 import mage.filter.FilterCard;
-import mage.filter.common.FilterCreatureCard;
+import mage.filter.StaticFilters;
 import mage.filter.predicate.other.OwnerPredicate;
 import mage.game.Game;
 import mage.players.Player;
@@ -54,24 +29,25 @@ import mage.target.common.TargetCardInYourGraveyard;
  *
  * @author emerald000
  */
-public class PulsemageAdvocate extends CardImpl {
+public final class PulsemageAdvocate extends CardImpl {
 
     private static final FilterCard filter = new FilterCard("cards from an opponent's graveyard");
+
     static {
         filter.add(new OwnerPredicate(TargetController.NOT_YOU));
     }
 
     public PulsemageAdvocate(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{2}{W}");
-        this.subtype.add("Human");
-        this.subtype.add("Cleric");
+        super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{2}{W}");
+        this.subtype.add(SubType.HUMAN);
+        this.subtype.add(SubType.CLERIC);
         this.power = new MageInt(1);
         this.toughness = new MageInt(3);
 
-        // {tap}: Return three target cards from an opponent's graveyard to his or her hand. Return target creature card from your graveyard to the battlefield.
+        // {tap}: Return three target cards from an opponent's graveyard to their hand. Return target creature card from your graveyard to the battlefield.
         Ability ability = new SimpleActivatedAbility(Zone.BATTLEFIELD, new PulsemageAdvocateEffect(), new TapSourceCost());
         ability.addTarget(new TargetCardInASingleGraveyard(3, 3, filter));
-        ability.addTarget(new TargetCardInYourGraveyard(new FilterCreatureCard("creature card from your graveyard")));
+        ability.addTarget(new TargetCardInYourGraveyard(StaticFilters.FILTER_CARD_CREATURE_YOUR_GRAVEYARD));
         this.addAbility(ability);
     }
 
@@ -89,7 +65,7 @@ class PulsemageAdvocateEffect extends OneShotEffect {
 
     PulsemageAdvocateEffect() {
         super(Outcome.PutCreatureInPlay);
-        this.staticText = "Return three target cards from an opponent's graveyard to his or her hand. Return target creature card from your graveyard to the battlefield";
+        this.staticText = "Return three target cards from an opponent's graveyard to their hand. Return target creature card from your graveyard to the battlefield";
     }
 
     PulsemageAdvocateEffect(final PulsemageAdvocateEffect effect) {

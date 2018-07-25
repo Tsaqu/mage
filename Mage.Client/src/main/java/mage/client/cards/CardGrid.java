@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 
  /*
  * CardGrid.java
@@ -33,23 +7,10 @@
  */
 package mage.client.cards;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.UUID;
 import mage.cards.MageCard;
 import mage.client.deckeditor.SortSetting;
 import mage.client.plugins.impl.Plugins;
+import mage.client.util.ClientEventType;
 import mage.client.util.Event;
 import mage.client.util.GUISizeHelper;
 import mage.client.util.Listener;
@@ -58,13 +19,20 @@ import mage.view.CardView;
 import mage.view.CardsView;
 import org.mage.card.arcane.CardPanel;
 
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.*;
+import java.util.List;
+import java.util.Map.Entry;
+
 /**
  *
  * @author BetaSteward_at_googlemail.com
  */
 public class CardGrid extends javax.swing.JLayeredPane implements MouseListener, ICardGrid {
 
-    protected CardEventSource cardEventSource = new CardEventSource();
+    protected final CardEventSource cardEventSource = new CardEventSource();
     protected BigCard bigCard;
     protected UUID gameId;
     private final Map<UUID, MageCard> cards = new HashMap<>();
@@ -128,13 +96,12 @@ public class CardGrid extends javax.swing.JLayeredPane implements MouseListener,
                 addCard(card, bigCard, gameId, drawImage);
             }
         }
-        // System.gc();
         drawCards(sortSetting);
         this.setVisible(true);
     }
 
     private void addCard(CardView card, BigCard bigCard, UUID gameId, boolean drawImage) {
-        MageCard cardImg = Plugins.getInstance().getMageCard(card, bigCard, cardDimension, gameId, drawImage, true);
+        MageCard cardImg = Plugins.instance.getMageCard(card, bigCard, cardDimension, gameId, drawImage, true);
         cards.put(card.getId(), cardImg);
         cardImg.addMouseListener(this);
         add(cardImg);
@@ -154,22 +121,22 @@ public class CardGrid extends javax.swing.JLayeredPane implements MouseListener,
             List<MageCard> sortedCards = new ArrayList<>(cards.values());
             switch (sortSetting.getSortBy()) {
                 case NAME:
-                    Collections.sort(sortedCards, new CardNameComparator());
+                    sortedCards.sort(new CardNameComparator());
                     break;
                 case CARD_TYPE:
-                    Collections.sort(sortedCards, new CardTypeComparator());
+                    sortedCards.sort(new CardTypeComparator());
                     break;
                 case RARITY:
-                    Collections.sort(sortedCards, new CardRarityComparator());
+                    sortedCards.sort(new CardRarityComparator());
                     break;
                 case COLOR:
-                    Collections.sort(sortedCards, new CardColorComparator());
+                    sortedCards.sort(new CardColorComparator());
                     break;
                 case COLOR_IDENTITY:
-                    Collections.sort(sortedCards, new CardColorDetailedIdentity());
+                    sortedCards.sort(new CardColorDetailedIdentity());
                     break;
                 case CASTING_COST:
-                    Collections.sort(sortedCards, new CardCostComparator());
+                    sortedCards.sort(new CardCostComparator());
                     break;
 
             }
@@ -193,7 +160,7 @@ public class CardGrid extends javax.swing.JLayeredPane implements MouseListener,
                             }
                             break;
                         case RARITY:
-                            if (!cardImg.getOriginal().getRarity().equals(lastCard.getOriginal().getRarity())) {
+                            if (cardImg.getOriginal().getRarity() != lastCard.getOriginal().getRarity()) {
                                 curColumn++;
                                 curRow = 0;
                             }
@@ -322,15 +289,15 @@ public class CardGrid extends javax.swing.JLayeredPane implements MouseListener,
             Object obj = e.getSource();
             if (obj instanceof Card) {
                 if (e.isAltDown()) {
-                    cardEventSource.altDoubleClick(((Card) obj).getOriginal(), "alt-double-click");
+                    cardEventSource.fireEvent(((Card) obj).getOriginal(), ClientEventType.ALT_DOUBLE_CLICK);
                 } else {
-                    cardEventSource.doubleClick(((Card) obj).getOriginal(), "double-click");
+                    cardEventSource.fireEvent(((Card) obj).getOriginal(), ClientEventType.DOUBLE_CLICK);
                 }
             } else if (obj instanceof MageCard) {
                 if (e.isAltDown()) {
-                    cardEventSource.altDoubleClick(((MageCard) obj).getOriginal(), "alt-double-click");
+                    cardEventSource.fireEvent(((MageCard) obj).getOriginal(), ClientEventType.ALT_DOUBLE_CLICK);
                 } else {
-                    cardEventSource.doubleClick(((MageCard) obj).getOriginal(), "double-click");
+                    cardEventSource.fireEvent(((MageCard) obj).getOriginal(), ClientEventType.DOUBLE_CLICK);
                 }
             }
         }
@@ -409,7 +376,7 @@ class CardCostComparator implements Comparator<MageCard> {
 
     @Override
     public int compare(MageCard o1, MageCard o2) {
-        int val = Integer.valueOf(o1.getOriginal().getConvertedManaCost()).compareTo(Integer.valueOf(o2.getOriginal().getConvertedManaCost()));
+        int val = Integer.valueOf(o1.getOriginal().getConvertedManaCost()).compareTo(o2.getOriginal().getConvertedManaCost());
         if (val == 0) {
             return o1.getOriginal().getName().compareTo(o2.getOriginal().getName());
         } else {

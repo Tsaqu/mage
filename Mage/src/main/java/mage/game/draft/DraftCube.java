@@ -1,37 +1,10 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.game.draft;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.Objects;
 import mage.cards.Card;
-import mage.cards.repository.CardCriteria;
 import mage.cards.repository.CardInfo;
 import mage.cards.repository.CardRepository;
 import mage.util.RandomUtil;
@@ -73,7 +46,7 @@ public abstract class DraftCube {
     private static final Logger logger = Logger.getLogger(DraftCube.class);
 
     private final String name;
-    private final int boosterSize = 15;
+    private static final int boosterSize = 15;
 
     protected List<CardIdentity> cubeCards = new ArrayList<>();
     protected List<CardIdentity> leftCubeCards = new ArrayList<>();
@@ -106,11 +79,7 @@ public abstract class DraftCube {
                 if (!cardId.getName().isEmpty()) {
                     CardInfo cardInfo = null;
                     if (!cardId.getExtension().isEmpty()) {
-                        CardCriteria criteria = new CardCriteria().name(cardId.getName()).setCodes(cardId.extension);
-                        List<CardInfo> cardList = CardRepository.instance.findCards(criteria);
-                        if (cardList != null && cardList.size() > 0) {
-                            cardInfo = cardList.get(0);
-                        }
+                        cardInfo = CardRepository.instance.findCardWPreferredSet(cardId.getName(), cardId.getExtension(), false);
                     } else {
                         cardInfo = CardRepository.instance.findPreferedCoreExpansionCard(cardId.getName(), false);
                     }
@@ -119,11 +88,11 @@ public abstract class DraftCube {
                         booster.add(cardInfo.getCard());
                         done = true;
                     } else {
-                        logger.warn(new StringBuilder(this.getName()).append(" - Card not found: ").append(cardId.getName()).append(":").append(cardId.extension));
+                        logger.warn(new StringBuilder(this.getName()).append(" - Card not found: ").append(cardId.getName()).append(':').append(cardId.extension));
                         notValid++;
                     }
                 } else {
-                    logger.error(new StringBuilder(this.getName()).append(" - Empty card name: ").append(cardId.getName()).append(":").append(cardId.extension));
+                    logger.error(new StringBuilder(this.getName()).append(" - Empty card name: ").append(cardId.getName()).append(':').append(cardId.extension));
                     notValid++;
                 }
 
@@ -146,7 +115,7 @@ public abstract class DraftCube {
         }
 
         for (int i = leftCubeCards.size() - 1; i >= 0; i--) {
-            if (leftCubeCards.get(i) == cardId) {
+            if (Objects.equals(leftCubeCards.get(i), cardId)) {
                 leftCubeCards.remove(i);
                 return;
             }

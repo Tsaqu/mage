@@ -1,34 +1,6 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.h;
 
-import java.util.ArrayList;
-import java.util.UUID;
 import mage.MageObject;
 import mage.abilities.Ability;
 import mage.abilities.common.EntersBattlefieldTriggeredAbility;
@@ -38,25 +10,25 @@ import mage.abilities.effects.OneShotEffect;
 import mage.cards.Card;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
-import mage.constants.AsThoughEffectType;
-import mage.constants.CardType;
-import mage.constants.Duration;
-import mage.constants.Outcome;
-import mage.constants.Zone;
+import mage.constants.*;
 import mage.game.ExileZone;
 import mage.game.Game;
 import mage.players.Player;
 import mage.target.common.TargetOpponent;
 import mage.util.CardUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 /**
  *
  * @author LevelX2
  */
-public class HedonistsTrove extends CardImpl {
+public final class HedonistsTrove extends CardImpl {
 
     public HedonistsTrove(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.ENCHANTMENT},"{5}{B}{B}");
+        super(ownerId, setInfo, new CardType[]{CardType.ENCHANTMENT}, "{5}{B}{B}");
 
         // When Hedonist's Trove enters the battlefield, exile all cards from target opponent's graveyard.
         Ability ability = new EntersBattlefieldTriggeredAbility(new HedonistsTroveExileEffect());
@@ -100,7 +72,7 @@ class HedonistsTroveExileEffect extends OneShotEffect {
         MageObject sourceObject = source.getSourceObject(game);
         if (controller != null && targetPlayer != null && sourceObject != null) {
             UUID exileId = CardUtil.getExileZoneId(game, source.getSourceId(), source.getSourceObjectZoneChangeCounter());
-            ArrayList<UUID> graveyard = new ArrayList<>(targetPlayer.getGraveyard());
+            List<UUID> graveyard = new ArrayList<>(targetPlayer.getGraveyard());
             for (UUID cardId : graveyard) {
                 Card card = game.getCard(cardId);
                 if (card != null) {
@@ -117,7 +89,7 @@ class HedonistsTrovePlayLandEffect extends AsThoughEffectImpl {
 
     public HedonistsTrovePlayLandEffect() {
         super(AsThoughEffectType.PLAY_FROM_NOT_OWN_HAND_ZONE, Duration.WhileOnBattlefield, Outcome.Benefit);
-        staticText = "You may play land cards exiled by {this}";
+        staticText = "You may play land cards exiled with {this}";
     }
 
     public HedonistsTrovePlayLandEffect(final HedonistsTrovePlayLandEffect effect) {
@@ -139,7 +111,7 @@ class HedonistsTrovePlayLandEffect extends AsThoughEffectImpl {
         if (affectedControllerId.equals(source.getControllerId())) {
             Card card = game.getCard(objectId);
             MageObject sourceObject = source.getSourceObject(game);
-            if (card != null && card.getCardType().contains(CardType.LAND) && sourceObject != null) {
+            if (card != null && card.isLand() && sourceObject != null) {
                 UUID exileId = CardUtil.getExileZoneId(game, source.getSourceId(), source.getSourceObjectZoneChangeCounter());
                 if (exileId != null) {
                     ExileZone exileZone = game.getState().getExile().getExileZone(exileId);
@@ -182,7 +154,7 @@ class HedonistsTroveCastNonlandCardsEffect extends AsThoughEffectImpl {
         if (affectedControllerId.equals(source.getControllerId())) {
             Card card = game.getCard(objectId);
             MageObject sourceObject = source.getSourceObject(game);
-            if (card != null && !card.getCardType().contains(CardType.LAND) && sourceObject != null) {
+            if (card != null && !card.isLand() && sourceObject != null) {
                 UUID exileId = CardUtil.getExileZoneId(game, source.getSourceId(), source.getSourceObjectZoneChangeCounter());
                 if (exileId != null) {
                     ExileZone exileZone = game.getState().getExile().getExileZone(exileId);

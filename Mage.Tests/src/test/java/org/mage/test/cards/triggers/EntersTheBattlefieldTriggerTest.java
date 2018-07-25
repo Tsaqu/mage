@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package org.mage.test.cards.triggers;
 
 import mage.constants.PhaseStep;
@@ -312,14 +286,14 @@ public class EntersTheBattlefieldTriggerTest extends CardTestPlayerBase {
         /*
         * playerA's Carnivorous Plant will get -1/-1 from Noxious Ghoul -> 3/4
         * playerB's Carnivorous Plant will get -1/-1 from Noxious Ghoul -> 3/4
-        */
+         */
 
         castSpell(1, PhaseStep.POSTCOMBAT_MAIN, playerA, "Clone");
         setChoice(playerA, "Noxious Ghoul");
         /*
         * playerA's Carnivorous Plant will get -1/-1 from Clone -> 2/3
         * playerB's Carnivorous Plant will get -1/-1 from Clone -> 2/3
-        */
+         */
         castSpell(1, PhaseStep.POSTCOMBAT_MAIN, playerB, "Ego Erasure", "targetPlayer=PlayerA", "Whenever");
         /*
         * playerA' Noxious Ghoul will get -2/0 -> 1/3
@@ -328,7 +302,7 @@ public class EntersTheBattlefieldTriggerTest extends CardTestPlayerBase {
         * playerA' Noxious Ghoul will get -1/-1 from itself -> -1/1
         * playerA's Carnivorous Plant will get -1/-1 from Noxious Ghoul -> -1/2
         * playerB's Carnivorous Plant will get -1/-1 from Noxious Ghoul -> 1/2
-        */
+         */
         setStopAt(1, PhaseStep.END_TURN);
 
         execute();
@@ -341,21 +315,69 @@ public class EntersTheBattlefieldTriggerTest extends CardTestPlayerBase {
         assertPowerToughness(playerB, "Carnivorous Plant", 1, 2);
         assertPowerToughness(playerA, "Carnivorous Plant", -1, 2);
     }
-    
+
     @Test
     public void testHearthcageGiant() {
         // {6}{R}{R} Creature — Giant Warrior
         //When Hearthcage Giant enters the battlefield, put two 3/1 red Elemental Shaman creature tokens onto the battlefield.
         //Sacrifice an Elemental: Target Giant creature gets +3/+1 until end of turn.
-        addCard(Zone.HAND,playerA,"Hearthcage Giant");
+        addCard(Zone.HAND, playerA, "Hearthcage Giant");
         addCard(Zone.BATTLEFIELD, playerA, "Mountain", 8);
-        
+
         castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Hearthcage Giant");
         setStopAt(1, PhaseStep.BEGIN_COMBAT);
         execute();
-        
+
         assertPermanentCount(playerA, "Hearthcage Giant", 1);
         assertPermanentCount(playerA, "Elemental Shaman", 2);
         assertPowerToughness(playerA, "Elemental Shaman", 3, 1);
+    }
+
+    /**
+     * Just had a game with Harmonic Sliver being reanimated or blinked, but
+     * never triggered. Only when cast from hand.
+     */
+    @Test
+    public void testReanimateHarmonicSliver() {
+        // All Slivers have "When this permanent enters the battlefield, destroy target artifact or enchantment."
+        addCard(Zone.GRAVEYARD, playerA, "Harmonic Sliver");
+        // Put target creature card from a graveyard onto the battlefield under your control. You lose life equal to its converted mana cost.
+        addCard(Zone.HAND, playerA, "Reanimate"); // Sorcery {B}
+        addCard(Zone.BATTLEFIELD, playerA, "Swamp", 1);
+
+        addCard(Zone.BATTLEFIELD, playerB, "Juggernaut", 1);
+
+        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Reanimate", "Harmonic Sliver");
+        setStopAt(1, PhaseStep.BEGIN_COMBAT);
+        execute();
+
+        assertPermanentCount(playerA, "Harmonic Sliver", 1);
+        assertGraveyardCount(playerA, "Reanimate", 1);
+        assertGraveyardCount(playerB, "Juggernaut", 1);
+        assertLife(playerA, 17);
+    }
+
+    @Test
+    public void testReanimateHarmonicSliverOther() {
+        // All Slivers have "When this permanent enters the battlefield, destroy target artifact or enchantment."
+        addCard(Zone.BATTLEFIELD, playerA, "Harmonic Sliver");
+        // Sliver creatures you control get +2/+0.
+        addCard(Zone.GRAVEYARD, playerA, "Battle Sliver");
+        // Put target creature card from a graveyard onto the battlefield under your control. You lose life equal to its converted mana cost.
+        addCard(Zone.HAND, playerA, "Reanimate"); // Sorcery {B}
+        addCard(Zone.BATTLEFIELD, playerA, "Swamp", 1);
+
+        addCard(Zone.BATTLEFIELD, playerB, "Juggernaut", 1);
+
+        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Reanimate", "Battle Sliver");
+        setStopAt(1, PhaseStep.BEGIN_COMBAT);
+        execute();
+
+        assertPowerToughness(playerA, "Harmonic Sliver", 3, 1);
+        assertPowerToughness(playerA, "Battle Sliver", 5, 3);
+        assertGraveyardCount(playerA, "Reanimate", 1);
+        assertGraveyardCount(playerB, "Juggernaut", 1);
+
+        assertLife(playerA, 15);
     }
 }

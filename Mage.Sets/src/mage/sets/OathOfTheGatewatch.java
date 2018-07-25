@@ -5,27 +5,27 @@
  */
 package mage.sets;
 
-import java.util.ArrayList;
-import java.util.List;
 import mage.cards.ExpansionSet;
 import mage.cards.repository.CardCriteria;
 import mage.cards.repository.CardInfo;
 import mage.cards.repository.CardRepository;
 import mage.cards.w.Wastes;
-import mage.constants.SetType;
 import mage.constants.Rarity;
-import mage.cards.CardGraphicInfo;
+import mage.constants.SetType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author fireshoes
  */
-public class OathOfTheGatewatch extends ExpansionSet {
+public final class OathOfTheGatewatch extends ExpansionSet {
 
-    private static final OathOfTheGatewatch fINSTANCE = new OathOfTheGatewatch();
+    private static final OathOfTheGatewatch instance = new OathOfTheGatewatch();
 
     public static OathOfTheGatewatch getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     protected final List<CardInfo> savedSpecialLand = new ArrayList<>();
@@ -218,8 +218,10 @@ public class OathOfTheGatewatch extends ExpansionSet {
         cards.add(new SetCardInfo("Wandering Fumarole", 182, Rarity.RARE, mage.cards.w.WanderingFumarole.class));
         cards.add(new SetCardInfo("Warden of Geometries", 11, Rarity.COMMON, mage.cards.w.WardenOfGeometries.class));
         cards.add(new SetCardInfo("Warping Wail", 12, Rarity.UNCOMMON, mage.cards.w.WarpingWail.class));
-        cards.add(new SetCardInfo("Wastes", 183, Rarity.COMMON, Wastes.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Wastes", 184, Rarity.COMMON, Wastes.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Wastes", "183a", Rarity.LAND, Wastes.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Wastes", "183b", Rarity.LAND, Wastes.class, FULL_ART_BFZ_VARIOUS));
+        cards.add(new SetCardInfo("Wastes", "184a", Rarity.LAND, Wastes.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Wastes", "184b", Rarity.LAND, Wastes.class, FULL_ART_BFZ_VARIOUS));
         cards.add(new SetCardInfo("Weapons Trainer", 160, Rarity.UNCOMMON, mage.cards.w.WeaponsTrainer.class));
         cards.add(new SetCardInfo("Witness the End", 82, Rarity.COMMON, mage.cards.w.WitnessTheEnd.class));
         cards.add(new SetCardInfo("World Breaker", 126, Rarity.MYTHIC, mage.cards.w.WorldBreaker.class));

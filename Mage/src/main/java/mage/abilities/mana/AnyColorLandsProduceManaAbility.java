@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.abilities.mana;
 
 import java.util.ArrayList;
@@ -35,7 +9,7 @@ import mage.abilities.Ability;
 import mage.abilities.costs.common.TapSourceCost;
 import mage.abilities.effects.common.ManaEffect;
 import mage.choices.Choice;
-import mage.choices.ChoiceImpl;
+import mage.choices.ChoiceColor;
 import mage.constants.ColoredManaSymbol;
 import mage.constants.TargetController;
 import mage.constants.Zone;
@@ -50,10 +24,14 @@ import mage.players.Player;
  *
  * @author LevelX2
  */
-public class AnyColorLandsProduceManaAbility extends ManaAbility {
+public class AnyColorLandsProduceManaAbility extends ActivatedManaAbilityImpl {
 
     public AnyColorLandsProduceManaAbility(TargetController targetController) {
-        super(Zone.BATTLEFIELD, new AnyColorLandsProduceManaEffect(targetController), new TapSourceCost());
+        this(targetController, true);
+    }
+
+    public AnyColorLandsProduceManaAbility(TargetController targetController, boolean onlyColors) {
+        super(Zone.BATTLEFIELD, new AnyColorLandsProduceManaEffect(targetController, onlyColors), new TapSourceCost());
     }
 
     public AnyColorLandsProduceManaAbility(final AnyColorLandsProduceManaAbility ability) {
@@ -69,29 +47,53 @@ public class AnyColorLandsProduceManaAbility extends ManaAbility {
     public List<Mana> getNetMana(Game game) {
         return ((AnyColorLandsProduceManaEffect) getEffects().get(0)).getNetMana(game, this);
     }
+
+    @Override
+    public boolean definesMana(Game game) {
+        return true;
+    }
+
 }
 
 class AnyColorLandsProduceManaEffect extends ManaEffect {
 
     private final FilterPermanent filter;
+    private final boolean onlyColors; // false if mana types can be produced (also Colorless mana), if true only colors can be produced (no Colorless mana).
 
-    public AnyColorLandsProduceManaEffect(TargetController targetController) {
+    private boolean inManaTypeCalculation = false;
+
+    public AnyColorLandsProduceManaEffect(TargetController targetController, boolean onlyColors) {
         super();
         filter = new FilterLandPermanent();
+        this.onlyColors = onlyColors;
         filter.add(new ControllerPredicate(targetController));
         String text = targetController == TargetController.OPPONENT ? "an opponent controls" : "you control";
-        staticText = "Add to your mana pool one mana of any color that a land " + text + " could produce";
+        staticText = "Add one mana of any " + (this.onlyColors ? "color" : "type") + " that a land " + text + " could produce";
     }
 
     public AnyColorLandsProduceManaEffect(final AnyColorLandsProduceManaEffect effect) {
         super(effect);
         this.filter = effect.filter.copy();
+        this.onlyColors = effect.onlyColors;
     }
 
     @Override
     public boolean apply(Game game, Ability source) {
+        Player controller = game.getPlayer(source.getControllerId());
+        if (controller != null) {
+            checkToFirePossibleEvents(getMana(game, source), game, source);
+            controller.getManaPool().addMana(getMana(game, source), game, source);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Mana produceMana(boolean netMana, Game game, Ability source) {
+        Mana mana = new Mana();
         Mana types = getManaTypes(game, source);
-        Choice choice = new ChoiceImpl(true);
+        Choice choice = new ChoiceColor(true);
+        choice.getChoices().clear();
         choice.setMessage("Pick a mana color");
         if (types.getBlack() > 0) {
             choice.getChoices().add("Black");
@@ -108,22 +110,30 @@ class AnyColorLandsProduceManaEffect extends ManaEffect {
         if (types.getWhite() > 0) {
             choice.getChoices().add("White");
         }
+        if (!onlyColors && types.getColorless() > 0) {
+            choice.getChoices().add("Colorless");
+        }
         if (types.getAny() > 0) {
             choice.getChoices().add("Black");
             choice.getChoices().add("Red");
             choice.getChoices().add("Blue");
             choice.getChoices().add("Green");
             choice.getChoices().add("White");
+            if (!onlyColors) {
+                choice.getChoices().add("Colorless");
+            }
+
         }
-        if (choice.getChoices().size() > 0) {
+        if (!choice.getChoices().isEmpty()) {
             Player player = game.getPlayer(source.getControllerId());
             if (choice.getChoices().size() == 1) {
                 choice.setChoice(choice.getChoices().iterator().next());
             } else {
-                player.choose(outcome, choice, game);
+                if (player == null || !player.choose(outcome, choice, game)) {
+                    return null;
+                }
             }
             if (choice.getChoice() != null) {
-                Mana mana = new Mana();
                 switch (choice.getChoice()) {
                     case "Black":
                         mana.setBlack(1);
@@ -140,35 +150,40 @@ class AnyColorLandsProduceManaEffect extends ManaEffect {
                     case "White":
                         mana.setWhite(1);
                         break;
+                    case "Colorless":
+                        mana.setColorless(1);
+                        break;
                 }
-                checkToFirePossibleEvents(mana, game, source);
-                player.getManaPool().addMana(mana, game, source);
             }
         }
-        return true;
-    }
-
-    @Override
-    public Mana getMana(Game game, Ability source) {
-        return null;
+        return mana;
     }
 
     private Mana getManaTypes(Game game, Ability source) {
-        List<Permanent> lands = game.getBattlefield().getActivePermanents(filter, source.getControllerId(), game);
         Mana types = new Mana();
+        if (game == null || game.getPhase() == null) {
+            return types;
+        }
+        if (inManaTypeCalculation) {
+            return types;
+        }
+        inManaTypeCalculation = true;
+        List<Permanent> lands = game.getBattlefield().getActivePermanents(filter, source.getControllerId(), source.getSourceId(), game);
         for (Permanent land : lands) {
-            Abilities<ManaAbility> mana = land.getAbilities().getManaAbilities(Zone.BATTLEFIELD);
-            for (ManaAbility ability : mana) {
-                if (!ability.equals(source) && ability.definesMana()) {
+            Abilities<ActivatedManaAbilityImpl> mana = land.getAbilities().getActivatedManaAbilities(Zone.BATTLEFIELD);
+            for (ActivatedManaAbilityImpl ability : mana) {
+                if (!ability.equals(source) && ability.definesMana(game)) {
                     for (Mana netMana : ability.getNetMana(game)) {
                         types.add(netMana);
                     }
                 }
             }
         }
+        inManaTypeCalculation = false;
         return types;
     }
 
+    @Override
     public List<Mana> getNetMana(Game game, Ability source) {
         List<Mana> netManas = new ArrayList<>();
         Mana types = getManaTypes(game, source);
@@ -188,7 +203,10 @@ class AnyColorLandsProduceManaEffect extends ManaEffect {
             netManas.add(new Mana(ColoredManaSymbol.W));
         }
         if (types.getColorless() > 0) {
-            netManas.add(new Mana(0, 0, 0, 0, 0, 0, 0, 1));
+            netManas.add(Mana.ColorlessMana(1));
+        }
+        if (types.getAny() > 0) {
+            netManas.add(Mana.AnyMana(1));
         }
         return netManas;
     }

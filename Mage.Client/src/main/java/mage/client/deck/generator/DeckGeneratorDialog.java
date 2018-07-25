@@ -1,36 +1,8 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.client.deck.generator;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -44,6 +16,7 @@ import mage.cards.decks.Deck;
 import mage.client.MageFrame;
 import mage.client.dialog.PreferencesDialog;
 import mage.client.util.gui.ColorsChooser;
+import mage.client.util.gui.FastSearchUtil;
 import mage.client.util.sets.ConstructedFormats;
 
 /**
@@ -108,21 +81,39 @@ public class DeckGeneratorDialog {
         c.weightx = 0.10;
         mainPanel.add(formatSetText, c);
 
-        // Format/set dropdown
+        // Format/set dropdown with search button
+        JPanel setPanel = new JPanel();
+        setPanel.setLayout(new javax.swing.BoxLayout(setPanel, javax.swing.BoxLayout.LINE_AXIS));
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 1;
         c.gridy = 1;
         c.ipadx = 30;
         c.insets = new Insets(5, 10, 0, 10);
-        c.weightx = 0.90;
+        c.weightx = 0.80;
+        mainPanel.add(setPanel, c);
+
         cbSets = new JComboBox<>(ConstructedFormats.getTypes());
         cbSets.setSelectedIndex(0);
-        mainPanel.add(cbSets, c);
+        cbSets.setAlignmentX(0.0F);
+        setPanel.add(cbSets);
 
         String prefSet = PreferencesDialog.getCachedValue(PreferencesDialog.KEY_NEW_DECK_GENERATOR_SET, null);
         if (prefSet != null) {
             cbSets.setSelectedItem(prefSet);
         }
+
+        JButton btn = new JButton();
+        btn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/buttons/search_32.png")));
+        btn.setToolTipText(FastSearchUtil.DEFAULT_EXPANSION_TOOLTIP_MESSAGE);
+        btn.setAlignmentX(1.0F);
+        btn.setPreferredSize(new java.awt.Dimension(32, 32));
+        btn.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                FastSearchUtil.showFastSearchForStringComboBox(cbSets, FastSearchUtil.DEFAULT_EXPANSION_SEARCH_MESSAGE);
+            }
+        });
+        //setPanel.add(btn, c); // TODO: can't show pickdialog here... need to replace standard modal dialog (JOptionPane) to internal mage dialog
 
         // Deck size label
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -193,12 +184,9 @@ public class DeckGeneratorDialog {
         // Advanced checkbox (enable/disable advanced configuration)
         cAdvanced = new JCheckBox("Advanced");
         cAdvanced.setToolTipText("Enable advanced configuration options");
-        cAdvanced.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
-                boolean enable = cAdvanced.isSelected();
-                enableAdvancedPanel(enable);
-            }
+        cAdvanced.addItemListener(itemEvent -> {
+            boolean enable = cAdvanced.isSelected();
+            enableAdvancedPanel(enable);
         });
 
         // Advanced Checkbox
@@ -216,23 +204,17 @@ public class DeckGeneratorDialog {
         mainPanel.add(advancedPanel, c);
 
         btnGenerate = new JButton("Ok");
-        btnGenerate.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnGenerate.setEnabled(false);
-                colorsChooser.setEnabled(false);
-                selectedColors = (String) colorsChooser.getSelectedItem();
-                dlg.setVisible(false);
-                MageFrame.getPreferences().put("genDeckColor", selectedColors);
-            }
+        btnGenerate.addActionListener(e -> {
+            btnGenerate.setEnabled(false);
+            colorsChooser.setEnabled(false);
+            selectedColors = (String) colorsChooser.getSelectedItem();
+            dlg.setVisible(false);
+            MageFrame.getPreferences().put("genDeckColor", selectedColors);
         });
         btnCancel = new JButton("Cancel");
-        btnCancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dlg.setVisible(false);
-                selectedColors = null;
-            }
+        btnCancel.addActionListener(e -> {
+            dlg.setVisible(false);
+            selectedColors = null;
         });
         JButton[] options = {btnGenerate, btnCancel};
         JOptionPane optionPane = new JOptionPane(mainPanel, JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION, null, options, options[1]);
@@ -308,12 +290,9 @@ public class DeckGeneratorDialog {
         c.gridy = 2;
         btnReset = new JButton("Reset");
         btnReset.setToolTipText("Reset advanced dialog to default values");
-        btnReset.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                cbCMC.setSelectedItem(DeckGeneratorCMC.Default);
-                adjustingSliderPanel.resetValues();
-            }
+        btnReset.addActionListener(actionEvent -> {
+            cbCMC.setSelectedItem(DeckGeneratorCMC.Default);
+            adjustingSliderPanel.resetValues();
         });
         advancedPanel.add(btnReset, c);
 

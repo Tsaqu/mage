@@ -1,51 +1,24 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.abilities.keyword;
 
+import mage.MageObject;
 import mage.abilities.Ability;
 import mage.abilities.SpellAbility;
 import mage.abilities.common.SimpleStaticAbility;
 import mage.abilities.costs.mana.ManaCostsImpl;
-import mage.abilities.effects.ContinuousEffectImpl;
+import mage.abilities.effects.ReplacementEffectImpl;
 import mage.abilities.effects.common.AttachEffect;
-import mage.abilities.effects.common.continuous.SourceEffect;
 import mage.cards.Card;
-import mage.cards.repository.CardRepository;
 import mage.constants.CardType;
-import mage.constants.DependencyType;
 import mage.constants.Duration;
-import mage.constants.Layer;
 import mage.constants.Outcome;
 import mage.constants.SpellAbilityType;
-import mage.constants.SubLayer;
+import mage.constants.SubType;
 import mage.constants.TimingRule;
 import mage.constants.Zone;
 import mage.game.Game;
+import mage.game.events.GameEvent;
+import mage.game.events.GameEvent.EventType;
 import mage.game.permanent.Permanent;
 import mage.target.TargetPermanent;
 import mage.target.common.TargetCreaturePermanent;
@@ -123,7 +96,7 @@ public class BestowAbility extends SpellAbility {
         TargetPermanent auraTarget = new TargetCreaturePermanent();
         this.addTarget(auraTarget);
         this.addEffect(new AttachEffect(Outcome.BoostCreature));
-        Ability ability = new SimpleStaticAbility(Zone.BATTLEFIELD, new BestowTypeChangingEffect());
+        Ability ability = new SimpleStaticAbility(Zone.BATTLEFIELD, new BestowEntersBattlefieldEffect());
         ability.setRuleVisible(false);
         addSubAbility(ability);
     }
@@ -147,64 +120,62 @@ public class BestowAbility extends SpellAbility {
         return "Bestow " + getManaCostsToPay().getText() + " <i>(If you cast this card for its bestow cost, it's an Aura spell with enchant creature. It becomes a creature again if it's not attached to a creature.)</i>";
     }
 
-    class BestowTypeChangingEffect extends ContinuousEffectImpl implements SourceEffect {
-
-        private boolean wasAttached;
-
-        public BestowTypeChangingEffect() {
-            super(Duration.WhileOnBattlefield, Outcome.BoostCreature);
-            wasAttached = false;
-            dependencyTypes.add(DependencyType.AuraAddingRemoving);
-        }
-
-        public BestowTypeChangingEffect(final BestowTypeChangingEffect effect) {
-            super(effect);
-            this.wasAttached = effect.wasAttached;
-        }
-
-        @Override
-        public BestowTypeChangingEffect copy() {
-            return new BestowTypeChangingEffect(this);
-        }
-
-        @Override
-        public boolean apply(Layer layer, SubLayer sublayer, Ability source, Game game) {
-            Permanent permanent = game.getPermanent(source.getSourceId());
-            if (permanent != null) {
-                switch (layer) {
-                    case TypeChangingEffects_4:
-                        if (sublayer == SubLayer.NA) {
-                            if (permanent.getAttachedTo() == null) {
-                                if (wasAttached && permanent.getSubtype(game).contains("Aura")) {
-                                    permanent.getSubtype(game).remove("Aura");
-                                    wasAttached = false;
-                                }
-                            } else {
-                                permanent.getCardType().remove(CardType.CREATURE);
-                                permanent.getSubtype(game).retainAll(CardRepository.instance.getLandTypes());
-                                if (!permanent.getSubtype(game).contains("Aura")) {
-                                    permanent.getSubtype(game).add("Aura");
-                                }
-                                wasAttached = true;
-                            }
-                        }
-                        break;
+    static public void becomeCreature(Permanent permanent, Game game) {
+        if (permanent != null) {
+            MageObject basicObject = permanent.getBasicMageObject(game);
+            if (basicObject != null) {
+                basicObject.getSubtype(null).remove(SubType.AURA);
+                if (!basicObject.isCreature()) {
+                    basicObject.addCardType(CardType.CREATURE);
                 }
-                return true;
             }
-            return false;
-        }
+            permanent.getSubtype(null).remove(SubType.AURA);
+            if (!permanent.isCreature()) {
+                permanent.addCardType(CardType.CREATURE);
+            }
 
-        @Override
-        public boolean apply(Game game, Ability source) {
-            return false;
         }
+    }
+}
 
-        @Override
-        public boolean hasLayer(Layer layer) {
-            return layer == Layer.TypeChangingEffects_4;
+class BestowEntersBattlefieldEffect extends ReplacementEffectImpl {
+
+    public BestowEntersBattlefieldEffect() {
+        super(Duration.WhileOnBattlefield, Outcome.Neutral);
+    }
+
+    public BestowEntersBattlefieldEffect(final BestowEntersBattlefieldEffect effect) {
+        super(effect);
+    }
+
+    @Override
+    public boolean checksEventType(GameEvent event, Game game) {
+        return EventType.ENTERS_THE_BATTLEFIELD_SELF == event.getType();
+    }
+
+    @Override
+    public boolean applies(GameEvent event, Ability source, Game game) {
+        return event.getTargetId().equals(source.getSourceId());
+    }
+
+    @Override
+    public boolean replaceEvent(GameEvent event, Ability source, Game game) {
+        Permanent bestowPermanent = game.getPermanentEntering(source.getSourceId());
+        if (bestowPermanent != null) {
+            if (bestowPermanent.hasSubtype(SubType.AURA, game)) {
+                MageObject basicObject = bestowPermanent.getBasicMageObject(game);
+                if (basicObject != null && !basicObject.getSubtype(null).contains(SubType.AURA)) {
+                    basicObject.getSubtype(null).add(SubType.AURA);
+                    basicObject.getCardType().remove(CardType.CREATURE);
+                }
+            }
         }
+        return false;
+    }
 
+    @Override
+    public BestowEntersBattlefieldEffect copy() {
+        return new BestowEntersBattlefieldEffect(this);
     }
 
 }

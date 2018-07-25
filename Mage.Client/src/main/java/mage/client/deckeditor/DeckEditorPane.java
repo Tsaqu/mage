@@ -1,30 +1,4 @@
-/*
-* Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are
-* permitted provided that the following conditions are met:
-*
-*    1. Redistributions of source code must retain the above copyright notice, this list of
-*       conditions and the following disclaimer.
-*
-*    2. Redistributions in binary form must reproduce the above copyright notice, this list
-*       of conditions and the following disclaimer in the documentation and/or other materials
-*       provided with the distribution.
-*
-* THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-* FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*
-* The views and conclusions contained in the software and documentation are those of the
-* authors and should not be interpreted as representing official policies, either expressed
-* or implied, of BetaSteward_at_googlemail.com.
- */
+
 
  /*
  * DeckEditorPane.java
@@ -53,11 +27,10 @@ public class DeckEditorPane extends MagePane {
      * Creates new form TablesPane
      */
     public DeckEditorPane() {
-        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         boolean initialized = false;
-        if (Plugins.getInstance().isThemePluginLoaded()) {
+        if (Plugins.instance.isThemePluginLoaded()) {
             Map<String, JComponent> uiMap = new HashMap<>();
-            JComponent container = Plugins.getInstance().updateTablePanel(uiMap);
+            JComponent container = Plugins.instance.updateTablePanel(uiMap);
             if (container != null) {
                 deckEditorPanel1 = new mage.client.deckeditor.DeckEditorPanel();
                 initComponents(container);
@@ -81,6 +54,8 @@ public class DeckEditorPane extends MagePane {
     public void show(DeckEditorMode mode, Deck deck, String name, UUID tableId, int time) {
         if (mode == DeckEditorMode.SIDEBOARDING || mode == DeckEditorMode.LIMITED_BUILDING) {
             this.setTitle("Deck Editor - " + tableId.toString());
+        } else if (mode == DeckEditorMode.VIEW_LIMITED_DECK) {
+            this.setTitle("Deck Editor - Current Deck");
         } else if (deck != null) {
             this.setTitle("Deck Editor - " + deck.getName());
         } else {
@@ -105,8 +80,8 @@ public class DeckEditorPane extends MagePane {
 
         deckEditorPanel1 = new mage.client.deckeditor.DeckEditorPanel();
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(deckEditorPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 885, Short.MAX_VALUE)
@@ -115,14 +90,12 @@ public class DeckEditorPane extends MagePane {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(deckEditorPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 626, Short.MAX_VALUE)
         );
-
-        pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void initComponents(Component container) {
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
         layout.setHorizontalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addComponent(container, javax.swing.GroupLayout.DEFAULT_SIZE, 885, Short.MAX_VALUE)
@@ -132,7 +105,7 @@ public class DeckEditorPane extends MagePane {
                 .addComponent(container, javax.swing.GroupLayout.DEFAULT_SIZE, 626, Short.MAX_VALUE)
         );
 
-        pack();
+
     }
 
     public DeckEditorPanel getPanel() {

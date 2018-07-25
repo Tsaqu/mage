@@ -1,6 +1,7 @@
 package mage.abilities.keyword;
 
 import mage.MageObject;
+import mage.MageObjectReference;
 import mage.abilities.Ability;
 import mage.abilities.TriggeredAbilityImpl;
 import mage.abilities.effects.OneShotEffect;
@@ -44,10 +45,7 @@ public class RippleAbility extends TriggeredAbilityImpl {
     @Override
     public boolean checkTrigger(GameEvent event, Game game) {
         Spell spell = game.getStack().getSpell(event.getTargetId());
-        if (spell != null && spell.getSourceId().equals(this.getSourceId())) {
-            return true;
-        }
-        return false;
+        return spell != null && spell.getSourceId().equals(this.getSourceId());
 
     }
 
@@ -56,12 +54,10 @@ public class RippleAbility extends TriggeredAbilityImpl {
         return new RippleAbility(this);
     }
 
-
     @Override
     public String getRule() {
-        return "Ripple " + rippleNumber + " <i>(When you cast this spell, you may reveal the top " + CardUtil.numberToText(rippleNumber) + " cards of your library. You may cast any revealed cards with the same name as this spell without paying their mana costs. Put the rest on the bottom of your library.)</i>";
+        return "ripple " + rippleNumber + " <i>(When you cast this spell, you may reveal the top " + CardUtil.numberToText(rippleNumber) + " cards of your library. You may cast any revealed cards with the same name as this spell without paying their mana costs. Put the rest on the bottom of your library.)</i>";
     }
-
 
 }
 
@@ -84,13 +80,12 @@ class RippleEffect extends OneShotEffect {
         return new RippleEffect(this);
     }
 
-
     @Override
     public boolean apply(Game game, Ability source) {
         Player player = game.getPlayer(source.getControllerId());
         MageObject sourceObject = game.getObject(source.getSourceId());
         if (player != null) {
-            if (!player.chooseUse(Outcome.Neutral, "Reveal " + rippleNumber + " cards from the top of your library?", source, game)){
+            if (!player.chooseUse(Outcome.Neutral, "Reveal " + rippleNumber + " cards from the top of your library?", source, game)) {
                 return true; //fizzle
             }
             // reveal to/**/p cards from library
@@ -109,7 +104,7 @@ class RippleEffect extends OneShotEffect {
             while (player.canRespond() && cards.count(sameNameFilter, game) > 0 && player.choose(Outcome.PlayForFree, cards, target1, game)) {
                 Card card = cards.get(target1.getFirstTarget(), game);
                 if (card != null) {
-                    player.cast(card.getSpellAbility(), game, true);
+                    player.cast(card.getSpellAbility(), game, true, new MageObjectReference(source.getSourceObject(game), game));
                     cards.remove(card);
                 }
                 target1.clearChosen();
@@ -123,4 +118,3 @@ class RippleEffect extends OneShotEffect {
     }
 
 }
-

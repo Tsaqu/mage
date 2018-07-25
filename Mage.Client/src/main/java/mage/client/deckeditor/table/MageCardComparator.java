@@ -73,23 +73,23 @@ public class MageCardComparator implements Comparator<CardView> {
                 break;
             // Color
             case 3:
-                aCom = CardHelper.getColor(a);
-                bCom = CardHelper.getColor(b);
+                aCom = a.getColorText();
+                bCom = b.getColorText();
                 break;
             // Type
             case 4:
-                aCom = CardHelper.getType(a);
-                bCom = CardHelper.getType(b);
+                aCom = a.getTypeText();
+                bCom = b.getTypeText();
                 break;
             // Stats, attack and defense
             case 5:
                 aCom = (float) -1;
                 bCom = (float) -1;
-                if (CardHelper.isCreature(a)) {
-                    aCom = new Float(a.getPower() + "." + (a.getToughness().startsWith("-") ? "0" : a.getToughness()));
+                if (a.isCreature()) {
+                    aCom = new Float(a.getPower() + '.' + (a.getToughness().startsWith("-") ? "0" : a.getToughness()));
                 }
-                if (CardHelper.isCreature(b)) {
-                    bCom = new Float(b.getPower() + "." + (b.getToughness().startsWith("-") ? "0" : b.getToughness()));
+                if (b.isCreature()) {
+                    bCom = new Float(b.getPower() + '.' + (b.getToughness().startsWith("-") ? "0" : b.getToughness()));
                 }
                 break;
             // Rarity

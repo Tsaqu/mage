@@ -1,30 +1,4 @@
-/*
-* Copyright 2011 BetaSteward_at_googlemail.com. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are
-* permitted provided that the following conditions are met:
-*
-*    1. Redistributions of source code must retain the above copyright notice, this list of
-*       conditions and the following disclaimer.
-*
-*    2. Redistributions in binary form must reproduce the above copyright notice, this list
-*       of conditions and the following disclaimer in the documentation and/or other materials
-*       provided with the distribution.
-*
-* THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-* FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*
-* The views and conclusions contained in the software and documentation are those of the
-* authors and should not be interpreted as representing official policies, either expressed
-* or implied, of BetaSteward_at_googlemail.com.
- */
+
 
  /*
  * ConsolePanel.java
@@ -35,14 +9,12 @@ package mage.server.console;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import javax.swing.*;
 import static javax.swing.JTable.AUTO_RESIZE_NEXT_COLUMN;
 import static javax.swing.JTable.AUTO_RESIZE_OFF;
-import javax.swing.SwingWorker;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableRowSorter;
 import mage.remote.Session;
@@ -51,7 +23,6 @@ import mage.view.UserView;
 import org.apache.log4j.Logger;
 
 /**
- *
  * @author BetaSteward_at_googlemail.com
  */
 public class ConsolePanel extends javax.swing.JPanel {
@@ -110,6 +81,10 @@ public class ConsolePanel extends javax.swing.JPanel {
         }
     }
 
+    public JTextField getjUserName() {
+        return jUserName;
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -138,6 +113,8 @@ public class ConsolePanel extends javax.swing.JPanel {
         tblTables = new javax.swing.JTable();
         jPanel6 = new javax.swing.JPanel();
         btnRemoveTable = new javax.swing.JButton();
+        jUserName = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
 
         jSplitPane1.setDividerLocation(250);
         jSplitPane1.setResizeWeight(0.5);
@@ -153,7 +130,7 @@ public class ConsolePanel extends javax.swing.JPanel {
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 462, Short.MAX_VALUE)
         );
 
         jPanel4.setVerifyInputWhenFocusTarget(false);
@@ -267,11 +244,11 @@ public class ConsolePanel extends javax.swing.JPanel {
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 453, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 606, Short.MAX_VALUE)
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 459, Short.MAX_VALUE)
         );
 
         btnRemoveTable.setLabel("Remove Table");
@@ -281,20 +258,32 @@ public class ConsolePanel extends javax.swing.JPanel {
             }
         });
 
+        jUserName.setName("Username"); // NOI18N
+
+        jLabel1.setText("Username:");
+
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jUserName, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnRemoveTable)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
-                .addComponent(btnRemoveTable)
-                .addContainerGap(31, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnRemoveTable)
+                    .addComponent(jUserName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -308,7 +297,7 @@ public class ConsolePanel extends javax.swing.JPanel {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(0, 0, 0)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -322,7 +311,7 @@ public class ConsolePanel extends javax.swing.JPanel {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 521, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -331,30 +320,66 @@ public class ConsolePanel extends javax.swing.JPanel {
         ConsoleFrame.getSession().disconnectUser((String) tableUserModel.getValueAt(row, TableUserModel.POS_SESSION_ID));
     }//GEN-LAST:event_btnDisconnectActionPerformed
 
-    private void btnRemoveTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveTableActionPerformed
-        int row = this.tblTables.convertRowIndexToModel(tblTables.getSelectedRow());
-        ConsoleFrame.getSession().removeTable((UUID) tableTableModel.getValueAt(row, 7));
-    }//GEN-LAST:event_btnRemoveTableActionPerformed
-
     private void btnEndSessionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEndSessionActionPerformed
         int row = this.tblUsers.convertRowIndexToModel(tblUsers.getSelectedRow());
-        ConsoleFrame.getSession().endUserSession((String) tableUserModel.getValueAt(row, TableUserModel.POS_GAME_INFO));
+        String userSessionId = (String) tableUserModel.getValueAt(row, TableUserModel.POS_GAME_INFO);
+
+        if (JOptionPane.showConfirmDialog(null, "Are you sure you mean to end userSessionId " + userSessionId + '?', "WARNING",
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            ConsoleFrame.getSession().endUserSession(userSessionId);
+        }
     }//GEN-LAST:event_btnEndSessionActionPerformed
 
     private void btnMuteUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMuteUserActionPerformed
         int row = this.tblUsers.convertRowIndexToModel(tblUsers.getSelectedRow());
-        ConsoleFrame.getSession().muteUserChat((String) tableUserModel.getValueAt(row, TableUserModel.POS_USER_NAME), ((Number) spinnerMuteDurationMinutes.getValue()).longValue());
+        String userName = (String) tableUserModel.getValueAt(row, TableUserModel.POS_USER_NAME);
+        long durationMinute = ((Number) spinnerMuteDurationMinutes.getValue()).longValue();
+        if (JOptionPane.showConfirmDialog(null, "Are you sure you mean to mute user: " + userName + " for " + durationMinute + " minutes?", "WARNING",
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            ConsoleFrame.getSession().muteUserChat(userName, durationMinute);
+        }
     }//GEN-LAST:event_btnMuteUserActionPerformed
 
     private void btnDeActivateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeActivateActionPerformed
-        int row = this.tblUsers.convertRowIndexToModel(tblUsers.getSelectedRow());
-        ConsoleFrame.getSession().toggleActivation((String) tableUserModel.getValueAt(row, TableUserModel.POS_USER_NAME));
+        String userName;
+        if (!getjUserName().getText().isEmpty()) {
+            userName = getjUserName().getText();
+        } else {
+            int row = this.tblUsers.convertRowIndexToModel(tblUsers.getSelectedRow());
+            userName = (String) tableUserModel.getValueAt(row, TableUserModel.POS_USER_NAME);
+        }
+
+        if (JOptionPane.showConfirmDialog(null, "Did you want to set user: " + userName + " to active?", "WARNING",
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            ConsoleFrame.getSession().setActivation(userName, true);
+            return;
+        }
+        if (JOptionPane.showConfirmDialog(null, "Did you want to set user: " + userName + " to inactive?", "WARNING",
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            ConsoleFrame.getSession().setActivation(userName, false);
+            return;
+        }
+        if (JOptionPane.showConfirmDialog(null, "Are you sure you mean to toggle activation for user: " + userName + '?', "WARNING",
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            ConsoleFrame.getSession().toggleActivation(userName);
+            return;
+        }
     }//GEN-LAST:event_btnDeActivateActionPerformed
 
     private void btnLockUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLockUserActionPerformed
         int row = this.tblUsers.convertRowIndexToModel(tblUsers.getSelectedRow());
-        ConsoleFrame.getSession().lockUser((String) tableUserModel.getValueAt(row, TableUserModel.POS_USER_NAME), ((Number) spinnerMuteDurationMinutes.getValue()).longValue());
+        String userName = (String) tableUserModel.getValueAt(row, TableUserModel.POS_USER_NAME);
+        long durationMinute = ((Number) spinnerMuteDurationMinutes.getValue()).longValue();
+        if (JOptionPane.showConfirmDialog(null, "Are you sure you mean to lock user: " + userName + " for " + durationMinute + " minutes?", "WARNING",
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            ConsoleFrame.getSession().lockUser(userName, durationMinute);
+        }
     }//GEN-LAST:event_btnLockUserActionPerformed
+
+    private void btnRemoveTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveTableActionPerformed
+        int row = this.tblTables.convertRowIndexToModel(tblTables.getSelectedRow());
+        ConsoleFrame.getSession().removeTable((UUID) tableTableModel.getValueAt(row, 7));
+    }//GEN-LAST:event_btnRemoveTableActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDeActivate;
@@ -363,6 +388,7 @@ public class ConsolePanel extends javax.swing.JPanel {
     private javax.swing.JButton btnLockUser;
     private javax.swing.JButton btnMuteUser;
     private javax.swing.JButton btnRemoveTable;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -372,6 +398,7 @@ public class ConsolePanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JTextField jUserName;
     private javax.swing.JLabel lblMinutes;
     private javax.swing.JSpinner spinnerMuteDurationMinutes;
     private javax.swing.JTable tblTables;
@@ -384,13 +411,14 @@ class TableUserModel extends AbstractTableModel {
     public static final int POS_USER_NAME = 0;
     public static final int POS_HOST = 1;
     public static final int POS_TIME_CONNECTED = 2;
-    public static final int POS_SESSION_ID = 3;
-    public static final int POS_GAME_INFO = 4;
-    public static final int POS_USER_STATE = 5;
-    public static final int POS_CHAT_MUTE = 6;
-    public static final int POS_CLIENT_VERSION = 7;
+    public static final int POS_LAST_ACTIVITY = 3;
+    public static final int POS_SESSION_ID = 4;
+    public static final int POS_GAME_INFO = 5;
+    public static final int POS_USER_STATE = 6;
+    public static final int POS_CHAT_MUTE = 7;
+    public static final int POS_CLIENT_VERSION = 8;
 
-    private final String[] columnNames = new String[]{"User Name", "Host", "Time Connected", "SessionId", "Gameinfo", "User state", "Chat mute", "Client Version"};
+    private final String[] columnNames = new String[]{"User Name", "Host", "Time Connected", "Last activity", "SessionId", "Gameinfo", "User state", "Chat mute", "Client Version"};
     private UserView[] users = new UserView[0];
     private static final DateFormat formatterTime = new SimpleDateFormat("HH:mm:ss");
     private static final DateFormat formatterTimeStamp = new SimpleDateFormat("yy-M-dd HH:mm:ss");
@@ -419,6 +447,8 @@ class TableUserModel extends AbstractTableModel {
                 return users[arg0].getHost();
             case POS_TIME_CONNECTED:
                 return formatterTime.format(users[arg0].getTimeConnected());
+            case POS_LAST_ACTIVITY:
+                return formatterTime.format(users[arg0].getLastActivity());
             case POS_SESSION_ID:
                 return users[arg0].getSessionId();
             case POS_GAME_INFO:
@@ -538,6 +568,7 @@ class UpdateUsersTask extends SwingWorker<Void, List<UserView>> {
     private List<UserView> previousUsers;
 
     private static final Logger logger = Logger.getLogger(UpdateUsersTask.class);
+    Map<String, String> peopleIps = new HashMap<>();
 
     UpdateUsersTask(Session session, ConsolePanel panel) {
         this.session = session;
@@ -548,6 +579,15 @@ class UpdateUsersTask extends SwingWorker<Void, List<UserView>> {
     protected Void doInBackground() throws Exception {
         while (!isCancelled()) {
             List<UserView> users = session.getUsers();
+            if (!panel.getjUserName().getText().equals("")) {
+                List<UserView> users2 = new ArrayList<>();
+                for (UserView user : users) {
+                    if (user.getUserName().toUpperCase(Locale.ENGLISH).matches(".*" + panel.getjUserName().getText().toUpperCase(Locale.ENGLISH) + ".*")) {
+                        users2.add(user);
+                    }
+                }
+                users = users2;
+            }
 
             if (previousUsers == null || checkUserListChanged(users)) {
                 logger.debug("Need to update the user list");
@@ -568,25 +608,33 @@ class UpdateUsersTask extends SwingWorker<Void, List<UserView>> {
             return true;
         }
         for (UserView u1 : previousUsers) {
-            boolean found = false;
             for (UserView u2 : usersToCheck) {
                 if (u1.getUserName().equals(u2.getUserName())) {
-                    found = true;
+                    String s = u1.getUserName() + ',' + u1.getHost();
+                    if (peopleIps.get(s) == null) {
+                        logger.warn("Found new user: " + u1.getUserName() + ',' + u1.getHost());
+                        peopleIps.put(s, "1");
+                    }
+                    s = u2.getUserName() + ',' + u2.getHost();
+                    if (peopleIps.get(s) == null) {
+                        logger.warn("Found new user: " + u1.getUserName() + ',' + u1.getHost());
+                        peopleIps.put(s, "1");
+                    }
                     break;
                 }
             }
-            if (!found) {
-                // some new user replaced old one
-                return true;
-            }
         }
         // seems nothing has been changed
-        return false;
+        return true;
     }
 
     @Override
     protected void process(List<List<UserView>> view) {
         panel.update(view.get(0));
+    }
+
+    public ConsolePanel getPanel() {
+        return panel;
     }
 
     @Override
@@ -619,7 +667,18 @@ class UpdateTablesTask extends SwingWorker<Void, Collection<TableView>> {
     @Override
     protected Void doInBackground() throws Exception {
         while (!isCancelled()) {
-            this.publish(session.getTables(roomId));
+            Collection<TableView> tableViews = session.getTables(roomId);
+            if (!panel.getjUserName().getText().equals("")) {
+                Collection<TableView> tableViews2 = new ArrayList<>();
+                for (TableView table : tableViews) {
+                    if (table.getControllerName().toUpperCase(Locale.ENGLISH).matches(".*" + panel.getjUserName().getText().toUpperCase(Locale.ENGLISH) + ".*")) {
+                        tableViews2.add(table);
+                    }
+                }
+                tableViews = tableViews2;
+            }
+
+            this.publish(tableViews);
             Thread.sleep(3000);
         }
         return null;

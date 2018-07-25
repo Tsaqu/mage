@@ -1,33 +1,6 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.u;
 
-import java.util.UUID;
 import mage.MageInt;
 import mage.abilities.Ability;
 import mage.abilities.TriggeredAbilityImpl;
@@ -38,10 +11,7 @@ import mage.abilities.effects.common.ExileTargetEffect;
 import mage.cards.Card;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
-import mage.constants.CardType;
-import mage.constants.Duration;
-import mage.constants.Outcome;
-import mage.constants.Zone;
+import mage.constants.*;
 import mage.game.Game;
 import mage.game.events.DamagePlayerEvent;
 import mage.game.events.GameEvent;
@@ -51,23 +21,25 @@ import mage.game.permanent.token.ZombieToken;
 import mage.players.Player;
 import mage.target.targetpointer.FixedTarget;
 
+import java.util.UUID;
+
 /**
  *
  * @author BetaSteward
  */
-public class UndeadAlchemist extends CardImpl {
+public final class UndeadAlchemist extends CardImpl {
 
     public UndeadAlchemist(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{3}{U}");
-        this.subtype.add("Zombie");
+        this.subtype.add(SubType.ZOMBIE);
 
         this.power = new MageInt(4);
         this.toughness = new MageInt(2);
 
-        // If a Zombie you control would deal combat damage to a player, instead that player puts that many cards from the top of his or her library into his or her graveyard.
+        // If a Zombie you control would deal combat damage to a player, instead that player puts that many cards from the top of their library into their graveyard.
         this.addAbility(new SimpleStaticAbility(Zone.BATTLEFIELD, new UndeadAlchemistEffect()));
 
-        // Whenever a creature card is put into an opponent's graveyard from his or her library, exile that card and put a 2/2 black Zombie creature token onto the battlefield.
+        // Whenever a creature card is put into an opponent's graveyard from their library, exile that card and create a 2/2 black Zombie creature token.
         this.addAbility(new UndeadAlchemistTriggeredAbility());
     }
 
@@ -107,7 +79,7 @@ class UndeadAlchemistTriggeredAbility extends TriggeredAbilityImpl {
         ZoneChangeEvent zEvent = (ZoneChangeEvent) event;
         if (zEvent.getFromZone() == Zone.LIBRARY && zEvent.getToZone() == Zone.GRAVEYARD && game.getOpponents(this.getControllerId()).contains(zEvent.getPlayerId())) {
             Card card = game.getCard(event.getTargetId());
-            if (card != null && card.getCardType().contains(CardType.CREATURE)) {
+            if (card != null && card.isCreature()) {
                 this.getEffects().get(0).setTargetPointer(new FixedTarget(card.getId()));
                 return true;
             }
@@ -117,7 +89,7 @@ class UndeadAlchemistTriggeredAbility extends TriggeredAbilityImpl {
 
     @Override
     public String getRule() {
-        return "Whenever a creature card is put into an opponent's graveyard from his or her library, exile that card and put a 2/2 black Zombie creature token onto the battlefield.";
+        return "Whenever a creature card is put into an opponent's graveyard from their library, exile that card and create a 2/2 black Zombie creature token.";
     }
 }
 
@@ -125,7 +97,7 @@ class UndeadAlchemistEffect extends ReplacementEffectImpl {
 
     UndeadAlchemistEffect() {
         super(Duration.WhileOnBattlefield, Outcome.RedirectDamage);
-        staticText = "If a Zombie you control would deal combat damage to a player, instead that player puts that many cards from the top of his or her library into his or her graveyard";
+        staticText = "If a Zombie you control would deal combat damage to a player, instead that player puts that many cards from the top of their library into their graveyard";
     }
 
     UndeadAlchemistEffect(final UndeadAlchemistEffect effect) {
@@ -150,8 +122,9 @@ class UndeadAlchemistEffect extends ReplacementEffectImpl {
     public boolean applies(GameEvent event, Ability source, Game game) {
         DamagePlayerEvent damageEvent = (DamagePlayerEvent) event;
         if (damageEvent.isCombatDamage()) {
+            UUID controllerId = source.getControllerId();
             Permanent permanent = game.getPermanent(event.getSourceId());
-            if (permanent != null && permanent.hasSubtype("Zombie", game)) {
+            if (permanent != null && permanent.hasSubtype(SubType.ZOMBIE, game) && permanent.isControlledBy(controllerId)) {
                 return true;
             }
         }

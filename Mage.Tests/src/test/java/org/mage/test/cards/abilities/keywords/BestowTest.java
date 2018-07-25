@@ -1,34 +1,10 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package org.mage.test.cards.abilities.keywords;
 
+import mage.abilities.mana.ManaOptions;
 import mage.constants.CardType;
 import mage.constants.PhaseStep;
+import mage.constants.SubType;
 import mage.constants.Zone;
 import mage.game.permanent.Permanent;
 import org.junit.Assert;
@@ -69,7 +45,7 @@ public class BestowTest extends CardTestPlayerBase {
     @Test
     public void bestowEnchantmentToCreature() {
         addCard(Zone.BATTLEFIELD, playerA, "Plains", 5);
-        addCard(Zone.BATTLEFIELD, playerA, "Silent Artisan");
+        addCard(Zone.BATTLEFIELD, playerA, "Silent Artisan"); // 3/5
         addCard(Zone.HAND, playerA, "Hopeful Eidolon");
         addCard(Zone.HAND, playerA, "Gods Willing");
 
@@ -109,7 +85,7 @@ public class BestowTest extends CardTestPlayerBase {
         // because Boon Satyr is no creature on the battlefield, evolve may not trigger
         assertPermanentCount(playerA, "Boon Satyr", 1);
         Permanent boonSatyr = getPermanent("Boon Satyr", playerA);
-        Assert.assertTrue("Boon Satyr may not be a creature", !boonSatyr.getCardType().contains(CardType.CREATURE));
+        Assert.assertTrue("Boon Satyr may not be a creature", !boonSatyr.isCreature());
         assertPermanentCount(playerA, "Silent Artisan", 1);
         assertPermanentCount(playerA, "Experiment One", 1);
         assertPowerToughness(playerA, "Experiment One", 1, 1);
@@ -145,8 +121,8 @@ public class BestowTest extends CardTestPlayerBase {
         assertPowerToughness(playerA, "Hopeful Eidolon", 1, 1);
 
         Permanent hopefulEidolon = getPermanent("Hopeful Eidolon", playerA);
-        Assert.assertTrue("Hopeful Eidolon has to be a creature but is not", hopefulEidolon.getCardType().contains(CardType.CREATURE));
-        Assert.assertTrue("Hopeful Eidolon has to be an enchantment but is not", hopefulEidolon.getCardType().contains(CardType.ENCHANTMENT));
+        Assert.assertTrue("Hopeful Eidolon has to be a creature but is not", hopefulEidolon.isCreature());
+        Assert.assertTrue("Hopeful Eidolon has to be an enchantment but is not", hopefulEidolon.isEnchantment());
 
     }
 
@@ -360,7 +336,7 @@ public class BestowTest extends CardTestPlayerBase {
         assertPowerToughness(playerB, "Nighthowler", 2, 2);
         Permanent nighthowler = getPermanent("Nighthowler", playerB);
 
-        Assert.assertEquals("Nighthowler has to be a creature", true, nighthowler.getCardType().contains(CardType.CREATURE));
+        Assert.assertEquals("Nighthowler has to be a creature", true, nighthowler.isCreature());
     }
 
     @Test
@@ -446,4 +422,48 @@ public class BestowTest extends CardTestPlayerBase {
         assertTapped("Elite Vanguard", true);
         assertPowerToughness(playerA, "Elite Vanguard", 5, 3); // 2/1 + 3/2 = 5/3
     }
+
+    /**
+     * When a creature with Nighthowler attatched gets enchanted with Song of
+     * the Dryads, Nightholwer doesn't become a creature and gets turned into a
+     * card without stats.
+     */
+    @Test
+    public void testEnchantedChangedWithSongOfTheDryads() {
+        // Enchantment Creature — Horror
+        // 0/0
+        // Bestow {2}{B}{B}
+        // Nighthowler and enchanted creature each get +X/+X, where X is the number of creature cards in all graveyards.
+        addCard(Zone.HAND, playerA, "Nighthowler");
+        addCard(Zone.BATTLEFIELD, playerA, "Swamp", 4);
+        addCard(Zone.BATTLEFIELD, playerA, "Silvercoat Lion"); // {1}{W} 2/2 creature
+
+        addCard(Zone.GRAVEYARD, playerA, "Pillarfield Ox");
+        addCard(Zone.GRAVEYARD, playerB, "Pillarfield Ox");
+
+        // Enchant permanent
+        // Enchanted permanent is a colorless Forest land.
+        addCard(Zone.BATTLEFIELD, playerB, "Forest", 3);
+        addCard(Zone.HAND, playerB, "Song of the Dryads"); // Enchantment Aura {2}{G}
+
+        castSpell(1, PhaseStep.PRECOMBAT_MAIN, playerA, "Nighthowler using bestow", "Silvercoat Lion");
+
+        castSpell(2, PhaseStep.PRECOMBAT_MAIN, playerB, "Song of the Dryads", "Silvercoat Lion");
+        setStopAt(2, PhaseStep.BEGIN_COMBAT);
+        execute();
+
+        assertPermanentCount(playerB, "Song of the Dryads", 1);
+
+        ManaOptions options = playerA.getAvailableManaTest(currentGame);
+        Assert.assertEquals("Player should be able to create 1 green mana", "{G}", options.get(0).toString());
+
+        assertPermanentCount(playerA, "Nighthowler", 1);
+        assertPowerToughness(playerA, "Nighthowler", 2, 2);
+        assertType("Nighthowler", CardType.CREATURE, true);
+        assertType("Nighthowler", CardType.ENCHANTMENT, true);
+
+        Permanent nighthowler = getPermanent("Nighthowler");
+        Assert.assertFalse("The unattached Nighthowler may not have the aura subtype.", nighthowler.getSubtype(currentGame).contains(SubType.AURA));
+    }
+
 }

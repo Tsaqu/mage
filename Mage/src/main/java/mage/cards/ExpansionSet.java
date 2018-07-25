@@ -1,50 +1,26 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
-import java.util.List;
+import mage.ObjectColor;
 import mage.cards.repository.CardCriteria;
 import mage.cards.repository.CardInfo;
 import mage.cards.repository.CardRepository;
 import mage.constants.Rarity;
 import mage.constants.SetType;
+import mage.util.CardUtil;
 import mage.util.RandomUtil;
+
+import java.io.Serializable;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author BetaSteward_at_googlemail.com
  */
 public abstract class ExpansionSet implements Serializable {
+
+    public final static CardGraphicInfo NON_FULL_USE_VARIOUS = new CardGraphicInfo(null, true);
+    public final static CardGraphicInfo FULL_ART_BFZ_VARIOUS = new CardGraphicInfo(FrameStyle.BFZ_FULL_ART_BASIC, true);
 
     public class SetCardInfo implements Serializable {
 
@@ -82,6 +58,10 @@ public abstract class ExpansionSet implements Serializable {
             return this.cardNumber;
         }
 
+        public int getCardNumberAsInt() {
+            return CardUtil.parseCardNumberAsInt(this.cardNumber);
+        }
+
         public Rarity getRarity() {
             return this.rarity;
         }
@@ -109,13 +89,19 @@ public abstract class ExpansionSet implements Serializable {
     protected int numBoosterSpecial;
 
     protected int numBoosterLands;
-    protected int ratioBoosterSpecialLand = 0; // if > 0 basic lands are replaced with special land in the ratio every X land is replaced by special land
+    protected int ratioBoosterSpecialLand = 0; // if > 0 basic lands are replaced with special land with probability ratioBoosterSpecialLandNumerator / ratioBoosterSpecialLand
+    protected int ratioBoosterSpecialLandNumerator = 1;
 
     protected int numBoosterCommon;
     protected int numBoosterUncommon;
     protected int numBoosterRare;
     protected int numBoosterDoubleFaced; // -1 = include normally 0 = exclude  1-n = include explicit
     protected int ratioBoosterMythic;
+
+    protected boolean needsLegendCreature = false;
+    protected boolean validateBoosterColors = true;
+    protected double rejectMissingColorProbability = 0.8;
+    protected double rejectSameColorUncommonsProbability = 0.8;
 
     protected int maxCardNumberInBooster; // used to omit cards with collector numbers beyond the regular cards in a set for boosters
 
@@ -164,13 +150,7 @@ public abstract class ExpansionSet implements Serializable {
     }
 
     public List<SetCardInfo> findCardInfoByClass(Class<?> clazz) {
-        ArrayList<SetCardInfo> result = new ArrayList<>();
-        for (SetCardInfo info : cards) {
-            if (info.getCardClass().equals(clazz)) {
-                result.add(info);
-            }
-        }
-        return result;
+        return cards.stream().filter(info -> info.getCardClass().equals(clazz)).collect(Collectors.toList());
     }
 
     public List<Card> create15CardBooster() {
@@ -211,6 +191,86 @@ public abstract class ExpansionSet implements Serializable {
     }
 
     public List<Card> createBooster() {
+        for (int i = 0; i < 100; i++) {//don't want to somehow loop forever
+            List<Card> booster = tryBooster();
+            if (boosterIsValid(booster)) {
+                return booster;
+            }
+        }
+        return tryBooster();
+    }
+
+    protected boolean boosterIsValid(List<Card> booster) {
+        if (validateBoosterColors) {
+            if (!validateColors(booster)) {
+                return false;
+            }
+        }
+
+        if (needsLegendCreature) {
+            if (booster.stream().noneMatch(card -> card.isLegendary() && card.isCreature())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    protected boolean validateColors(List<Card> booster) {
+        List<ObjectColor> magicColors =
+                Arrays.asList(ObjectColor.WHITE, ObjectColor.BLUE, ObjectColor.BLACK, ObjectColor.RED, ObjectColor.GREEN);
+
+        // all cards colors
+        Map<ObjectColor, Integer> colorWeight = new HashMap<>();
+        // uncommon/rare/mythic cards colors
+        Map<ObjectColor, Integer> uncommonWeight = new HashMap<>();
+
+        for (ObjectColor color : magicColors) {
+            colorWeight.put(color, 0);
+            uncommonWeight.put(color, 0);
+        }
+
+        // count colors in the booster
+        for (Card card : booster) {
+            ObjectColor cardColor = card.getColor(null);
+            if (cardColor != null) {
+                List<ObjectColor> colors = cardColor.getColors();
+                // todo: do we need gold color?
+                colors.remove(ObjectColor.GOLD);
+                if (!colors.isEmpty()) {
+                    // 60 - full card weight
+                    // multicolored cards add part of the weight to each color
+                    int cardColorWeight = 60 / colors.size();
+                    for (ObjectColor color : colors) {
+                        colorWeight.put(color, colorWeight.get(color) + cardColorWeight);
+                        if (card.getRarity() != Rarity.COMMON) {
+                            uncommonWeight.put(color, uncommonWeight.get(color) + cardColorWeight);
+                        }
+                    }
+                }
+            }
+        }
+
+        // check that all colors are present
+        if (magicColors.stream().anyMatch(color -> colorWeight.get(color) < 60)) {
+            // reject only part of the boosters
+            if (RandomUtil.nextDouble() < rejectMissingColorProbability) {
+                return false;
+            }
+        }
+
+        // check that we don't have 3 or more uncommons/rares of the same color
+        if (magicColors.stream().anyMatch(color -> uncommonWeight.get(color) >= 180)) {
+            // reject only part of the boosters
+            if (RandomUtil.nextDouble() < rejectSameColorUncommonsProbability) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public List<Card> tryBooster() {
         List<Card> booster = new ArrayList<>();
         if (!hasBoosters) {
             return booster;
@@ -220,7 +280,7 @@ public abstract class ExpansionSet implements Serializable {
             List<CardInfo> specialLands = getSpecialLand();
             List<CardInfo> basicLands = getCardsByRarity(Rarity.LAND);
             for (int i = 0; i < numBoosterLands; i++) {
-                if (ratioBoosterSpecialLand > 0 && RandomUtil.nextInt(ratioBoosterSpecialLand) == 0 && specialLands != null) {
+                if (ratioBoosterSpecialLand > 0 && RandomUtil.nextInt(ratioBoosterSpecialLand) < ratioBoosterSpecialLandNumerator && specialLands != null) {
                     addToBooster(booster, specialLands);
                 } else {
                     addToBooster(booster, basicLands);
@@ -314,29 +374,22 @@ public abstract class ExpansionSet implements Serializable {
     private void addSpecial(List<Card> booster) {
         int specialCards = 0;
         List<CardInfo> specialBonus = getSpecialBonus();
-        if (specialBonus != null) {
-            specialCards += specialBonus.size();
-        }
+        specialCards += specialBonus.size();
+
         List<CardInfo> specialMythic = getSpecialMythic();
-        if (specialMythic != null) {
-            specialCards += specialMythic.size();
-        }
+        specialCards += specialMythic.size();
         List<CardInfo> specialRare = getSpecialRare();
-        if (specialRare != null) {
-            specialCards += specialRare.size();
-        }
+        specialCards += specialRare.size();
         List<CardInfo> specialUncommon = getSpecialUncommon();
-        if (specialUncommon != null) {
-            specialCards += specialUncommon.size();
-        }
+        specialCards += specialUncommon.size();
         List<CardInfo> specialCommon = getSpecialCommon();
-        if (specialCommon != null) {
-            specialCards += specialCommon.size();
-        }
+
+        specialCards += specialCommon.size();
+
         if (specialCards > 0) {
             for (int i = 0; i < numBoosterSpecial; i++) {
                 if (RandomUtil.nextInt(15) < 10) {
-                    if (specialCommon != null && !specialCommon.isEmpty()) {
+                    if (!specialCommon.isEmpty()) {
                         addToBooster(booster, specialCommon);
                     } else {
                         i--;
@@ -344,7 +397,7 @@ public abstract class ExpansionSet implements Serializable {
                     continue;
                 }
                 if (RandomUtil.nextInt(4) < 3) {
-                    if (specialUncommon != null && !specialUncommon.isEmpty()) {
+                    if (!specialUncommon.isEmpty()) {
                         addToBooster(booster, specialUncommon);
                     } else {
                         i--;
@@ -352,15 +405,15 @@ public abstract class ExpansionSet implements Serializable {
                     continue;
                 }
                 if (RandomUtil.nextInt(8) < 7) {
-                    if (specialRare != null && !specialRare.isEmpty()) {
+                    if (!specialRare.isEmpty()) {
                         addToBooster(booster, specialRare);
                     } else {
                         i--;
                     }
                     continue;
                 }
-                if (specialMythic != null && !specialMythic.isEmpty()) {
-                    if (specialBonus != null && !specialBonus.isEmpty()) {
+                if (!specialMythic.isEmpty()) {
+                    if (!specialBonus.isEmpty()) {
                         if (RandomUtil.nextInt(3) < 2) {
                             addToBooster(booster, specialMythic);
                             continue;
@@ -372,7 +425,7 @@ public abstract class ExpansionSet implements Serializable {
                 } else {
                     i--;
                 }
-                if (specialBonus != null && !specialBonus.isEmpty()) {
+                if (!specialBonus.isEmpty()) {
                     addToBooster(booster, specialBonus);
                 }
             }
@@ -391,7 +444,7 @@ public abstract class ExpansionSet implements Serializable {
         List<CardInfo> savedCardsInfos = savedCards.get(rarity);
         if (savedCardsInfos == null) {
             CardCriteria criteria = new CardCriteria();
-            if (rarity.equals(Rarity.LAND)) {
+            if (rarity == Rarity.LAND) {
                 criteria.setCodes(!hasBasicLands && parentSet != null ? parentSet.code : this.code);
             } else {
                 criteria.setCodes(this.code);
@@ -403,13 +456,7 @@ public abstract class ExpansionSet implements Serializable {
             savedCardsInfos = CardRepository.instance.findCards(criteria);
             // Workaround after card number is numeric
             if (maxCardNumberInBooster != Integer.MAX_VALUE) {
-                Iterator<CardInfo> iterator = savedCardsInfos.iterator();
-                while (iterator.hasNext()) {
-                    CardInfo next = iterator.next();
-                    if (Integer.valueOf(next.getCardNumber()) > maxCardNumberInBooster) {
-                        iterator.remove();
-                    }
-                }
+                savedCardsInfos.removeIf(next -> next.getCardNumberAsInt() > maxCardNumberInBooster && rarity != Rarity.LAND);
             }
 
             savedCards.put(rarity, savedCardsInfos);
@@ -419,27 +466,27 @@ public abstract class ExpansionSet implements Serializable {
     }
 
     public List<CardInfo> getSpecialCommon() {
-        return null;
+        return new ArrayList<>();
     }
 
     public List<CardInfo> getSpecialUncommon() {
-        return null;
+        return new ArrayList<>();
     }
 
     public List<CardInfo> getSpecialRare() {
-        return null;
+        return new ArrayList<>();
     }
 
     public List<CardInfo> getSpecialMythic() {
-        return null;
+        return new ArrayList<>();
     }
 
     public List<CardInfo> getSpecialBonus() {
-        return null;
+        return new ArrayList<>();
     }
 
     public List<CardInfo> getSpecialLand() {
-        return null;
+        return new ArrayList<>();
     }
 
     public boolean isCustomSet() {
@@ -448,6 +495,10 @@ public abstract class ExpansionSet implements Serializable {
 
     public void removeSavedCards() {
         savedCards.clear();
+    }
+
+    public int getMaxCardNumberInBooster() {
+        return maxCardNumberInBooster;
     }
 
 }

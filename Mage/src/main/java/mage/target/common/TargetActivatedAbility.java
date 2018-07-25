@@ -1,36 +1,11 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.target.common;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import mage.abilities.Ability;
+import mage.abilities.ActivatedAbility;
 import mage.constants.AbilityType;
 import mage.constants.Zone;
 import mage.filter.Filter;
@@ -46,15 +21,23 @@ import mage.target.TargetObject;
  */
 public class TargetActivatedAbility extends TargetObject {
 
+    protected final FilterAbility filter;
+
     public TargetActivatedAbility() {
+        this(new FilterAbility("activated ability"));
+    }
+
+    public TargetActivatedAbility(FilterAbility filter) {
         this.minNumberOfTargets = 1;
         this.maxNumberOfTargets = 1;
         this.zone = Zone.STACK;
-        this.targetName = "activated ability";
+        this.targetName = filter.getMessage();
+        this.filter = filter;
     }
 
     public TargetActivatedAbility(final TargetActivatedAbility target) {
         super(target);
+        this.filter = target.filter.copy();
     }
 
     @Override
@@ -63,7 +46,8 @@ public class TargetActivatedAbility extends TargetObject {
             return false;
         }
         StackObject stackObject = game.getStack().getStackObject(id);
-        return stackObject != null && stackObject.getStackAbility() != null && stackObject.getStackAbility().getAbilityType().equals(AbilityType.ACTIVATED);
+        return stackObject != null && stackObject.getStackAbility() != null && stackObject.getStackAbility().getAbilityType() == AbilityType.ACTIVATED
+                && filter.match(((ActivatedAbility) stackObject.getStackAbility()), game);
     }
 
     @Override
@@ -73,13 +57,13 @@ public class TargetActivatedAbility extends TargetObject {
 
     @Override
     public boolean canChoose(UUID sourceControllerId, Game game) {
-        for (StackObject stackObject :  game.getStack()) {
-            if (stackObject.getStackAbility() != null 
-                    && stackObject.getStackAbility().getAbilityType().equals(AbilityType.ACTIVATED)
+        for (StackObject stackObject : game.getStack()) {
+            if (stackObject.getStackAbility() != null
+                    && stackObject.getStackAbility().getAbilityType() == AbilityType.ACTIVATED
                     && game.getState().getPlayersInRange(sourceControllerId, game).contains(stackObject.getStackAbility().getControllerId())) {
-                    return true;
-                }
+                return true;
             }
+        }
         return false;
     }
 
@@ -92,7 +76,9 @@ public class TargetActivatedAbility extends TargetObject {
     public Set<UUID> possibleTargets(UUID sourceControllerId, Game game) {
         Set<UUID> possibleTargets = new HashSet<>();
         for (StackObject stackObject : game.getStack()) {
-            if (stackObject.getStackAbility().getAbilityType().equals(AbilityType.ACTIVATED) && game.getState().getPlayersInRange(sourceControllerId, game).contains(stackObject.getStackAbility().getControllerId())) {
+            if (stackObject.getStackAbility().getAbilityType() == AbilityType.ACTIVATED
+                    && game.getState().getPlayersInRange(sourceControllerId, game).contains(stackObject.getStackAbility().getControllerId())
+                    && filter.match(((StackAbility) stackObject), game)) {
                 possibleTargets.add(stackObject.getStackAbility().getId());
             }
         }
@@ -108,17 +94,17 @@ public class TargetActivatedAbility extends TargetObject {
     public Filter<Ability> getFilter() {
         return new FilterAbility();
     }
-    
+
     @Override
     public String getTargetedName(Game game) {
         StringBuilder sb = new StringBuilder("activated ability (");
         for (UUID targetId : getTargets()) {
             StackAbility object = (StackAbility) game.getObject(targetId);
             if (object != null) {
-                sb.append(object.getRule()).append(" ");
+                sb.append(object.getRule()).append(' ');
             }
         }
-        sb.append(")");
+        sb.append(')');
         return sb.toString();
     }
 }

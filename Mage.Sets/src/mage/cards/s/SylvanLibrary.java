@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.s;
 
 import java.util.HashMap;
@@ -57,14 +31,14 @@ import mage.watchers.Watcher;
  *
  * @author LevelX2
  */
-public class SylvanLibrary extends CardImpl {
+public final class SylvanLibrary extends CardImpl {
 
     public SylvanLibrary(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.ENCHANTMENT},"{1}{G}");
+        super(ownerId, setInfo, new CardType[]{CardType.ENCHANTMENT}, "{1}{G}");
 
         // At the beginning of your draw step, you may draw two additional cards. If you do, choose two cards in your hand drawn this turn. For each of those cards, pay 4 life or put the card on top of your library.
         this.addAbility(new BeginningOfDrawTriggeredAbility(new SylvanLibraryEffect(), TargetController.YOU, true),
-                new CardsDrawnThisTurnWatcher());
+                new SylvanLibraryCardsDrawnThisTurnWatcher());
 
     }
 
@@ -99,7 +73,7 @@ class SylvanLibraryEffect extends OneShotEffect {
         Player controller = game.getPlayer(source.getControllerId());
         if (controller != null) {
             controller.drawCards(2, game);
-            CardsDrawnThisTurnWatcher watcher = (CardsDrawnThisTurnWatcher) game.getState().getWatchers().get("CardsDrawnThisTurnWatcher");
+            SylvanLibraryCardsDrawnThisTurnWatcher watcher = (SylvanLibraryCardsDrawnThisTurnWatcher) game.getState().getWatchers().get(SylvanLibraryCardsDrawnThisTurnWatcher.class.getSimpleName());
             if (watcher != null) {
                 Cards cards = new CardsImpl();
                 Set<UUID> cardsDrawnThisTurn = watcher.getCardsDrawnThisTurn(controller.getId());
@@ -132,7 +106,7 @@ class SylvanLibraryEffect extends OneShotEffect {
                             }
                         }
                     }
-                    controller.putCardsOnTopOfLibrary(cardsPutBack, game, source, applyEffectsAfter);
+                    controller.putCardsOnTopOfLibrary(cardsPutBack, game, source, false);
                 }
             }
             return true;
@@ -141,15 +115,15 @@ class SylvanLibraryEffect extends OneShotEffect {
     }
 }
 
-class CardsDrawnThisTurnWatcher extends Watcher {
+class SylvanLibraryCardsDrawnThisTurnWatcher extends Watcher {
 
     private final Map<UUID, Set<UUID>> cardsDrawnThisTurn = new HashMap<>();
 
-    public CardsDrawnThisTurnWatcher() {
-        super("CardsDrawnThisTurnWatcher", WatcherScope.GAME);
+    public SylvanLibraryCardsDrawnThisTurnWatcher() {
+        super(SylvanLibraryCardsDrawnThisTurnWatcher.class.getSimpleName(), WatcherScope.GAME);
     }
 
-    public CardsDrawnThisTurnWatcher(final CardsDrawnThisTurnWatcher watcher) {
+    public SylvanLibraryCardsDrawnThisTurnWatcher(final SylvanLibraryCardsDrawnThisTurnWatcher watcher) {
         super(watcher);
         this.cardsDrawnThisTurn.putAll(watcher.cardsDrawnThisTurn);
     }
@@ -157,17 +131,15 @@ class CardsDrawnThisTurnWatcher extends Watcher {
     @Override
     public void watch(GameEvent event, Game game) {
         if (event.getType() == GameEvent.EventType.DREW_CARD) {
-            if (!cardsDrawnThisTurn.containsKey(event.getPlayerId())) {
-                Set<UUID> cardsDrawn = new LinkedHashSet<>();
-                cardsDrawnThisTurn.put(event.getPlayerId(), cardsDrawn);
-            }
-            Set<UUID> cardsDrawn = cardsDrawnThisTurn.get(event.getPlayerId());
+
+            Set<UUID> cardsDrawn = getCardsDrawnThisTurn(event.getPlayerId());
             cardsDrawn.add(event.getTargetId());
+            cardsDrawnThisTurn.put(event.getPlayerId(), cardsDrawn);
         }
     }
 
     public Set<UUID> getCardsDrawnThisTurn(UUID playerId) {
-        return cardsDrawnThisTurn.get(playerId);
+        return cardsDrawnThisTurn.getOrDefault(playerId, new LinkedHashSet<>());
     }
 
     @Override
@@ -177,8 +149,8 @@ class CardsDrawnThisTurnWatcher extends Watcher {
     }
 
     @Override
-    public CardsDrawnThisTurnWatcher copy() {
-        return new CardsDrawnThisTurnWatcher(this);
+    public SylvanLibraryCardsDrawnThisTurnWatcher copy() {
+        return new SylvanLibraryCardsDrawnThisTurnWatcher(this);
     }
 }
 

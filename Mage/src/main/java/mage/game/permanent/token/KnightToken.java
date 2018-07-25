@@ -6,17 +6,19 @@ import java.util.List;
 import mage.MageInt;
 import mage.abilities.keyword.VigilanceAbility;
 import mage.constants.CardType;
+import mage.constants.SubType;
+import mage.util.RandomUtil;
 
 /**
  *
  * @author LevelX2
  */
-public class KnightToken extends Token {
+public final class KnightToken extends TokenImpl {
 
     final static private List<String> tokenImageSets = new ArrayList<>();
 
     static {
-        tokenImageSets.addAll(Arrays.asList("ORI", "RTR", "C15"));
+        tokenImageSets.addAll(Arrays.asList("ORI", "RTR", "C15", "CMA", "DOM"));
     }
 
     public KnightToken() {
@@ -24,13 +26,24 @@ public class KnightToken extends Token {
         if (getOriginalExpansionSetCode() != null && getOriginalExpansionSetCode().equals("C15")) {
             setTokenType(2);
         }
+        if (getOriginalExpansionSetCode() != null && getOriginalExpansionSetCode().equals("DOM")) {
+            this.setTokenType(RandomUtil.nextInt(2) + 1);
+        }
         cardType.add(CardType.CREATURE);
         color.setWhite(true);
-        subtype.add("Knight");
+        subtype.add(SubType.KNIGHT);
         power = new MageInt(2);
         toughness = new MageInt(2);
         this.addAbility(VigilanceAbility.getInstance());
 
         availableImageSetCodes = tokenImageSets;
+    }
+
+    public KnightToken(final KnightToken token) {
+        super(token);
+    }
+
+    public KnightToken copy() {
+        return new KnightToken(this);
     }
 }

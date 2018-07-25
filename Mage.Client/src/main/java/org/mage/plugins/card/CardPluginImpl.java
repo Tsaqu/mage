@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLayeredPane;
@@ -21,7 +22,6 @@ import mage.client.dialog.PreferencesDialog;
 import mage.client.util.GUISizeHelper;
 import mage.constants.Rarity;
 import mage.interfaces.plugin.CardPlugin;
-import mage.utils.CardUtil;
 import mage.view.CardView;
 import mage.view.CounterView;
 import mage.view.PermanentView;
@@ -30,20 +30,16 @@ import net.xeoh.plugins.base.annotations.events.Init;
 import net.xeoh.plugins.base.annotations.events.PluginLoaded;
 import net.xeoh.plugins.base.annotations.meta.Author;
 import org.apache.log4j.Logger;
-import org.mage.card.arcane.Animation;
-import org.mage.card.arcane.CardPanel;
-import org.mage.card.arcane.CardPanelComponentImpl;
-import org.mage.card.arcane.ManaSymbols;
+import org.mage.card.arcane.*;
 import org.mage.plugins.card.dl.DownloadGui;
 import org.mage.plugins.card.dl.DownloadJob;
 import org.mage.plugins.card.dl.Downloader;
-import org.mage.plugins.card.dl.sources.CardFrames;
 import org.mage.plugins.card.dl.sources.DirectLinksForDownload;
 import org.mage.plugins.card.dl.sources.GathererSets;
 import org.mage.plugins.card.dl.sources.GathererSymbols;
+import org.mage.plugins.card.dl.sources.ScryfallSymbolsSource;
 import org.mage.plugins.card.images.ImageCache;
 import org.mage.plugins.card.info.CardInfoPaneImpl;
-import org.mage.card.arcane.CardPanelRenderImpl;
 
 /**
  * {@link CardPlugin} implementation.
@@ -68,12 +64,12 @@ public class CardPluginImpl implements CardPlugin {
     private static final float STACK_SPACING_Y = 0.10f;
     private static final float ATTACHMENT_SPACING_Y = 0.13f;
 
-    private int landStackMax = 5;
+    private static final int landStackMax = 5;
     // private int cardWidthMin = 50, cardWidthMax = Constants.CARD_SIZE_FULL.width;
     private int cardWidthMin = (int) GUISizeHelper.battlefieldCardMinDimension.getWidth();
     private int cardWidthMax = (int) GUISizeHelper.battlefieldCardMaxDimension.getWidth();
 
-    private boolean stackVertical = false;
+    private static final boolean stackVertical = false;
 
     private int playAreaWidth, playAreaHeight;
     private int cardWidth, cardHeight;
@@ -108,14 +104,14 @@ public class CardPluginImpl implements CardPlugin {
         cardWidthMin = (int) GUISizeHelper.battlefieldCardMinDimension.getWidth();
         cardWidthMax = (int) GUISizeHelper.battlefieldCardMaxDimension.getWidth();
     }
-    
+
     /**
-     * Temporary card rendering shim. Split card rendering isn't implemented yet, so
-     * use old component based rendering for the split cards.
+     * Temporary card rendering shim. Split card rendering isn't implemented
+     * yet, so use old component based rendering for the split cards.
      */
     private CardPanel makePanel(CardView view, UUID gameId, boolean loadImage, ActionCallback callback, boolean isFoil, Dimension dimension) {
         String fallback = PreferencesDialog.getCachedValue(PreferencesDialog.KEY_CARD_RENDERING_FALLBACK, "false");
-        if (view.isSplitCard() || fallback.equals("true")) {
+        if (fallback.equals("true")) {
             return new CardPanelComponentImpl(view, gameId, loadImage, callback, isFoil, dimension);
         } else {
             return new CardPanelRenderImpl(view, gameId, loadImage, callback, isFoil, dimension);
@@ -125,7 +121,7 @@ public class CardPluginImpl implements CardPlugin {
     @Override
     public MagePermanent getMagePermanent(PermanentView permanent, Dimension dimension, UUID gameId, ActionCallback callback, boolean canBeFoil, boolean loadImage) {
         CardPanel cardPanel = makePanel(permanent, gameId, loadImage, callback, false, dimension);
-        boolean implemented = !permanent.getRarity().equals(Rarity.NA);
+        boolean implemented = permanent.getRarity() != Rarity.NA;
         cardPanel.setShowCastingCost(implemented);
         return cardPanel;
     }
@@ -133,13 +129,13 @@ public class CardPluginImpl implements CardPlugin {
     @Override
     public MagePermanent getMageCard(CardView cardView, Dimension dimension, UUID gameId, ActionCallback callback, boolean canBeFoil, boolean loadImage) {
         CardPanel cardPanel = makePanel(cardView, gameId, loadImage, callback, false, dimension);
-        boolean implemented = cardView.getRarity() != null && !cardView.getRarity().equals(Rarity.NA);
+        boolean implemented = cardView.getRarity() != null && cardView.getRarity() != Rarity.NA;
         cardPanel.setShowCastingCost(implemented);
         return cardPanel;
     }
 
     @Override
-    public int sortPermanents(Map<String, JComponent> ui, Collection<MagePermanent> permanents, boolean nonPermanentsOwnRow, boolean topPanel) {
+    public int sortPermanents(Map<String, JComponent> ui, Map<UUID, MagePermanent> permanents, boolean nonPermanentsOwnRow, boolean topPanel) {
         //TODO: add caching
         //requires to find out is position have been changed that includes:
         //adding/removing permanents, type change
@@ -160,8 +156,8 @@ public class CardPluginImpl implements CardPlugin {
 
         outerLoop:
         //
-        for (MagePermanent permanent : permanents) {
-            if (!CardUtil.isLand(permanent) || CardUtil.isCreature(permanent)) {
+        for (MagePermanent permanent : permanents.values()) {
+            if (!permanent.isLand() || permanent.isCreature()) {
                 continue;
             }
 
@@ -179,7 +175,7 @@ public class CardPluginImpl implements CardPlugin {
                         break;
                     }
                     List<CounterView> counters = firstPanel.getOriginalPermanent().getCounters();
-                    if (counters != null && counters.size() > 0) {
+                    if (counters != null && !counters.isEmpty()) {
                         // don't put to first panel if it has counters
                         insertIndex = i;
                         break;
@@ -191,7 +187,7 @@ public class CardPluginImpl implements CardPlugin {
                         continue;
                     }
                     counters = permanent.getOriginalPermanent().getCounters();
-                    if (counters != null && counters.size() > 0) {
+                    if (counters != null && !counters.isEmpty()) {
                         // if a land has counter, put it to the right
                         insertIndex = i + 1;
                         continue;
@@ -207,8 +203,13 @@ public class CardPluginImpl implements CardPlugin {
 
             Stack stack = new Stack();
 
-            if (permanent.getOriginalPermanent().getAttachments() != null) {
-                stack.setMaxAttachedCount(permanent.getOriginalPermanent().getAttachments().size());
+            if (permanent.getOriginalPermanent().getAttachments() != null
+                    && !permanent.getOriginalPermanent().getAttachments().isEmpty()
+                    && !permanent.getOriginalPermanent().isAttachedTo()) {
+                // get the number of all attachements and sub attachments
+                AttachmentLayoutInfos ali = calculateNeededNumberOfVerticalColumns(0, permanents, permanent);
+                stack.setMaxAttachedCount(ali.getAttachments());
+                stack.setAttachmentColumns(ali.getColumns());
             }
 
             stack.add(permanent);
@@ -422,17 +423,36 @@ public class CardPluginImpl implements CardPlugin {
         return height - cardSpacingY + GUTTER_Y * 2;
     }
 
-    private static enum RowType {
+    private AttachmentLayoutInfos calculateNeededNumberOfVerticalColumns(int currentCol, Map<UUID, MagePermanent> permanents, MagePermanent permanentWithAttachments) {
+        int maxCol = ++currentCol;
+        int attachments = 0;
+        for (UUID attachmentId : permanentWithAttachments.getOriginalPermanent().getAttachments()) {
+            MagePermanent attachedPermanent = permanents.get(attachmentId);
+            if (attachedPermanent != null) {
+                attachments++;
+                if (attachedPermanent.getOriginalPermanent().getAttachments() != null && !attachedPermanent.getOriginalPermanent().getAttachments().isEmpty()) {
+                    AttachmentLayoutInfos attachmentLayoutInfos = calculateNeededNumberOfVerticalColumns(currentCol, permanents, attachedPermanent);
+                    if (attachmentLayoutInfos.getColumns() > maxCol) {
+                        maxCol = attachmentLayoutInfos.getColumns();
+                        attachments += attachmentLayoutInfos.getAttachments();
+                    }
+                }
+            }
+        }
+        return new AttachmentLayoutInfos(maxCol, attachments);
+    }
+
+    private enum RowType {
         land, creature, other, attached;
 
         public boolean isType(MagePermanent card) {
             switch (this) {
                 case land:
-                    return CardUtil.isLand(card);
+                    return card.isLand();
                 case creature:
-                    return CardUtil.isCreature(card);
+                    return card.isCreature();
                 case other:
-                    return !CardUtil.isLand(card) && !CardUtil.isCreature(card);
+                    return !card.isLand() && !card.isCreature();
                 case attached:
                     return card.getOriginalPermanent().isAttachedToPermanent();
                 default:
@@ -449,24 +469,26 @@ public class CardPluginImpl implements CardPlugin {
             super(16);
         }
 
-        public Row(Collection<MagePermanent> permanents, RowType type) {
+        public Row(Map<UUID, MagePermanent> permanents, RowType type) {
             this();
             addAll(permanents, type);
         }
 
-        private void addAll(Collection<MagePermanent> permanents, RowType type) {
-            for (MagePermanent permanent : permanents) {
+        private void addAll(Map<UUID, MagePermanent> permanents, RowType type) {
+            for (MagePermanent permanent : permanents.values()) {
                 if (!type.isType(permanent)) {
                     continue;
                 }
                 // all attached permanents are grouped separately later
-                if (!type.equals(RowType.attached) && RowType.attached.isType(permanent)) {
+                if (type != RowType.attached && RowType.attached.isType(permanent)) {
                     continue;
                 }
                 Stack stack = new Stack();
                 stack.add(permanent);
                 if (permanent.getOriginalPermanent().getAttachments() != null) {
-                    stack.setMaxAttachedCount(permanent.getOriginalPermanent().getAttachments().size());
+                    AttachmentLayoutInfos ali = calculateNeededNumberOfVerticalColumns(0, permanents, permanent);
+                    stack.setMaxAttachedCount(ali.getAttachments());
+                    stack.setAttachmentColumns(ali.getColumns());
                 }
                 add(stack);
             }
@@ -510,13 +532,14 @@ public class CardPluginImpl implements CardPlugin {
          * Max attached object count attached to single permanent in the stack.
          */
         private int maxAttachedCount = 0;
+        private int attachmentColumns = 0;
 
         public Stack() {
             super(8);
         }
 
         private int getWidth() {
-            return cardWidth + (size() - 1) * stackSpacingX + cardSpacingX;
+            return cardWidth + (size() - 1) * stackSpacingX + cardSpacingX + (12 * attachmentColumns);
         }
 
         private int getHeight() {
@@ -530,46 +553,84 @@ public class CardPluginImpl implements CardPlugin {
         public void setMaxAttachedCount(int maxAttachedCount) {
             this.maxAttachedCount = maxAttachedCount;
         }
+
+        public void setAttachmentColumns(int attachmentColumns) {
+            this.attachmentColumns = attachmentColumns;
+        }
+    }
+
+    private final class AttachmentLayoutInfos {
+
+        private int columns;
+        private int attachments;
+
+        public AttachmentLayoutInfos(int columns, int attachments) {
+            this.columns = columns;
+            this.attachments = attachments;
+        }
+
+        public int getColumns() {
+            return columns;
+        }
+
+        public int getAttachments() {
+            return attachments;
+        }
+
+        public void increaseAttachments() {
+            attachments++;
+        }
+
+        public void increaseColumns() {
+            columns++;
+        }
     }
 
     /**
      * Download various symbols (mana, tap, set).
      *
-     * @param imagesPath Path to check in and store symbols to. Can be null, in
-     * such case default path should be used.
+     * @param imagesDir Path to check in and store symbols to. Can't be null.
      */
     @Override
-    public void downloadSymbols(String imagesPath) {
+    public void downloadSymbols(String imagesDir) {
         final DownloadGui g = new DownloadGui(new Downloader());
 
-        Iterable<DownloadJob> it = new GathererSymbols(imagesPath);
+        Iterable<DownloadJob> it;
 
+        it = new GathererSymbols();
         for (DownloadJob job : it) {
             g.getDownloader().add(job);
         }
 
-        it = new GathererSets(imagesPath);
+        it = new GathererSets();
         for (DownloadJob job : it) {
             g.getDownloader().add(job);
         }
 
-        it = new CardFrames(imagesPath);
+        it = new ScryfallSymbolsSource();
         for (DownloadJob job : it) {
             g.getDownloader().add(job);
         }
 
-        it = new DirectLinksForDownload(imagesPath);
+        /*
+        it = new CardFrames(imagesDir); // TODO: delete frames download (not need now)
+        for (DownloadJob job : it) {
+            g.getDownloader().add(job);
+        }
+         */
+        it = new DirectLinksForDownload();
         for (DownloadJob job : it) {
             g.getDownloader().add(job);
         }
 
-        JDialog d = new JDialog((Frame) null, "Download pictures", false);
+        JDialog d = new JDialog((Frame) null, "Download symbols", false);
         d.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         d.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 g.getDownloader().dispose();
                 ManaSymbols.loadImages();
+                // TODO: check reload process after download (icons do not update)
             }
         });
         d.setLayout(new BorderLayout());
@@ -581,10 +642,10 @@ public class CardPluginImpl implements CardPlugin {
     @Override
     public void onAddCard(MagePermanent card, int count) {
         if (card != null) {
-            Animation.showCard((CardPanel) card, count > 0 ? count : 1);
+            Animation.showCard(card, count > 0 ? count : 1);
             try {
                 while ((card).getAlpha() + 0.05f < 1) {
-                    Thread.sleep(30);
+                    TimeUnit.MILLISECONDS.sleep(30);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -598,7 +659,7 @@ public class CardPluginImpl implements CardPlugin {
             Animation.hideCard(card, count > 0 ? count : 1);
             try {
                 while ((card).getAlpha() - 0.05f > 0) {
-                    Thread.sleep(30);
+                    TimeUnit.MILLISECONDS.sleep(30);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

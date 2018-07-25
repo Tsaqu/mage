@@ -29,11 +29,12 @@
  */
 package mage.abilities.effects.common;
 
+import static java.lang.Integer.min;
+import java.util.Locale;
 import mage.abilities.Ability;
 import mage.abilities.Mode;
 import mage.abilities.dynamicvalue.DynamicValue;
 import mage.abilities.dynamicvalue.common.StaticValue;
-import mage.cards.Card;
 import mage.cards.Cards;
 import mage.cards.CardsImpl;
 import mage.constants.Outcome;
@@ -57,22 +58,37 @@ public class LookLibraryAndPickControllerEffect extends LookLibraryControllerEff
     protected int foundCardsToPick = 0;
     protected boolean optional;
     private boolean upTo;
+    private boolean putOnTopSelected;
+    private boolean anyOrder;
 
-    public LookLibraryAndPickControllerEffect(DynamicValue numberOfCards, boolean mayShuffleAfter, DynamicValue numberToPick, FilterCard pickFilter, boolean putOnTop) {
-        this(numberOfCards, mayShuffleAfter, numberToPick, pickFilter, putOnTop, true);
+    //TODO: These constructors are a mess
+    public LookLibraryAndPickControllerEffect(DynamicValue numberOfCards,
+            boolean mayShuffleAfter, DynamicValue numberToPick,
+            FilterCard pickFilter, boolean putOnTop) {
+        this(numberOfCards, mayShuffleAfter, numberToPick, pickFilter,
+                putOnTop, true);
     }
 
-    public LookLibraryAndPickControllerEffect(DynamicValue numberOfCards, boolean mayShuffleAfter, DynamicValue numberToPick, FilterCard pickFilter, boolean putOnTop, boolean reveal) {
-        this(numberOfCards, mayShuffleAfter, numberToPick, pickFilter, Zone.LIBRARY, putOnTop, reveal);
+    public LookLibraryAndPickControllerEffect(DynamicValue numberOfCards,
+            boolean mayShuffleAfter, DynamicValue numberToPick,
+            FilterCard pickFilter, boolean putOnTop, boolean reveal) {
+        this(numberOfCards, mayShuffleAfter, numberToPick, pickFilter,
+                Zone.LIBRARY, putOnTop, reveal);
     }
 
-    public LookLibraryAndPickControllerEffect(DynamicValue numberOfCards, boolean mayShuffleAfter, DynamicValue numberToPick,
-            FilterCard pickFilter, Zone targetZoneLookedCards, boolean putOnTop, boolean reveal) {
-        this(numberOfCards, mayShuffleAfter, numberToPick, pickFilter, targetZoneLookedCards, putOnTop, reveal, false);
+    public LookLibraryAndPickControllerEffect(DynamicValue numberOfCards,
+            boolean mayShuffleAfter, DynamicValue numberToPick,
+            FilterCard pickFilter, Zone targetZoneLookedCards,
+            boolean putOnTop, boolean reveal) {
+        this(numberOfCards, mayShuffleAfter, numberToPick, pickFilter,
+                targetZoneLookedCards, putOnTop, reveal, false);
     }
 
-    public LookLibraryAndPickControllerEffect(int numberOfCards, int numberToPick, FilterCard pickFilter, boolean upTo) {
-        this(new StaticValue(numberOfCards), false, new StaticValue(numberToPick), pickFilter, Zone.LIBRARY, false, true, upTo);
+    public LookLibraryAndPickControllerEffect(int numberOfCards,
+            int numberToPick, FilterCard pickFilter, boolean upTo) {
+        this(new StaticValue(numberOfCards), false,
+                new StaticValue(numberToPick), pickFilter, Zone.LIBRARY, false,
+                true, upTo);
     }
 
     /**
@@ -85,9 +101,12 @@ public class LookLibraryAndPickControllerEffect extends LookLibraryControllerEff
      * @param targetZonePickedCards
      * @param optional
      */
-    public LookLibraryAndPickControllerEffect(int numberOfCards, int numberToPick, FilterCard pickFilter, boolean reveal, boolean upTo,
-            Zone targetZonePickedCards, boolean optional) {
-        this(new StaticValue(numberOfCards), false, new StaticValue(numberToPick), pickFilter, Zone.LIBRARY, false, reveal, upTo, targetZonePickedCards, optional);
+    public LookLibraryAndPickControllerEffect(int numberOfCards,
+            int numberToPick, FilterCard pickFilter, boolean reveal,
+            boolean upTo, Zone targetZonePickedCards, boolean optional) {
+        this(new StaticValue(numberOfCards), false,
+                new StaticValue(numberToPick), pickFilter, Zone.LIBRARY, false,
+                reveal, upTo, targetZonePickedCards, optional, true, true);
 
     }
 
@@ -98,13 +117,18 @@ public class LookLibraryAndPickControllerEffect extends LookLibraryControllerEff
      * @param numberToPick
      * @param pickFilter
      * @param targetZoneLookedCards
-     * @param putOnTop
+     * @param putOnTop if zone for the rest is library decide if cards go to top
+     * or bottom
      * @param reveal
      * @param upTo
      */
-    public LookLibraryAndPickControllerEffect(DynamicValue numberOfCards, boolean mayShuffleAfter, DynamicValue numberToPick,
-            FilterCard pickFilter, Zone targetZoneLookedCards, boolean putOnTop, boolean reveal, boolean upTo) {
-        this(numberOfCards, mayShuffleAfter, numberToPick, pickFilter, targetZoneLookedCards, putOnTop, reveal, upTo, Zone.HAND, false);
+    public LookLibraryAndPickControllerEffect(DynamicValue numberOfCards,
+            boolean mayShuffleAfter, DynamicValue numberToPick,
+            FilterCard pickFilter, Zone targetZoneLookedCards,
+            boolean putOnTop, boolean reveal, boolean upTo) {
+        this(numberOfCards, mayShuffleAfter, numberToPick, pickFilter,
+                targetZoneLookedCards, putOnTop, reveal, upTo, Zone.HAND,
+                false, true, true);
     }
 
     /**
@@ -114,21 +138,55 @@ public class LookLibraryAndPickControllerEffect extends LookLibraryControllerEff
      * @param numberToPick
      * @param pickFilter
      * @param targetZoneLookedCards
-     * @param putOnTop
+     * @param putOnTop if zone for the rest is library decide if cards go to top
+     * or bottom
      * @param reveal
      * @param upTo
      * @param targetZonePickedCards
      * @param optional
      */
-    public LookLibraryAndPickControllerEffect(DynamicValue numberOfCards, boolean mayShuffleAfter, DynamicValue numberToPick,
-            FilterCard pickFilter, Zone targetZoneLookedCards, boolean putOnTop, boolean reveal, boolean upTo, Zone targetZonePickedCards, boolean optional) {
-        super(Outcome.DrawCard, numberOfCards, mayShuffleAfter, targetZoneLookedCards, putOnTop);
+    public LookLibraryAndPickControllerEffect(DynamicValue numberOfCards,
+            boolean mayShuffleAfter, DynamicValue numberToPick,
+            FilterCard pickFilter, Zone targetZoneLookedCards, boolean putOnTop,
+            boolean reveal, boolean upTo, Zone targetZonePickedCards,
+            boolean optional) {
+
+        this(numberOfCards, mayShuffleAfter, numberToPick, pickFilter,
+                targetZoneLookedCards, putOnTop, reveal, upTo,
+                targetZonePickedCards, optional, true, true);
+    }
+
+    /**
+     *
+     * @param numberOfCards
+     * @param mayShuffleAfter
+     * @param numberToPick
+     * @param pickFilter
+     * @param targetZoneLookedCards
+     * @param putOnTop if zone for the rest is library decide if cards go to top
+     * or bottom
+     * @param reveal
+     * @param upTo
+     * @param targetZonePickedCards
+     * @param optional
+     * @param putOnTopSelected
+     * @param anyOrder
+     */
+    public LookLibraryAndPickControllerEffect(DynamicValue numberOfCards,
+            boolean mayShuffleAfter, DynamicValue numberToPick,
+            FilterCard pickFilter, Zone targetZoneLookedCards, boolean putOnTop,
+            boolean reveal, boolean upTo, Zone targetZonePickedCards,
+            boolean optional, boolean putOnTopSelected, boolean anyOrder) {
+        super(Outcome.DrawCard, numberOfCards, mayShuffleAfter,
+                targetZoneLookedCards, putOnTop);
         this.numberToPick = numberToPick;
         this.filter = pickFilter;
         this.revealPickedCards = reveal;
         this.targetPickedCards = targetZonePickedCards;
         this.upTo = upTo;
         this.optional = optional;
+        this.putOnTopSelected = putOnTopSelected;
+        this.anyOrder = anyOrder;
     }
 
     public LookLibraryAndPickControllerEffect(final LookLibraryAndPickControllerEffect effect) {
@@ -139,6 +197,8 @@ public class LookLibraryAndPickControllerEffect extends LookLibraryControllerEff
         this.targetPickedCards = effect.targetPickedCards;
         this.upTo = effect.upTo;
         this.optional = effect.optional;
+        this.putOnTopSelected = effect.putOnTopSelected;
+        this.anyOrder = effect.anyOrder;
     }
 
     @Override
@@ -148,26 +208,25 @@ public class LookLibraryAndPickControllerEffect extends LookLibraryControllerEff
     }
 
     @Override
-    protected void cardLooked(Card card, Game game, Ability source) {
-        if (numberToPick.calculate(game, source, this) > 0 && filter.match(card, game)) {
-            ++foundCardsToPick;
-        }
-    }
-
-    @Override
-    protected void actionWithSelectedCards(Cards cards, Game game, Ability source, String windowName) {
+    protected void actionWithSelectedCards(Cards cards, Game game, Ability source) {
         Player player = game.getPlayer(source.getControllerId());
-        if (player != null && foundCardsToPick > 0) {
+        if (player != null && numberToPick.calculate(game, source, this) > 0
+                && cards.count(filter, source.getSourceId(), source.getControllerId(), game) > 0) {
             if (!optional || player.chooseUse(Outcome.DrawCard, getMayText(), source, game)) {
                 FilterCard pickFilter = filter.copy();
                 pickFilter.setMessage(getPickText());
-                TargetCard target = new TargetCard((upTo ? 0 : numberToPick.calculate(game, source, this)), numberToPick.calculate(game, source, this), Zone.LIBRARY, pickFilter);
+                int number = min(cards.size(), numberToPick.calculate(game, source, this));
+                TargetCard target = new TargetCard((upTo ? 0 : number), number, Zone.LIBRARY, pickFilter);
                 if (player.choose(Outcome.DrawCard, cards, target, game)) {
                     Cards pickedCards = new CardsImpl(target.getTargets());
                     cards.removeAll(pickedCards);
-                    player.moveCards(pickedCards.getCards(game), targetPickedCards, source, game);
+                    if (targetPickedCards == Zone.LIBRARY && !putOnTopSelected) {
+                        player.putCardsOnBottomOfLibrary(pickedCards, game, source, anyOrder);
+                    } else {
+                        player.moveCards(pickedCards.getCards(game), targetPickedCards, source, game);
+                    }
                     if (revealPickedCards) {
-                        player.revealCards(windowName, pickedCards, game);
+                        player.revealCards(source, pickedCards, game);
                     }
 
                 }
@@ -193,12 +252,24 @@ public class LookLibraryAndPickControllerEffect extends LookLibraryControllerEff
                 sb.append("put ").append(filter.getMessage()).append(" into your graveyard");
                 break;
         }
-        return sb.append("?").toString();
+        return sb.append('?').toString();
     }
 
     private String getPickText() {
         StringBuilder sb = new StringBuilder(filter.getMessage()).append(" to ");
         switch (targetPickedCards) {
+            case LIBRARY:
+                if (putOnTopSelected) {
+                    sb.append("put on the top of your library");
+                } else {
+                    sb.append("put on the bottom of your library");
+                }
+                if (anyOrder) {
+                    sb.append(" in any order");
+                } else {
+                    sb.append(" in a random order");
+                }
+                break;
             case HAND:
                 if (revealPickedCards) {
                     sb.append("reveal and put into your hand");
@@ -227,12 +298,14 @@ public class LookLibraryAndPickControllerEffect extends LookLibraryControllerEff
             if (revealPickedCards) {
                 sb.append(". You may reveal ");
                 sb.append(filter.getMessage()).append(" from among them and put it into your ");
-            } else if (targetPickedCards.equals(Zone.BATTLEFIELD)) {
-                sb.append(". You ");
+            } else if (targetPickedCards == Zone.BATTLEFIELD) {
+                sb.append(". ");
                 if (optional) {
-                    sb.append("may ");
+                    sb.append("You may p");
+                } else {
+                    sb.append('P');
                 }
-                sb.append("put ").append(filter.getMessage()).append(" from among them onto the ");
+                sb.append("ut ").append(filter.getMessage()).append(" from among them onto the ");
             } else {
                 sb.append(". Put ");
                 if (numberToPick.calculate(null, null, this) > 1) {
@@ -251,7 +324,7 @@ public class LookLibraryAndPickControllerEffect extends LookLibraryControllerEff
 
                 sb.append(" of them into your ");
             }
-            sb.append(targetPickedCards.toString().toLowerCase());
+            sb.append(targetPickedCards.toString().toLowerCase(Locale.ENGLISH));
 
             if (targetZoneLookedCards == Zone.LIBRARY) {
                 sb.append(". Put the rest ");
@@ -260,9 +333,22 @@ public class LookLibraryAndPickControllerEffect extends LookLibraryControllerEff
                 } else {
                     sb.append("on the bottom");
                 }
-                sb.append(" of your library in any order");
+                sb.append(" of your library in ");
+                if (anyOrder) {
+                    sb.append("any");
+                } else {
+                    sb.append("a random");
+                }
+                sb.append(" order");
             } else if (targetZoneLookedCards == Zone.GRAVEYARD) {
-                sb.append(" and the other into your graveyard");
+                sb.append(" and the");
+                if (numberOfCards instanceof StaticValue && numberToPick instanceof StaticValue
+                        && ((StaticValue) numberToPick).getValue() + 1 == ((StaticValue) numberOfCards).getValue()) {
+                    sb.append(" other");
+                } else {
+                    sb.append(" rest");
+                }
+                sb.append(" into your graveyard");
             }
         }
         // get text frame from super class and inject action text

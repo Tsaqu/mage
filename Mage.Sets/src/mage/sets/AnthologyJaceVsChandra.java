@@ -1,33 +1,6 @@
-/*
- * Copyright 2011 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.sets;
 
-import mage.cards.CardGraphicInfo;
 import mage.cards.ExpansionSet;
 import mage.constants.Rarity;
 import mage.constants.SetType;
@@ -36,12 +9,12 @@ import mage.constants.SetType;
  *
  * @author fireshoes
  */
-public class AnthologyJaceVsChandra extends ExpansionSet {
+public final class AnthologyJaceVsChandra extends ExpansionSet {
 
-    private static final AnthologyJaceVsChandra fINSTANCE = new AnthologyJaceVsChandra();
+    private static final AnthologyJaceVsChandra instance = new AnthologyJaceVsChandra();
 
     public static AnthologyJaceVsChandra getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     private AnthologyJaceVsChandra() {
@@ -80,20 +53,20 @@ public class AnthologyJaceVsChandra extends ExpansionSet {
         cards.add(new SetCardInfo("Incinerate", 51, Rarity.COMMON, mage.cards.i.Incinerate.class));
         cards.add(new SetCardInfo("Ingot Chewer", 45, Rarity.COMMON, mage.cards.i.IngotChewer.class));
         cards.add(new SetCardInfo("Inner-Flame Acolyte", 41, Rarity.COMMON, mage.cards.i.InnerFlameAcolyte.class));
-        cards.add(new SetCardInfo("Island", 30, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 31, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 32, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 33, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Island", 30, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 31, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 32, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 33, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Jace Beleren", 1, Rarity.MYTHIC, mage.cards.j.JaceBeleren.class));
         cards.add(new SetCardInfo("Keldon Megaliths", 58, Rarity.UNCOMMON, mage.cards.k.KeldonMegaliths.class));
         cards.add(new SetCardInfo("Magma Jet", 52, Rarity.UNCOMMON, mage.cards.m.MagmaJet.class));
         cards.add(new SetCardInfo("Man-o'-War", 8, Rarity.COMMON, mage.cards.m.ManOWar.class));
         cards.add(new SetCardInfo("Martyr of Frost", 2, Rarity.COMMON, mage.cards.m.MartyrOfFrost.class));
         cards.add(new SetCardInfo("Mind Stone", 22, Rarity.UNCOMMON, mage.cards.m.MindStone.class));
-        cards.add(new SetCardInfo("Mountain", 59, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 60, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 61, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 62, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Mountain", 59, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 60, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 61, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 62, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Mulldrifter", 12, Rarity.COMMON, mage.cards.m.Mulldrifter.class));
         cards.add(new SetCardInfo("Ophidian", 9, Rarity.COMMON, mage.cards.o.Ophidian.class));
         cards.add(new SetCardInfo("Oxidda Golem", 46, Rarity.COMMON, mage.cards.o.OxiddaGolem.class));

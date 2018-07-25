@@ -38,7 +38,7 @@ public class ConditionalSpellManaBuilder extends ConditionalManaBuilder {
 
     @Override
     public String getRule() {
-        return "Spend this mana only to cast " + filter.getMessage() + ".";
+        return "Spend this mana only to cast " + filter.getMessage() + '.';
     }
 }
 
@@ -46,7 +46,7 @@ class SpellCastConditionalMana extends ConditionalMana {
 
     SpellCastConditionalMana(Mana mana, FilterSpell filter) {
         super(mana);
-        staticText = "Spend this mana only to cast " + filter.getMessage() + ".";
+        staticText = "Spend this mana only to cast " + filter.getMessage() + '.';
         addCondition(new SpellCastManaCondition(filter));
     }
 }
@@ -63,7 +63,7 @@ class SpellCastManaCondition extends ManaCondition implements Condition {
     public boolean apply(Game game, Ability source) {
         if (source instanceof SpellAbility) {
             MageObject object = game.getObject(source.getSourceId());
-            if (object != null && (object instanceof StackObject)) {
+            if ((object instanceof StackObject)) {
                 return filter.match((StackObject) object, source.getSourceId(), source.getControllerId(), game);
             }
         }

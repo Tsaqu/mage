@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.r;
 
 import java.util.Set;
@@ -33,12 +7,13 @@ import mage.abilities.Ability;
 import mage.abilities.effects.OneShotEffect;
 import mage.abilities.effects.common.CreateTokenEffect;
 import mage.cards.Card;
+import mage.cards.CardSetInfo;
 import mage.cards.Cards;
 import mage.cards.CardsImpl;
-import mage.cards.CardSetInfo;
 import mage.cards.SplitCard;
 import mage.constants.CardType;
 import mage.constants.Outcome;
+import mage.constants.SpellAbilityType;
 import mage.constants.Zone;
 import mage.filter.FilterCard;
 import mage.game.Game;
@@ -50,15 +25,15 @@ import mage.target.TargetCard;
  *
  * @author magenoxx
  */
-public class ResearchDevelopment extends SplitCard {
+public final class ResearchDevelopment extends SplitCard {
 
     public ResearchDevelopment(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.INSTANT},"{G}{U}","{3}{U}{R}",false);
+        super(ownerId, setInfo, new CardType[]{CardType.INSTANT}, "{G}{U}", "{3}{U}{R}", SpellAbilityType.SPLIT);
 
         // Choose up to four cards you own from outside the game and shuffle them into your library.
         getLeftHalfCard().getSpellAbility().addEffect(new ResearchEffect());
 
-        // Put a 3/1 red Elemental creature token onto the battlefield unless any opponent has you draw a card. Repeat this process two more times.
+        // Create a 3/1 red Elemental creature token unless any opponent has you draw a card. Repeat this process two more times.
         getRightHalfCard().getSpellAbility().addEffect(new DevelopmentEffect());
     }
 
@@ -77,7 +52,6 @@ class ResearchEffect extends OneShotEffect {
     private static final String choiceText = "Choose a card you own from outside the game";
 
     private static final FilterCard filter = new FilterCard("card");
-
 
     public ResearchEffect() {
         super(Outcome.Benefit);
@@ -102,7 +76,7 @@ class ResearchEffect extends OneShotEffect {
             int count = 0;
             while (player.chooseUse(Outcome.Benefit, textToAsk.toString(), source, game)) {
                 Cards cards = player.getSideboard();
-                if(cards.isEmpty()) {
+                if (cards.isEmpty()) {
                     game.informPlayer(player, "You have no cards outside the game.");
                     break;
                 }
@@ -127,7 +101,7 @@ class ResearchEffect extends OneShotEffect {
                         textToAsk = new StringBuilder(choiceText);
                         textToAsk.append(" (");
                         textToAsk.append(count);
-                        textToAsk.append(")");
+                        textToAsk.append(')');
                     }
                 }
 
@@ -136,7 +110,7 @@ class ResearchEffect extends OneShotEffect {
                 }
             }
 
-            game.informPlayers(player.getLogName() + " has chosen " + count + " card(s) to shuffle into his or her library.");
+            game.informPlayers(player.getLogName() + " has chosen " + count + " card(s) to shuffle into their library.");
 
             if (count > 0) {
                 player.shuffleLibrary(source, game);
@@ -153,7 +127,7 @@ class DevelopmentEffect extends OneShotEffect {
 
     public DevelopmentEffect() {
         super(Outcome.Benefit);
-        staticText = "Put a 3/1 red Elemental creature token onto the battlefield unless any opponent has you draw a card. Repeat this process two more times.";
+        staticText = "Create a 3/1 red Elemental creature token unless any opponent has you draw a card. Repeat this process two more times.";
     }
 
     DevelopmentEffect(final DevelopmentEffect effect) {
@@ -170,7 +144,7 @@ class DevelopmentEffect extends OneShotEffect {
                 for (UUID opponentUuid : opponents) {
                     Player opponent = game.getPlayer(opponentUuid);
                     if (opponent != null && opponent.chooseUse(Outcome.Detriment,
-                            "Allow " + player.getLogName() + " to draw a card instead? (" + Integer.toString(i+1) + ")", source, game)) {
+                            "Allow " + player.getLogName() + " to draw a card instead? (" + Integer.toString(i + 1) + ')', source, game)) {
                         game.informPlayers(opponent.getLogName() + " had chosen to let " + player.getLogName() + " draw a card.");
                         player.drawCards(1, game);
                         putToken = false;

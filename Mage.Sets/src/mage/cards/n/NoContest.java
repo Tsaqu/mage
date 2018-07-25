@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.n;
 
 import java.util.Set;
@@ -35,7 +9,8 @@ import mage.cards.Card;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.CardType;
-import mage.filter.Filter;
+import mage.constants.ComparisonType;
+import mage.filter.StaticFilters;
 import mage.filter.common.FilterCreaturePermanent;
 import mage.filter.predicate.mageobject.PowerPredicate;
 import mage.game.Game;
@@ -45,13 +20,12 @@ import mage.target.TargetPermanent;
 import mage.target.common.TargetControlledCreaturePermanent;
 
 /**
- *
  * @author Styxo
  */
-public class NoContest extends CardImpl {
+public final class NoContest extends CardImpl {
 
     public NoContest(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.INSTANT},"{G}");
+        super(ownerId, setInfo, new CardType[]{CardType.INSTANT}, "{G}");
 
         // Target creature you control fights target creature with power less than its power.
         this.getSpellAbility().addEffect(new FightTargetsEffect());
@@ -84,14 +58,14 @@ class TargetCreatureWithLessPowerPermanent extends TargetPermanent {
     public boolean canChoose(UUID sourceId, UUID sourceControllerId, Game game) {
         int maxPower = Integer.MIN_VALUE; // get the most poerful controlled creature that can be targeted
         Card sourceCard = game.getCard(sourceId);
-        for (Permanent permanent : game.getBattlefield().getAllActivePermanents(new FilterCreaturePermanent(), sourceControllerId, game)) {
+        for (Permanent permanent : game.getBattlefield().getAllActivePermanents(StaticFilters.FILTER_PERMANENT_CREATURES, sourceControllerId, game)) {
             if (permanent.getPower().getValue() > maxPower && permanent.canBeTargetedBy(sourceCard, sourceControllerId, game)) {
                 maxPower = permanent.getPower().getValue();
             }
         }
         // now check, if another creature has less power and can be targeted
         FilterCreaturePermanent checkFilter = new FilterCreaturePermanent();
-        checkFilter.add(new PowerPredicate(Filter.ComparisonType.LessThan, maxPower));
+        checkFilter.add(new PowerPredicate(ComparisonType.FEWER_THAN, maxPower));
         for (Permanent permanent : game.getBattlefield().getActivePermanents(checkFilter, sourceControllerId, sourceId, game)) {
             if (permanent.canBeTargetedBy(sourceCard, sourceControllerId, game)) {
                 return true;
@@ -109,7 +83,7 @@ class TargetCreatureWithLessPowerPermanent extends TargetPermanent {
                 int power = firstTarget.getPower().getValue();
                 // overwrite the filter with the power predicate
                 filter = new FilterCreaturePermanent("creature with power less than " + power);
-                filter.add(new PowerPredicate(Filter.ComparisonType.LessThan, power));
+                filter.add(new PowerPredicate(ComparisonType.FEWER_THAN, power));
             }
         }
         return super.possibleTargets(sourceId, sourceControllerId, game);

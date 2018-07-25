@@ -7,7 +7,6 @@ import mage.abilities.costs.mana.ManaCostsImpl;
 import mage.cards.CardImpl;
 import mage.cards.repository.CardInfo;
 import mage.cards.repository.CardRepository;
-import mage.constants.CardType;
 import org.apache.log4j.Logger;
 
 /**
@@ -49,7 +48,7 @@ public class MockCard extends CardImpl {
             this.secondSideCard = new MockCard(CardRepository.instance.findCard(card.getSecondSideName()));
         }
 
-        if (this.cardType.contains(CardType.PLANESWALKER)) {
+        if (this.isPlaneswalker()) {
             String startingLoyaltyString = card.getStartingLoyalty();
             if (startingLoyaltyString.isEmpty()) {
                 //Logger.getLogger(MockCard.class).warn("Planeswalker `" + this.name + "` has empty starting loyalty.");

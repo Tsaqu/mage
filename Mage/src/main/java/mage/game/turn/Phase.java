@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.game.turn;
 
 import java.io.Serializable;
@@ -95,7 +69,7 @@ public abstract class Phase implements Serializable {
     }
 
     public boolean play(Game game, UUID activePlayerId) {
-        if (game.isPaused() || game.gameOver(null)) {
+        if (game.isPaused() || game.checkIfGameIsOver()) {
             return false;
         }
 
@@ -104,10 +78,10 @@ public abstract class Phase implements Serializable {
         if (beginPhase(game, activePlayerId)) {
 
             for (Step step : steps) {
-                if (game.isPaused() || game.gameOver(null)) {
+                if (game.isPaused() || game.checkIfGameIsOver()) {
                     return false;
                 }
-                if (game.getTurn().isEndTurnRequested() && !step.getType().equals(PhaseStep.CLEANUP)) {
+                if (game.getTurn().isEndTurnRequested() && step.getType()!=PhaseStep.CLEANUP) {
                     continue;
                 }
                 currentStep = step;
@@ -122,7 +96,7 @@ public abstract class Phase implements Serializable {
                 }
 
             }
-            if (game.isPaused() || game.gameOver(null)) {
+            if (game.isPaused() || game.checkIfGameIsOver()) {
                 return false;
             }
             count++;
@@ -133,17 +107,17 @@ public abstract class Phase implements Serializable {
     }
 
     private boolean checkStopOnStepOption(Game game) {
-        if (game.getOptions().stopOnTurn != null && game.getOptions().stopAtStep == getStep().getType()) {
-            if (game.getOptions().stopOnTurn <= game.getState().getTurnNum()) {
-                game.pause();
-                return true;
-            }
+        if (game.getOptions().stopOnTurn != null
+                && game.getOptions().stopOnTurn <= game.getState().getTurnNum()
+                && game.getOptions().stopAtStep == getStep().getType()) {
+            game.pause();
+            return true;
         }
         return false;
     }
 
     public boolean resumePlay(Game game, PhaseStep stepType, boolean wasPaused) {
-        if (game.isPaused() || game.gameOver(null)) {
+        if (game.isPaused() || game.checkIfGameIsOver()) {
             return false;
         }
 
@@ -157,7 +131,7 @@ public abstract class Phase implements Serializable {
         resumeStep(game, wasPaused);
         while (it.hasNext()) {
             step = it.next();
-            if (game.isPaused() || game.gameOver(null)) {
+            if (game.isPaused() || game.checkIfGameIsOver()) {
                 return false;
             }
             currentStep = step;
@@ -169,7 +143,7 @@ public abstract class Phase implements Serializable {
             }
         }
 
-        if (game.isPaused() || game.gameOver(null)) {
+        if (game.isPaused() || game.checkIfGameIsOver()) {
             return false;
         }
         count++;
@@ -206,13 +180,13 @@ public abstract class Phase implements Serializable {
         if (!currentStep.skipStep(game, activePlayerId)) {
             game.getState().increaseStepNum();
             prePriority(game, activePlayerId);
-            if (!game.isPaused() && !game.gameOver(null) && !game.executingRollback()) {
+            if (!game.isPaused() && !game.checkIfGameIsOver() && !game.executingRollback()) {
                 currentStep.priority(game, activePlayerId, false);
                 if (game.executingRollback()) {
                     return;
                 }
             }
-            if (!game.isPaused() && !game.gameOver(null) && !game.executingRollback()) {
+            if (!game.isPaused() && !game.checkIfGameIsOver() && !game.executingRollback()) {
                 postPriority(game, activePlayerId);
             }
         }
@@ -233,11 +207,11 @@ public abstract class Phase implements Serializable {
                     prePriority(game, activePlayerId);
                 }
             case PRIORITY:
-                if (!game.isPaused() && !game.gameOver(null)) {
+                if (!game.isPaused() && !game.checkIfGameIsOver()) {
                     currentStep.priority(game, activePlayerId, resuming);
                 }
             case POST:
-                if (!game.isPaused() && !game.gameOver(null)) {
+                if (!game.isPaused() && !game.checkIfGameIsOver()) {
                     postPriority(game, activePlayerId);
                 }
         }

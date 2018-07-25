@@ -1,48 +1,20 @@
-/*
-* Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are
-* permitted provided that the following conditions are met:
-*
-*    1. Redistributions of source code must retain the above copyright notice, this list of
-*       conditions and the following disclaimer.
-*
-*    2. Redistributions in binary form must reproduce the above copyright notice, this list
-*       of conditions and the following disclaimer in the documentation and/or other materials
-*       provided with the distribution.
-*
-* THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-* FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*
-* The views and conclusions contained in the software and documentation are those of the
-* authors and should not be interpreted as representing official policies, either expressed
-* or implied, of BetaSteward_at_googlemail.com.
-*/
 
 package mage.sets;
 
 import mage.cards.ExpansionSet;
-import mage.constants.SetType;
 import mage.constants.Rarity;
-import mage.cards.CardGraphicInfo;
+import mage.constants.SetType;
 
 /**
  *
  * @author LevelX2
  */
+public final class JaceVsVraska extends ExpansionSet {
 
-public class JaceVsVraska extends ExpansionSet {
-    private static final JaceVsVraska fINSTANCE = new JaceVsVraska();
+    private static final JaceVsVraska instance = new JaceVsVraska();
 
     public static JaceVsVraska getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     private JaceVsVraska() {
@@ -68,11 +40,11 @@ public class JaceVsVraska extends ExpansionSet {
         cards.add(new SetCardInfo("Drooling Groodion", 65, Rarity.UNCOMMON, mage.cards.d.DroolingGroodion.class));
         cards.add(new SetCardInfo("Errant Ephemeron", 20, Rarity.COMMON, mage.cards.e.ErrantEphemeron.class));
         cards.add(new SetCardInfo("Festerhide Boar", 59, Rarity.COMMON, mage.cards.f.FesterhideBoar.class));
-        cards.add(new SetCardInfo("Forest", 84, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 85, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 86, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 87, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 88, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Forest", 84, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 85, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 86, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 87, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 88, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Future Sight", 33, Rarity.RARE, mage.cards.f.FutureSight.class));
         cards.add(new SetCardInfo("Gatecreeper Vine", 48, Rarity.COMMON, mage.cards.g.GatecreeperVine.class));
         cards.add(new SetCardInfo("Golgari Guildgate", 76, Rarity.COMMON, mage.cards.g.GolgariGuildgate.class));
@@ -82,11 +54,11 @@ public class JaceVsVraska extends ExpansionSet {
         cards.add(new SetCardInfo("Highway Robber", 61, Rarity.COMMON, mage.cards.h.HighwayRobber.class));
         cards.add(new SetCardInfo("Hypnotic Cloud", 67, Rarity.COMMON, mage.cards.h.HypnoticCloud.class));
         cards.add(new SetCardInfo("Into the Roil", 23, Rarity.COMMON, mage.cards.i.IntoTheRoil.class));
-        cards.add(new SetCardInfo("Island", 37, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 38, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 39, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 40, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 41, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Island", 37, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 38, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 39, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 40, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 41, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Jace, Architect of Thought", 1, Rarity.MYTHIC, mage.cards.j.JaceArchitectOfThought.class));
         cards.add(new SetCardInfo("Jace's Ingenuity", 32, Rarity.UNCOMMON, mage.cards.j.JacesIngenuity.class));
         cards.add(new SetCardInfo("Jace's Mindseeker", 19, Rarity.RARE, mage.cards.j.JacesMindseeker.class));
@@ -123,11 +95,11 @@ public class JaceVsVraska extends ExpansionSet {
         cards.add(new SetCardInfo("Stealer of Secrets", 11, Rarity.COMMON, mage.cards.s.StealerOfSecrets.class));
         cards.add(new SetCardInfo("Stonefare Crocodile", 56, Rarity.COMMON, mage.cards.s.StonefareCrocodile.class));
         cards.add(new SetCardInfo("Summoner's Bane", 31, Rarity.UNCOMMON, mage.cards.s.SummonersBane.class));
-        cards.add(new SetCardInfo("Swamp", 79, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 80, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 81, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 82, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 83, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Swamp", 79, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 80, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 81, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 82, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 83, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Tainted Wood", 78, Rarity.UNCOMMON, mage.cards.t.TaintedWood.class));
         cards.add(new SetCardInfo("Tavern Swindler", 45, Rarity.UNCOMMON, mage.cards.t.TavernSwindler.class));
         cards.add(new SetCardInfo("Thought Scour", 21, Rarity.COMMON, mage.cards.t.ThoughtScour.class));

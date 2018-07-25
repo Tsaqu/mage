@@ -1,13 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package mage.abilities.effects.common.combat;
 
 import mage.abilities.Ability;
 import mage.abilities.effects.RestrictionEffect;
 import mage.constants.Duration;
+import static mage.constants.Duration.EndOfTurn;
 import mage.filter.common.FilterCreaturePermanent;
 import mage.game.Game;
 import mage.game.permanent.Permanent;
@@ -21,10 +18,11 @@ public class CantBeBlockedByAllTargetEffect extends RestrictionEffect {
     private final FilterCreaturePermanent filterBlockedBy;
 
     public CantBeBlockedByAllTargetEffect(FilterCreaturePermanent filterBlockedBy, Duration duration) {
-        super(Duration.WhileOnBattlefield);
+        super(duration);
         this.filterBlockedBy = filterBlockedBy;
-        staticText = "Target creature"
+        staticText = "target creature"
                 + " can't be blocked "
+                + (duration == EndOfTurn ? "this turn " : "")
                 + (filterBlockedBy.getMessage().startsWith("except by") ? "" : "by ")
                 + filterBlockedBy.getMessage();
     }

@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.sets;
 
 import mage.cards.ExpansionSet;
@@ -35,12 +9,12 @@ import mage.constants.SetType;
  *
  * @author North
  */
-public class Exodus extends ExpansionSet {
+public final class Exodus extends ExpansionSet {
 
-    private static final Exodus fINSTANCE = new Exodus();
+    private static final Exodus instance = new Exodus();
 
     public static Exodus getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     private Exodus() {
@@ -57,12 +31,14 @@ public class Exodus extends ExpansionSet {
         cards.add(new SetCardInfo("Allay", 1, Rarity.COMMON, mage.cards.a.Allay.class));
         cards.add(new SetCardInfo("Anarchist", 79, Rarity.COMMON, mage.cards.a.Anarchist.class));
         cards.add(new SetCardInfo("Angelic Blessing", 2, Rarity.COMMON, mage.cards.a.AngelicBlessing.class));
+        cards.add(new SetCardInfo("Avenging Druid", 105, Rarity.COMMON, mage.cards.a.AvengingDruid.class));
         cards.add(new SetCardInfo("Bequeathal", 106, Rarity.COMMON, mage.cards.b.Bequeathal.class));
         cards.add(new SetCardInfo("Carnophage", 53, Rarity.COMMON, mage.cards.c.Carnophage.class));
         cards.add(new SetCardInfo("Cartographer", 107, Rarity.UNCOMMON, mage.cards.c.Cartographer.class));
         cards.add(new SetCardInfo("Cataclysm", 3, Rarity.RARE, mage.cards.c.Cataclysm.class));
         cards.add(new SetCardInfo("Cat Burglar", 54, Rarity.COMMON, mage.cards.c.CatBurglar.class));
         cards.add(new SetCardInfo("Charging Paladin", 4, Rarity.COMMON, mage.cards.c.ChargingPaladin.class));
+        cards.add(new SetCardInfo("Cinder Crawler", 80, Rarity.COMMON, mage.cards.c.CinderCrawler.class));
         cards.add(new SetCardInfo("City of Traitors", 143, Rarity.RARE, mage.cards.c.CityOfTraitors.class));
         cards.add(new SetCardInfo("Coat of Arms", 131, Rarity.RARE, mage.cards.c.CoatOfArms.class));
         cards.add(new SetCardInfo("Convalescence", 5, Rarity.RARE, mage.cards.c.Convalescence.class));
@@ -75,6 +51,7 @@ public class Exodus extends ExpansionSet {
         cards.add(new SetCardInfo("Dauthi Warlord", 59, Rarity.UNCOMMON, mage.cards.d.DauthiWarlord.class));
         cards.add(new SetCardInfo("Death's Duet", 60, Rarity.COMMON, mage.cards.d.DeathsDuet.class));
         cards.add(new SetCardInfo("Dominating Licid", 30, Rarity.RARE, mage.cards.d.DominatingLicid.class));
+        cards.add(new SetCardInfo("Elven Palisade", 109, Rarity.UNCOMMON, mage.cards.e.ElvenPalisade.class));
         cards.add(new SetCardInfo("Elvish Berserker", 110, Rarity.COMMON, mage.cards.e.ElvishBerserker.class));
         cards.add(new SetCardInfo("Entropic Specter", 61, Rarity.RARE, mage.cards.e.EntropicSpecter.class));
         cards.add(new SetCardInfo("Ephemeron", 31, Rarity.RARE, mage.cards.e.Ephemeron.class));
@@ -83,6 +60,7 @@ public class Exodus extends ExpansionSet {
         cards.add(new SetCardInfo("Ertai, Wizard Adept", 33, Rarity.RARE, mage.cards.e.ErtaiWizardAdept.class));
         cards.add(new SetCardInfo("Exalted Dragon", 6, Rarity.RARE, mage.cards.e.ExaltedDragon.class));
         cards.add(new SetCardInfo("Fade Away", 34, Rarity.COMMON, mage.cards.f.FadeAway.class));
+        cards.add(new SetCardInfo("Fighting Chance", 82, Rarity.RARE, mage.cards.f.FightingChance.class));
         cards.add(new SetCardInfo("Flowstone Flood", 83, Rarity.UNCOMMON, mage.cards.f.FlowstoneFlood.class));
         cards.add(new SetCardInfo("Forbid", 35, Rarity.UNCOMMON, mage.cards.f.Forbid.class));
         cards.add(new SetCardInfo("Fugue", 62, Rarity.UNCOMMON, mage.cards.f.Fugue.class));
@@ -90,6 +68,9 @@ public class Exodus extends ExpansionSet {
         cards.add(new SetCardInfo("Hatred", 64, Rarity.RARE, mage.cards.h.Hatred.class));
         cards.add(new SetCardInfo("High Ground", 7, Rarity.UNCOMMON, mage.cards.h.HighGround.class));
         cards.add(new SetCardInfo("Jackalope Herd", 111, Rarity.COMMON, mage.cards.j.JackalopeHerd.class));
+        cards.add(new SetCardInfo("Keeper of the Beasts", 112, Rarity.UNCOMMON, mage.cards.k.KeeperOfTheBeasts.class));
+        cards.add(new SetCardInfo("Keeper of the Dead", 65, Rarity.UNCOMMON, mage.cards.k.KeeperOfTheDead.class));
+	    cards.add(new SetCardInfo("Keeper of the Light", 8, Rarity.UNCOMMON, mage.cards.k.KeeperOfTheLight.class));
         cards.add(new SetCardInfo("Killer Whale", 37, Rarity.UNCOMMON, mage.cards.k.KillerWhale.class));
         cards.add(new SetCardInfo("Kor Chant", 9, Rarity.COMMON, mage.cards.k.KorChant.class));
         cards.add(new SetCardInfo("Mage il-Vec", 86, Rarity.COMMON, mage.cards.m.MageIlVec.class));
@@ -97,24 +78,32 @@ public class Exodus extends ExpansionSet {
         cards.add(new SetCardInfo("Mana Breach", 38, Rarity.UNCOMMON, mage.cards.m.ManaBreach.class));
         cards.add(new SetCardInfo("Maniacal Rage", 87, Rarity.COMMON, mage.cards.m.ManiacalRage.class));
         cards.add(new SetCardInfo("Medicine Bag", 133, Rarity.UNCOMMON, mage.cards.m.MedicineBag.class));
+        cards.add(new SetCardInfo("Memory Crystal", 134, Rarity.RARE, mage.cards.m.MemoryCrystal.class));
         cards.add(new SetCardInfo("Merfolk Looter", 39, Rarity.COMMON, mage.cards.m.MerfolkLooter.class));
         cards.add(new SetCardInfo("Mindless Automaton", 135, Rarity.RARE, mage.cards.m.MindlessAutomaton.class));
         cards.add(new SetCardInfo("Mind Over Matter", 40, Rarity.RARE, mage.cards.m.MindOverMatter.class));
+        cards.add(new SetCardInfo("Mirozel", 41, Rarity.UNCOMMON, mage.cards.m.Mirozel.class));
         cards.add(new SetCardInfo("Mirri, Cat Warrior", 114, Rarity.RARE, mage.cards.m.MirriCatWarrior.class));
+        cards.add(new SetCardInfo("Mogg Assassin", 88, Rarity.UNCOMMON, mage.cards.m.MoggAssassin.class));
         cards.add(new SetCardInfo("Nausea", 67, Rarity.COMMON, mage.cards.n.Nausea.class));
         cards.add(new SetCardInfo("Necrologia", 68, Rarity.UNCOMMON, mage.cards.n.Necrologia.class));
         cards.add(new SetCardInfo("Null Brooch", 136, Rarity.RARE, mage.cards.n.NullBrooch.class));
         cards.add(new SetCardInfo("Oath of Druids", 115, Rarity.RARE, mage.cards.o.OathOfDruids.class));
+        cards.add(new SetCardInfo("Oath of Ghouls", 69, Rarity.RARE, mage.cards.o.OathOfGhouls.class));
         cards.add(new SetCardInfo("Oath of Lieges", 11, Rarity.RARE, mage.cards.o.OathOfLieges.class));
+        cards.add(new SetCardInfo("Oath of Mages", 90, Rarity.RARE, mage.cards.o.OathOfMages.class));
+        cards.add(new SetCardInfo("Oath of Scholars", 42, Rarity.RARE, mage.cards.o.OathOfScholars.class));
         cards.add(new SetCardInfo("Ogre Shaman", 91, Rarity.RARE, mage.cards.o.OgreShaman.class));
         cards.add(new SetCardInfo("Onslaught", 92, Rarity.COMMON, mage.cards.o.Onslaught.class));
         cards.add(new SetCardInfo("Paladin en-Vec", 12, Rarity.RARE, mage.cards.p.PaladinEnVec.class));
         cards.add(new SetCardInfo("Pandemonium", 93, Rarity.RARE, mage.cards.p.Pandemonium.class));
         cards.add(new SetCardInfo("Peace of Mind", 13, Rarity.UNCOMMON, mage.cards.p.PeaceOfMind.class));
         cards.add(new SetCardInfo("Pegasus Stampede", 14, Rarity.UNCOMMON, mage.cards.p.PegasusStampede.class));
+        cards.add(new SetCardInfo("Penance", 15, Rarity.UNCOMMON, mage.cards.p.Penance.class));
         cards.add(new SetCardInfo("Pit Spawn", 70, Rarity.RARE, mage.cards.p.PitSpawn.class));
         cards.add(new SetCardInfo("Plaguebearer", 71, Rarity.RARE, mage.cards.p.Plaguebearer.class));
         cards.add(new SetCardInfo("Plated Rootwalla", 116, Rarity.COMMON, mage.cards.p.PlatedRootwalla.class));
+        cards.add(new SetCardInfo("Predatory Hunger", 117, Rarity.COMMON, mage.cards.p.PredatoryHunger.class));
         cards.add(new SetCardInfo("Price of Progress", 95, Rarity.UNCOMMON, mage.cards.p.PriceOfProgress.class));
         cards.add(new SetCardInfo("Pygmy Troll", 118, Rarity.COMMON, mage.cards.p.PygmyTroll.class));
         cards.add(new SetCardInfo("Rabid Wolverines", 119, Rarity.COMMON, mage.cards.r.RabidWolverines.class));
@@ -125,19 +114,25 @@ public class Exodus extends ExpansionSet {
         cards.add(new SetCardInfo("Reclaim", 120, Rarity.COMMON, mage.cards.r.Reclaim.class));
         cards.add(new SetCardInfo("Reconnaissance", 17, Rarity.UNCOMMON, mage.cards.r.Reconnaissance.class));
         cards.add(new SetCardInfo("Recurring Nightmare", 72, Rarity.RARE, mage.cards.r.RecurringNightmare.class));
+        cards.add(new SetCardInfo("Resuscitate", 121, Rarity.UNCOMMON, mage.cards.r.Resuscitate.class));
         cards.add(new SetCardInfo("Robe of Mirrors", 43, Rarity.COMMON, mage.cards.r.RobeOfMirrors.class));
         cards.add(new SetCardInfo("Rootwater Alligator", 122, Rarity.COMMON, mage.cards.r.RootwaterAlligator.class));
         cards.add(new SetCardInfo("Rootwater Mystic", 44, Rarity.COMMON, mage.cards.r.RootwaterMystic.class));
         cards.add(new SetCardInfo("Sabertooth Wyvern", 99, Rarity.UNCOMMON, mage.cards.s.SabertoothWyvern.class));
+        cards.add(new SetCardInfo("Scalding Salamander", 100, Rarity.UNCOMMON, mage.cards.s.ScaldingSalamander.class));
+        cards.add(new SetCardInfo("Scare Tactics", 73, Rarity.COMMON, mage.cards.s.ScareTactics.class));
         cards.add(new SetCardInfo("School of Piranha", 45, Rarity.COMMON, mage.cards.s.SchoolOfPiranha.class));
         cards.add(new SetCardInfo("Scrivener", 46, Rarity.UNCOMMON, mage.cards.s.Scrivener.class));
         cards.add(new SetCardInfo("Seismic Assault", 101, Rarity.RARE, mage.cards.s.SeismicAssault.class));
         cards.add(new SetCardInfo("Shackles", 18, Rarity.COMMON, mage.cards.s.Shackles.class));
         cards.add(new SetCardInfo("Shattering Pulse", 102, Rarity.COMMON, mage.cards.s.ShatteringPulse.class));
+        cards.add(new SetCardInfo("Shield Mate", 19, Rarity.COMMON, mage.cards.s.ShieldMate.class));
         cards.add(new SetCardInfo("Skyshaper", 137, Rarity.UNCOMMON, mage.cards.s.Skyshaper.class));
         cards.add(new SetCardInfo("Skyshroud Elite", 123, Rarity.UNCOMMON, mage.cards.s.SkyshroudElite.class));
+        cards.add(new SetCardInfo("Skyshroud War Beast", 124, Rarity.RARE, mage.cards.s.SkyshroudWarBeast.class));
         cards.add(new SetCardInfo("Slaughter", 74, Rarity.UNCOMMON, mage.cards.s.Slaughter.class));
         cards.add(new SetCardInfo("Soltari Visionary", 20, Rarity.COMMON, mage.cards.s.SoltariVisionary.class));
+        cards.add(new SetCardInfo("Song of Serenity", 125, Rarity.UNCOMMON, mage.cards.s.SongOfSerenity.class));
         cards.add(new SetCardInfo("Sonic Burst", 103, Rarity.COMMON, mage.cards.s.SonicBurst.class));
         cards.add(new SetCardInfo("Soul Warden", 21, Rarity.COMMON, mage.cards.s.SoulWarden.class));
         cards.add(new SetCardInfo("Spellbook", 138, Rarity.UNCOMMON, mage.cards.s.Spellbook.class));
@@ -164,5 +159,6 @@ public class Exodus extends ExpansionSet {
         cards.add(new SetCardInfo("Whiptongue Frog", 52, Rarity.COMMON, mage.cards.w.WhiptongueFrog.class));
         cards.add(new SetCardInfo("Wood Elves", 130, Rarity.COMMON, mage.cards.w.WoodElves.class));
         cards.add(new SetCardInfo("Workhorse", 142, Rarity.RARE, mage.cards.w.Workhorse.class));
+        cards.add(new SetCardInfo("Zealots en-Dal", 26, Rarity.UNCOMMON, mage.cards.z.ZealotsEnDal.class));
     }
 }

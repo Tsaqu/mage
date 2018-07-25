@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.abilities.effects;
 
 import mage.abilities.Ability;
@@ -44,7 +18,7 @@ import mage.players.Player;
  */
 public abstract class PayCostToAttackBlockEffectImpl extends ReplacementEffectImpl implements PayCostToAttackBlockEffect {
 
-    public static enum RestrictType {
+    public enum RestrictType {
 
         ATTACK("attack"),
         ATTACK_AND_BLOCK("attack or block"),
@@ -64,7 +38,6 @@ public abstract class PayCostToAttackBlockEffectImpl extends ReplacementEffectIm
 
     protected final Cost cost;
     protected final ManaCosts manaCosts;
-
     protected final RestrictType restrictType;
 
     public PayCostToAttackBlockEffectImpl(Duration duration, Outcome outcome, RestrictType restrictType) {
@@ -88,7 +61,7 @@ public abstract class PayCostToAttackBlockEffectImpl extends ReplacementEffectIm
         this.manaCosts = manaCosts;
     }
 
-    public PayCostToAttackBlockEffectImpl(PayCostToAttackBlockEffectImpl effect) {
+    public PayCostToAttackBlockEffectImpl(final PayCostToAttackBlockEffectImpl effect) {
         super(effect);
         if (effect.cost != null) {
             this.cost = effect.cost.copy();
@@ -109,9 +82,9 @@ public abstract class PayCostToAttackBlockEffectImpl extends ReplacementEffectIm
             case ATTACK:
                 return event.getType() == GameEvent.EventType.DECLARE_ATTACKER;
             case BLOCK:
-                return event.getType().equals(GameEvent.EventType.DECLARE_BLOCKER);
+                return event.getType() == EventType.DECLARE_BLOCKER;
             case ATTACK_AND_BLOCK:
-                return event.getType() == GameEvent.EventType.DECLARE_ATTACKER || event.getType().equals(GameEvent.EventType.DECLARE_BLOCKER);
+                return event.getType() == GameEvent.EventType.DECLARE_ATTACKER || event.getType() == EventType.DECLARE_BLOCKER;
         }
         return false;
     }
@@ -120,11 +93,11 @@ public abstract class PayCostToAttackBlockEffectImpl extends ReplacementEffectIm
     public boolean replaceEvent(GameEvent event, Ability source, Game game) {
         ManaCosts attackBlockManaTax = getManaCostToPay(event, source, game);
         if (attackBlockManaTax != null) {
-            return handleManaCosts(attackBlockManaTax, event, source, game);
+            return handleManaCosts(attackBlockManaTax.copy(), event, source, game);
         }
         Cost attackBlockOtherTax = getOtherCostToPay(event, source, game);
         if (attackBlockOtherTax != null) {
-            return handleOtherCosts(attackBlockOtherTax, event, source, game);
+            return handleOtherCosts(attackBlockOtherTax.copy(), event, source, game);
         }
         return false;
     }
@@ -133,7 +106,7 @@ public abstract class PayCostToAttackBlockEffectImpl extends ReplacementEffectIm
         Player player = game.getPlayer(event.getPlayerId());
         if (player != null) {
             String chooseText;
-            if (event.getType().equals(GameEvent.EventType.DECLARE_ATTACKER)) {
+            if (event.getType() == EventType.DECLARE_ATTACKER) {
                 chooseText = "Pay " + attackBlockManaTax.getText() + " to attack?";
             } else {
                 chooseText = "Pay " + attackBlockManaTax.getText() + " to block?";
@@ -158,7 +131,7 @@ public abstract class PayCostToAttackBlockEffectImpl extends ReplacementEffectIm
             attackBlockOtherTax.clearPaid();
             if (attackBlockOtherTax.canPay(source, source.getSourceId(), event.getPlayerId(), game)
                     && player.chooseUse(Outcome.Neutral,
-                            attackBlockOtherTax.getText() + " to " + (event.getType().equals(EventType.DECLARE_ATTACKER) ? "attack?" : "block?"), source, game)) {
+                            attackBlockOtherTax.getText() + " to " + (event.getType() == EventType.DECLARE_ATTACKER ? "attack?" : "block?"), source, game)) {
                 if (attackBlockOtherTax.pay(source, game, source.getSourceId(), event.getPlayerId(), false, null)) {
                     return false;
                 }

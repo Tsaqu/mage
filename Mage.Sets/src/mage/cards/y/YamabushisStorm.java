@@ -30,12 +30,12 @@
 package mage.cards.y;
 
 import java.util.UUID;
-import mage.constants.CardType;
-import mage.constants.Duration;
 import mage.abilities.effects.common.DamageAllEffect;
 import mage.abilities.effects.common.replacement.DealtDamageToCreatureBySourceDies;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
+import mage.constants.CardType;
+import mage.constants.Duration;
 import mage.filter.common.FilterCreaturePermanent;
 import mage.watchers.common.DamagedByWatcher;
 
@@ -43,7 +43,7 @@ import mage.watchers.common.DamagedByWatcher;
  *
  * @author LevelX
  */
-public class YamabushisStorm extends CardImpl {
+public final class YamabushisStorm extends CardImpl {
 
     public YamabushisStorm(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId,setInfo,new CardType[]{CardType.SORCERY},"{1}{R}");

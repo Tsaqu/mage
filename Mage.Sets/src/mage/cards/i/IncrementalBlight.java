@@ -28,12 +28,12 @@
 package mage.cards.i;
 
 import java.util.UUID;
-import mage.constants.CardType;
-import mage.constants.Outcome;
 import mage.abilities.Ability;
 import mage.abilities.effects.OneShotEffect;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
+import mage.constants.CardType;
+import mage.constants.Outcome;
 import mage.counters.CounterType;
 import mage.filter.common.FilterCreaturePermanent;
 import mage.filter.predicate.mageobject.AnotherTargetPredicate;
@@ -46,7 +46,7 @@ import mage.target.common.TargetCreaturePermanent;
  *
  * @author LevelX2
  */
-public class IncrementalBlight extends CardImpl {
+public final class IncrementalBlight extends CardImpl {
 
     public IncrementalBlight(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId,setInfo,new CardType[]{CardType.SORCERY},"{3}{B}{B}");
@@ -105,7 +105,7 @@ class IncrementalBlightEffect extends OneShotEffect {
             i++;
             Permanent creature = game.getPermanent(target.getFirstTarget());
             if (creature != null) {
-                creature.addCounters(CounterType.M1M1.createInstance(i), game);
+                creature.addCounters(CounterType.M1M1.createInstance(i), source, game);
             }
         }
         return false;

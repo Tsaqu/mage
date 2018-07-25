@@ -1,46 +1,20 @@
-/*
- * Copyright 2011 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.sets;
 
 import mage.cards.ExpansionSet;
-import mage.constants.SetType;
 import mage.constants.Rarity;
-import mage.cards.CardGraphicInfo;
+import mage.constants.SetType;
 
 /**
  *
  * @author fireshoes
  */
-public class BlessedVsCursed extends ExpansionSet {
-    private static final BlessedVsCursed fINSTANCE = new BlessedVsCursed();
+public final class BlessedVsCursed extends ExpansionSet {
+
+    private static final BlessedVsCursed instance = new BlessedVsCursed();
 
     public static BlessedVsCursed getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     private BlessedVsCursed() {
@@ -82,12 +56,12 @@ public class BlessedVsCursed extends ExpansionSet {
         cards.add(new SetCardInfo("Havengul Runebinder", 44, Rarity.RARE, mage.cards.h.HavengulRunebinder.class));
         cards.add(new SetCardInfo("Human Frailty", 61, Rarity.UNCOMMON, mage.cards.h.HumanFrailty.class));
         cards.add(new SetCardInfo("Increasing Devotion", 14, Rarity.RARE, mage.cards.i.IncreasingDevotion.class));
-        cards.add(new SetCardInfo("Island", 35, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 36, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 37, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 71, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 72, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 73, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Island", 35, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 36, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 37, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 71, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 72, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 73, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Makeshift Mauler", 45, Rarity.COMMON, mage.cards.m.MakeshiftMauler.class));
         cards.add(new SetCardInfo("Mindwrack Demon", 41, Rarity.MYTHIC, mage.cards.m.MindwrackDemon.class));
         cards.add(new SetCardInfo("Mist Raven", 26, Rarity.COMMON, mage.cards.m.MistRaven.class));
@@ -95,9 +69,9 @@ public class BlessedVsCursed extends ExpansionSet {
         cards.add(new SetCardInfo("Momentary Blink", 15, Rarity.COMMON, mage.cards.m.MomentaryBlink.class));
         cards.add(new SetCardInfo("Moorland Inquisitor", 16, Rarity.COMMON, mage.cards.m.MoorlandInquisitor.class));
         cards.add(new SetCardInfo("Nephalia Smuggler", 27, Rarity.UNCOMMON, mage.cards.n.NephaliaSmuggler.class));
-        cards.add(new SetCardInfo("Plains", 38, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 39, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 40, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Plains", 38, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 39, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 40, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Pore Over the Pages", 28, Rarity.UNCOMMON, mage.cards.p.PoreOverThePages.class));
         cards.add(new SetCardInfo("Rebuke", 17, Rarity.COMMON, mage.cards.r.Rebuke.class));
         cards.add(new SetCardInfo("Relentless Skaabs", 46, Rarity.UNCOMMON, mage.cards.r.RelentlessSkaabs.class));
@@ -109,9 +83,9 @@ public class BlessedVsCursed extends ExpansionSet {
         cards.add(new SetCardInfo("Slayer of the Wicked", 18, Rarity.UNCOMMON, mage.cards.s.SlayerOfTheWicked.class));
         cards.add(new SetCardInfo("Spectral Gateguards", 19, Rarity.COMMON, mage.cards.s.SpectralGateguards.class));
         cards.add(new SetCardInfo("Stitched Drake", 49, Rarity.COMMON, mage.cards.s.StitchedDrake.class));
-        cards.add(new SetCardInfo("Swamp", 74, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 75, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 76, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Swamp", 74, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 75, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 76, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Tandem Lookout", 29, Rarity.UNCOMMON, mage.cards.t.TandemLookout.class));
         cards.add(new SetCardInfo("Thraben Heretic", 20, Rarity.UNCOMMON, mage.cards.t.ThrabenHeretic.class));
         cards.add(new SetCardInfo("Tooth Collector", 64, Rarity.UNCOMMON, mage.cards.t.ToothCollector.class));

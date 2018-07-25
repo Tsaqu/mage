@@ -1,0 +1,32 @@
+
+package mage.game.permanent.token;
+
+import mage.constants.CardType;
+import mage.constants.SubType;
+import mage.MageInt;
+import mage.abilities.keyword.AnnihilatorAbility;
+
+/**
+ *
+ * @author spjspj
+ */
+public final class EldraziAnnihilatorToken extends TokenImpl {
+
+    public EldraziAnnihilatorToken() {
+        super("Eldrazi", "7/7 colorless Eldrazi creature token");
+        cardType.add(CardType.CREATURE);
+        subtype.add(SubType.ELDRAZI);
+        setExpansionSetCodeForImage("PCA");
+        power = new MageInt(7);
+        toughness = new MageInt(7);
+        addAbility(new AnnihilatorAbility(1));
+    }
+
+    public EldraziAnnihilatorToken(final EldraziAnnihilatorToken token) {
+        super(token);
+    }
+
+    public EldraziAnnihilatorToken copy() {
+        return new EldraziAnnihilatorToken(this);
+    }
+}

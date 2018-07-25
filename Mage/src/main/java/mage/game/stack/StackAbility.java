@@ -1,45 +1,14 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.game.stack;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 import mage.MageInt;
 import mage.MageObject;
 import mage.ObjectColor;
-import mage.abilities.Abilities;
-import mage.abilities.AbilitiesImpl;
-import mage.abilities.Ability;
-import mage.abilities.MageSingleton;
-import mage.abilities.Mode;
-import mage.abilities.Modes;
-import mage.abilities.StateTriggeredAbility;
+import mage.abilities.*;
 import mage.abilities.costs.Cost;
 import mage.abilities.costs.Costs;
 import mage.abilities.costs.CostsImpl;
@@ -48,21 +17,19 @@ import mage.abilities.costs.mana.ManaCosts;
 import mage.abilities.costs.mana.ManaCostsImpl;
 import mage.abilities.effects.Effect;
 import mage.abilities.effects.Effects;
+import mage.abilities.text.TextPart;
 import mage.cards.Card;
 import mage.cards.FrameStyle;
-import mage.constants.AbilityType;
-import mage.constants.AbilityWord;
-import mage.constants.CardType;
-import mage.constants.EffectType;
-import mage.constants.Zone;
-import mage.constants.ZoneDetail;
+import mage.constants.*;
 import mage.game.Game;
 import mage.game.events.GameEvent;
 import mage.game.events.ZoneChangeEvent;
+import mage.game.permanent.Permanent;
 import mage.players.Player;
 import mage.target.Target;
 import mage.target.Targets;
 import mage.util.GameLog;
+import mage.util.SubTypeList;
 import mage.watchers.Watcher;
 
 /**
@@ -71,7 +38,7 @@ import mage.watchers.Watcher;
  */
 public class StackAbility extends StackObjImpl implements Ability {
 
-    private static List<CardType> emptyCardType = new ArrayList<>();
+    private static EnumSet<CardType> emptyCardType = EnumSet.noneOf(CardType.class);
     private static List<String> emptyString = new ArrayList<>();
     private static ObjectColor emptyColor = new ObjectColor();
     private static ManaCosts<ManaCost> emptyCost = new ManaCostsImpl<>();
@@ -82,11 +49,12 @@ public class StackAbility extends StackObjImpl implements Ability {
     private UUID controllerId;
     private String name;
     private String expansionSetCode;
+    private TargetAdjustment targetAdjustment = TargetAdjustment.NONE;
 
     public StackAbility(Ability ability, UUID controllerId) {
         this.ability = ability;
         this.controllerId = controllerId;
-        this.name = "stack ability (" + ability.getRule() + ")";
+        this.name = "stack ability (" + ability.getRule() + ')';
     }
 
     public StackAbility(final StackAbility stackAbility) {
@@ -94,6 +62,8 @@ public class StackAbility extends StackObjImpl implements Ability {
         this.controllerId = stackAbility.controllerId;
         this.name = stackAbility.name;
         this.expansionSetCode = stackAbility.expansionSetCode;
+        this.targetAdjustment = stackAbility.targetAdjustment;
+        this.targetChanged = stackAbility.targetChanged;
     }
 
     @Override
@@ -105,14 +75,14 @@ public class StackAbility extends StackObjImpl implements Ability {
     public boolean resolve(Game game) {
         if (ability.getTargets().stillLegal(ability, game) || !canFizzle()) {
             boolean result = ability.resolve(game);
-            game.getStack().remove(this);
+            game.getStack().remove(this, game);
             return result;
         }
         if (!game.isSimulation()) {
             game.informPlayers("Ability has been fizzled: " + getRule());
         }
         counter(null, game);
-        game.getStack().remove(this);
+        game.getStack().remove(this, game);
         return false;
     }
 
@@ -141,7 +111,7 @@ public class StackAbility extends StackObjImpl implements Ability {
 
     @Override
     public String getIdName() {
-        return getName() + " [" + getId().toString().substring(0, 3) + "]";
+        return getName() + " [" + getId().toString().substring(0, 3) + ']';
     }
 
     @Override
@@ -159,23 +129,23 @@ public class StackAbility extends StackObjImpl implements Ability {
     }
 
     @Override
-    public List<CardType> getCardType() {
+    public EnumSet<CardType> getCardType() {
         return emptyCardType;
     }
 
     @Override
-    public List<String> getSubtype(Game game) {
-        return emptyString;
+    public SubTypeList getSubtype(Game game) {
+        return new SubTypeList();
     }
 
     @Override
-    public boolean hasSubtype(String subtype, Game game) {
+    public boolean hasSubtype(SubType subtype, Game game) {
         return false;
     }
 
     @Override
-    public List<String> getSupertype() {
-        return emptyString;
+    public EnumSet<SuperType> getSuperType() {
+        return EnumSet.noneOf(SuperType.class);
     }
 
     @Override
@@ -194,7 +164,7 @@ public class StackAbility extends StackObjImpl implements Ability {
     public ObjectColor getColor(Game game) {
         return emptyColor;
     }
-    
+
     @Override
     public ObjectColor getFrameColor(Game game) {
         return ability.getSourceObject(game).getFrameColor(game);
@@ -220,7 +190,7 @@ public class StackAbility extends StackObjImpl implements Ability {
     public MageInt getToughness() {
         return MageInt.EmptyMageInt;
     }
-    
+
     @Override
     public int getStartingLoyalty() {
         return 0;
@@ -453,8 +423,9 @@ public class StackAbility extends StackObjImpl implements Ability {
     }
 
     @Override
-    public void setRuleAtTheTop(boolean ruleAtTheTop) {
+    public Ability setRuleAtTheTop(boolean ruleAtTheTop) {
         this.ability.setRuleAtTheTop(ruleAtTheTop);
+        return this;
     }
 
     @Override
@@ -534,17 +505,22 @@ public class StackAbility extends StackObjImpl implements Ability {
 
     @Override
     public MageObject getSourceObject(Game game) {
-        return game.getBaseObject(getSourceId());
+        return this.ability.getSourceObject(game);
     }
 
     @Override
     public MageObject getSourceObjectIfItStillExists(Game game) {
-        throw new UnsupportedOperationException("Not supported.");
+        return this.ability.getSourceObjectIfItStillExists(game);
+    }
+
+    @Override
+    public Permanent getSourcePermanentIfItStillExists(Game game) {
+        return this.ability.getSourcePermanentIfItStillExists(game);
     }
 
     @Override
     public int getSourceObjectZoneChangeCounter() {
-        throw new UnsupportedOperationException("Not supported.");
+        return ability.getSourceObjectZoneChangeCounter();
     }
 
     @Override
@@ -588,14 +564,44 @@ public class StackAbility extends StackObjImpl implements Ability {
         newAbility.newId();
         StackAbility newStackAbility = new StackAbility(newAbility, newControllerId);
         game.getStack().push(newStackAbility);
-        if (chooseNewTargets && newAbility.getTargets().size() > 0) {
+        if (chooseNewTargets && !newAbility.getTargets().isEmpty()) {
             Player controller = game.getPlayer(newControllerId);
-            if (controller.chooseUse(newAbility.getEffects().get(0).getOutcome(), "Choose new targets?", source, game)) {
+            Outcome outcome = newAbility.getEffects().isEmpty() ? Outcome.Detriment : newAbility.getEffects().get(0).getOutcome();
+            if (controller.chooseUse(outcome, "Choose new targets?", source, game)) {
                 newAbility.getTargets().clearChosen();
-                newAbility.getTargets().chooseTargets(newAbility.getEffects().get(0).getOutcome(), newControllerId, newAbility, false, game);
+                newAbility.getTargets().chooseTargets(outcome, newControllerId, newAbility, false, game);
             }
         }
         game.fireEvent(new GameEvent(GameEvent.EventType.COPIED_STACKOBJECT, newStackAbility.getId(), this.getId(), newControllerId));
         return newStackAbility;
+    }
+
+    @Override
+    public boolean isAllCreatureTypes() {
+        return false;
+    }
+
+    @Override
+    public void setIsAllCreatureTypes(boolean value) {
+    }
+
+    @Override
+    public List<TextPart> getTextParts() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public TextPart addTextPart(TextPart textPart) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setTargetAdjustment(TargetAdjustment targetAdjustment) {
+        this.targetAdjustment = targetAdjustment;
+    }
+
+    @Override
+    public TargetAdjustment getTargetAdjustment() {
+        return targetAdjustment;
     }
 }

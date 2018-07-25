@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.decks.importer;
 
 import java.util.ArrayList;
@@ -49,7 +23,7 @@ public class DckDeckImporter extends DeckImporter {
 
     private static final Pattern layoutStackPattern = Pattern.compile("\\(([^)]*)\\)");
 
-    private static final Pattern layoutStackEntryPattern = Pattern.compile("\\[(\\w+):(\\w+)]");
+    private static final Pattern layoutStackEntryPattern = Pattern.compile("\\[(\\w+[^:]*\\w*):(\\d+\\w*)]"); // [JR:64ab],[JR:64],[MPSAK1321:43],[MPSAKH:9],[MPS123-AKH:32],[MPS-13AKH:30],[MPS-AKH:49],[MPS-AKH:11]
 
     @Override
     protected void readLine(String line, DeckCardLists deckList) {
@@ -67,22 +41,47 @@ public class DckDeckImporter extends DeckImporter {
             int count = Integer.parseInt(m.group(2));
             String setCode = m.group(3);
             String cardNum = m.group(4);
+            String cardName = m.group(5);
+
+            cardNum = cardNum == null ? "" : cardNum.trim();
+            setCode = setCode == null ? "" : setCode.trim();
+            cardName = cardName == null ? "" : cardName.trim();
+
+            // search priority: set/code -> name
+            // with bulletproof on card number or name changes
 
             DeckCardInfo deckCardInfo = null;
-            CardInfo cardInfo = CardRepository.instance.findCard(setCode, cardNum);
-            if (cardInfo == null) {
-                // Try alternate based on name
-                String cardName = m.group(5);
-                if (cardName != null && cardName.length() > 0) {
-                    cardInfo = CardRepository.instance.findPreferedCoreExpansionCard(cardName, false);
-                    sbMessage.append("Could not find card '" + cardName + "' in set " + setCode + " of number " + cardNum + ".\n");
-                    if (cardInfo != null) {
-                        sbMessage.append("Made substitution of " + cardInfo.getCardNumber() + ", " + cardInfo.getCard().getExpansionSetCode() + " instead.\n");
-                    }
-                }                
+
+            // search by number
+            CardInfo foundedCard = CardRepository.instance.findCard(setCode, cardNum);
+            boolean wasOutdated = false;
+            if ((foundedCard != null) && !foundedCard.getName().equals(cardName)){
+                sbMessage.append("Line ").append(lineCount).append(": ").append("founded outdated card number or name, will try to replace: ").append(line).append('\n');
+                wasOutdated = true;
+                foundedCard = null;
             }
-            if (cardInfo != null) {
-                deckCardInfo = new DeckCardInfo(cardInfo.getName(), cardInfo.getCardNumber(), cardInfo.getSetCode());
+
+            // search by name
+            if (foundedCard == null) {
+                if(!wasOutdated){
+                    sbMessage.append("Line ").append(lineCount).append(": ").append("can't find card by number, will try ro replace: ").append(line).append('\n');
+                }
+
+                if (!cardName.equals("")) {
+                    foundedCard = CardRepository.instance.findPreferedCoreExpansionCard(cardName, false, setCode);
+                }
+
+                if (foundedCard != null) {
+                    sbMessage.append("Line ").append(lineCount).append(": ")
+                            .append("replaced to [").append(foundedCard.getSetCode()).append(":").append(foundedCard.getCardNumberAsInt()).append("] ")
+                            .append(foundedCard.getName()).append('\n');
+                }else{
+                    sbMessage.append("Line ").append(lineCount).append(": ").append("ERROR, can't find card [").append(cardName).append("]").append('\n');
+                }
+            }
+
+            if (foundedCard != null) {
+                deckCardInfo = new DeckCardInfo(foundedCard.getName(), foundedCard.getCardNumber(), foundedCard.getSetCode());
             }
             if (deckCardInfo != null) {
                 for (int i = 0; i < count; i++) {
@@ -92,8 +91,6 @@ public class DckDeckImporter extends DeckImporter {
                         deckList.getSideboard().add(deckCardInfo);
                     }
                 }
-            } else {
-                sbMessage.append("Could not find card '").append("' at line ").append(lineCount).append(": ").append(line).append("\n");
             }
         } else if (line.startsWith("NAME:")) {
             deckList.setName(line.substring(5, line.length()));

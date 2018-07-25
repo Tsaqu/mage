@@ -10,6 +10,7 @@ import mage.abilities.effects.RedirectionEffect;
 import mage.constants.Duration;
 import mage.game.Game;
 import mage.game.events.GameEvent;
+import mage.game.permanent.Permanent;
 
 /**
  *
@@ -17,8 +18,8 @@ import mage.game.events.GameEvent;
  */
 public class RedirectDamageFromSourceToTargetEffect extends RedirectionEffect {
 
-    public RedirectDamageFromSourceToTargetEffect(Duration duration, int amountToRedirect, boolean oneUsage) {
-        super(duration, amountToRedirect, oneUsage);
+    public RedirectDamageFromSourceToTargetEffect(Duration duration, int amountToRedirect, UsageType usageType) {
+        super(duration, amountToRedirect, usageType);
         staticText = "The next " + amountToRedirect + " damage that would be dealt to {this} this turn is dealt to target creature you control instead.";
     }
 
@@ -33,9 +34,14 @@ public class RedirectDamageFromSourceToTargetEffect extends RedirectionEffect {
 
     @Override
     public boolean applies(GameEvent event, Ability source, Game game) {
-        if (event.getTargetId().equals(source.getSourceId())) {
-            this.redirectTarget = source.getTargets().get(0);
-            return true;
+        Permanent permanent = game.getBattlefield().getPermanent(source.getSourceId());
+        if (permanent != null) {
+            if (event.getTargetId().equals(source.getSourceId())) {
+                if (getTargetPointer().getFirst(game, source) != null) {
+                    this.redirectTarget = source.getTargets().get(0);
+                    return true;
+                }
+            }
         }
         return false;
     }

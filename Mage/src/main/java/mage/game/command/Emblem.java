@@ -1,36 +1,11 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.game.command;
 
-import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 import mage.MageInt;
+import mage.MageObject;
 import mage.ObjectColor;
 import mage.abilities.Abilities;
 import mage.abilities.AbilitiesImpl;
@@ -38,28 +13,35 @@ import mage.abilities.Ability;
 import mage.abilities.costs.mana.ManaCost;
 import mage.abilities.costs.mana.ManaCosts;
 import mage.abilities.costs.mana.ManaCostsImpl;
+import mage.abilities.effects.ContinuousEffect;
+import mage.abilities.effects.Effect;
+import mage.abilities.text.TextPart;
+import mage.cards.Card;
 import mage.cards.FrameStyle;
 import mage.constants.CardType;
+import mage.constants.SubType;
+import mage.constants.SuperType;
 import mage.game.Game;
 import mage.game.events.ZoneChangeEvent;
 import mage.util.GameLog;
+import mage.util.SubTypeList;
 
 /**
  * @author nantuko
  */
 public class Emblem implements CommandObject {
 
-    private static List emptyList = new ArrayList();
+    private static EnumSet<CardType> emptySet = EnumSet.noneOf(CardType.class);
     private static ObjectColor emptyColor = new ObjectColor();
     private static ManaCosts emptyCost = new ManaCostsImpl();
 
-    private String name;
+    private String name = "";
     private UUID id;
     private UUID controllerId;
-    private UUID sourceId;
+    private MageObject sourceObject;
     private FrameStyle frameStyle;
     private Abilities<Ability> abilites = new AbilitiesImpl<>();
-    private String expansionSetCodeForImage = null;
+    private String expansionSetCodeForImage = "";
 
     public Emblem() {
         this.id = UUID.randomUUID();
@@ -70,8 +52,9 @@ public class Emblem implements CommandObject {
         this.name = emblem.name;
         this.frameStyle = emblem.frameStyle;
         this.controllerId = emblem.controllerId;
-        this.sourceId = emblem.sourceId;
+        this.sourceObject = emblem.sourceObject;
         this.abilites = emblem.abilites.copy();
+        this.expansionSetCodeForImage = emblem.expansionSetCodeForImage;
     }
 
     @Override
@@ -84,9 +67,29 @@ public class Emblem implements CommandObject {
         this.id = UUID.randomUUID();
     }
 
+    public void setSourceObject(MageObject sourceObject) {
+        this.sourceObject = sourceObject;
+        if (sourceObject instanceof Card) {
+            if (name.isEmpty()) {
+                name = sourceObject.getSubtype(null).toString();
+            }
+            if (expansionSetCodeForImage.isEmpty()) {
+                expansionSetCodeForImage = ((Card) sourceObject).getExpansionSetCode();
+            }
+        }
+    }
+
+    @Override
+    public MageObject getSourceObject() {
+        return sourceObject;
+    }
+
     @Override
     public UUID getSourceId() {
-        return this.sourceId;
+        if (sourceObject != null) {
+            return sourceObject.getId();
+        }
+        return null;
     }
 
     @Override
@@ -99,10 +102,6 @@ public class Emblem implements CommandObject {
         this.abilites.setControllerId(controllerId);
     }
 
-    public void setSourceId(UUID sourceId) {
-        this.sourceId = sourceId;
-    }
-
     @Override
     public String getName() {
         return name;
@@ -110,7 +109,7 @@ public class Emblem implements CommandObject {
 
     @Override
     public String getIdName() {
-        return getName() + " [" + getId().toString().substring(0, 3) + "]";
+        return getName() + " [" + getId().toString().substring(0, 3) + ']';
     }
 
     @Override
@@ -129,23 +128,23 @@ public class Emblem implements CommandObject {
     }
 
     @Override
-    public List<CardType> getCardType() {
-        return emptyList;
+    public EnumSet<CardType> getCardType() {
+        return emptySet;
     }
 
     @Override
-    public List<String> getSubtype(Game game) {
-        return emptyList;
+    public SubTypeList getSubtype(Game game) {
+        return new SubTypeList();
     }
 
     @Override
-    public boolean hasSubtype(String subtype, Game game) {
+    public boolean hasSubtype(SubType subtype, Game game) {
         return false;
     }
 
     @Override
-    public List<String> getSupertype() {
-        return emptyList;
+    public EnumSet<SuperType> getSuperType() {
+        return EnumSet.noneOf(SuperType.class);
     }
 
     @Override
@@ -162,8 +161,8 @@ public class Emblem implements CommandObject {
     public ObjectColor getColor(Game game) {
         return emptyColor;
     }
-    
-    @Override 
+
+    @Override
     public ObjectColor getFrameColor(Game game) {
         return emptyColor;
     }
@@ -187,7 +186,7 @@ public class Emblem implements CommandObject {
     public MageInt getToughness() {
         return MageInt.EmptyMageInt;
     }
-    
+
     @Override
     public int getStartingLoyalty() {
         return 0;
@@ -243,4 +242,34 @@ public class Emblem implements CommandObject {
         throw new UnsupportedOperationException("Unsupported operation");
     }
 
+    public boolean isAllCreatureTypes() {
+        return false;
+    }
+
+    public void setIsAllCreatureTypes(boolean value) {
+    }
+
+    public void discardEffects() {
+        for (Ability ability : abilites) {
+            for (Effect effect : ability.getEffects()) {
+                if (effect instanceof ContinuousEffect) {
+                    ((ContinuousEffect) effect).discard();
+                }
+            }
+        }
+    }
+
+    @Override
+    public List<TextPart> getTextParts() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public TextPart addTextPart(TextPart textPart) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void removePTCDA() {
+    }
 }

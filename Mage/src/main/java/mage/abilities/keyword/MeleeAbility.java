@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.abilities.keyword;
 
 import java.util.HashMap;
@@ -47,7 +21,7 @@ import mage.watchers.Watcher;
  *
  * @author emerald000
  */
-public class MeleeAbility extends AttacksTriggeredAbility {
+public class MeleeAbility extends AttacksTriggeredAbility { 
 
     public MeleeAbility() {
         super(new BoostSourceEffect(new MeleeDynamicValue(), new MeleeDynamicValue(), Duration.EndOfTurn), false);
@@ -71,7 +45,7 @@ public class MeleeAbility extends AttacksTriggeredAbility {
 
 class MeleeWatcher extends Watcher {
 
-    private final HashMap<UUID, Set<UUID>> playersAttacked = new HashMap<>(0);
+    private HashMap<UUID, Set<UUID>> playersAttacked = new HashMap<>(0);
 
     MeleeWatcher() {
         super("MeleeWatcher", WatcherScope.GAME);
@@ -95,7 +69,10 @@ class MeleeWatcher extends Watcher {
     }
 
     public int getNumberOfAttackedPlayers(UUID attackerId) {
-        return this.playersAttacked.get(attackerId).size();
+        if (this.playersAttacked.get(attackerId) != null) {
+            return this.playersAttacked.get(attackerId).size();
+        }
+        return 0;
     }
 
     @Override
@@ -106,11 +83,18 @@ class MeleeWatcher extends Watcher {
 
 class MeleeDynamicValue implements DynamicValue {
 
+    private boolean valueChecked = false;
+    private int lockedInValue;
+
     @Override
     public int calculate(Game game, Ability sourceAbility, Effect effect) {
-        MeleeWatcher watcher = (MeleeWatcher) game.getState().getWatchers().get("MeleeWatcher");
+        MeleeWatcher watcher = (MeleeWatcher) game.getState().getWatchers().get(MeleeWatcher.class.getSimpleName());
         if (watcher != null) {
-            return watcher.getNumberOfAttackedPlayers(sourceAbility.getControllerId());
+            if (!valueChecked) {
+                this.lockedInValue = watcher.getNumberOfAttackedPlayers(sourceAbility.getControllerId());
+                valueChecked = true;
+            }
+            return this.lockedInValue;
         }
         return 0;
     }

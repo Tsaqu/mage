@@ -16,11 +16,7 @@ import mage.abilities.effects.common.cost.CostModificationEffectImpl;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.choices.ChoiceImpl;
-import mage.constants.CardType;
-import mage.constants.CostModificationType;
-import mage.constants.Duration;
-import mage.constants.Outcome;
-import mage.constants.Zone;
+import mage.constants.*;
 import mage.game.Game;
 import mage.game.permanent.Permanent;
 import mage.game.stack.Spell;
@@ -31,16 +27,15 @@ import mage.util.CardUtil;
  *
  * @author nick.myers
  */
-public class CloudKey extends CardImpl {
+public final class CloudKey extends CardImpl {
 
     public CloudKey(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId,setInfo,new CardType[]{CardType.ARTIFACT},"{3}");
 
-        // As Cloud Key enters the battlefield, choose artifact, creature,
-        // enchantment, instant, or sorcery.
+        // As Cloud Key enters the battlefield, choose artifact, creature, enchantment, instant, or sorcery.
         this.addAbility(new AsEntersBattlefieldAbility(new CloudKeyChooseTypeEffect()));
 
-        // Spells of the chosen type cost {1} less to cast
+        // Spells you cast of the chosen type cost {1} less to cast.
         this.addAbility(new SimpleStaticAbility(Zone.BATTLEFIELD, new CloudKeyCostModificationEffect()));
     }
 
@@ -103,7 +98,7 @@ class CloudKeyCostModificationEffect extends CostModificationEffectImpl {
 
     public CloudKeyCostModificationEffect() {
         super(Duration.WhileOnBattlefield, Outcome.Benefit, CostModificationType.REDUCE_COST);
-        this.staticText = "Spells of the chosen type cost {1} less to cast.";
+        this.staticText = "Spells you cast of the chosen type cost {1} less to cast.";
     }
 
     public CloudKeyCostModificationEffect(final CloudKeyCostModificationEffect effect) {
@@ -124,7 +119,7 @@ class CloudKeyCostModificationEffect extends CostModificationEffectImpl {
 
     @Override
     public boolean applies(Ability abilityToModify, Ability source, Game game) {
-        if (abilityToModify instanceof SpellAbility && abilityToModify.getControllerId().equals(source.getControllerId())) {
+        if (abilityToModify instanceof SpellAbility && abilityToModify.isControlledBy(source.getControllerId())) {
             Spell spell = game.getStack().getSpell(abilityToModify.getSourceId());
             if (spell != null && spell.getCardType().toString().contains((String) game.getState().getValue(source.getSourceId().toString() + "_CloudKey"))) {
                 return true;

@@ -5,8 +5,6 @@
  */
 package mage.abilities.effects.common;
 
-import java.util.ArrayList;
-import java.util.List;
 import mage.abilities.Ability;
 import mage.abilities.Mode;
 import mage.abilities.effects.ReplacementEffectImpl;
@@ -14,6 +12,7 @@ import mage.cards.Cards;
 import mage.cards.CardsImpl;
 import mage.constants.Duration;
 import mage.constants.Outcome;
+import mage.constants.SubType;
 import mage.counters.CounterType;
 import mage.filter.common.FilterCreatureCard;
 import mage.filter.predicate.Predicates;
@@ -25,13 +24,16 @@ import mage.game.permanent.Permanent;
 import mage.players.Player;
 import mage.target.common.TargetCardInHand;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Effect for the AmplifyAbility
  *
  * 702.37. Amplify 702.37a Amplify is a static ability. “Amplify N” means “As
  * this object enters the battlefield, reveal any number of cards from your hand
  * that share a creature type with it. This permanent enters the battlefield
- * with N +1/+1 counters on it for each card revealed this way. You can’t reveal
+ * with N +1/+1 counters on it for each card revealed this way. You can't reveal
  * this card or any other cards that are entering the battlefield at the same
  * time as this card.” 702.37b If a creature has multiple instances of amplify,
  * each one works separately.
@@ -100,8 +102,8 @@ public class AmplifyEffect extends ReplacementEffectImpl {
         if (controller != null && sourceCreature != null) {
             FilterCreatureCard filter = new FilterCreatureCard("creatures cards to reveal");
             List<SubtypePredicate> filterSubtypes = new ArrayList<>();
-            for (String subtype : sourceCreature.getSubtype(game)) {
-                filterSubtypes.add(new SubtypePredicate((subtype)));
+            for (SubType subtype : sourceCreature.getSubtype(game)) {
+                filterSubtypes.add(new SubtypePredicate(subtype));
             }
             if (filterSubtypes.size() > 1) {
                 filter.add(Predicates.or(filterSubtypes));
@@ -115,7 +117,7 @@ public class AmplifyEffect extends ReplacementEffectImpl {
                         Cards cards = new CardsImpl();
                         cards.addAll(target.getTargets());
                         int amountCounters = cards.size() * amplifyFactor.getFactor();
-                        sourceCreature.addCounters(CounterType.P1P1.createInstance(amountCounters), game);
+                        sourceCreature.addCounters(CounterType.P1P1.createInstance(amountCounters), source, game);
                         controller.revealCards(sourceCreature.getIdName(), cards, game);
                     }
                 }

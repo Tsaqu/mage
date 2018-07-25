@@ -1,49 +1,20 @@
-/*
-* Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are
-* permitted provided that the following conditions are met:
-*
-*    1. Redistributions of source code must retain the above copyright notice, this list of
-*       conditions and the following disclaimer.
-*
-*    2. Redistributions in binary form must reproduce the above copyright notice, this list
-*       of conditions and the following disclaimer in the documentation and/or other materials
-*       provided with the distribution.
-*
-* THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-* FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*
-* The views and conclusions contained in the software and documentation are those of the
-* authors and should not be interpreted as representing official policies, either expressed
-* or implied, of BetaSteward_at_googlemail.com.
-*/
 
 package mage.sets;
 
-import mage.constants.SetType;
 import mage.cards.ExpansionSet;
 import mage.constants.Rarity;
-import mage.cards.CardGraphicInfo;
+import mage.constants.SetType;
 
 /**
  *
  * @author LevelX2
  */
+public final class Commander extends ExpansionSet {
 
-public class Commander extends ExpansionSet {
-
-    private static final Commander fINSTANCE = new Commander();
+    private static final Commander instance = new Commander();
 
     public static Commander getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     private Commander() {
@@ -78,6 +49,7 @@ public class Commander extends ExpansionSet {
         cards.add(new SetCardInfo("Baloth Woodcrasher", 143, Rarity.UNCOMMON, mage.cards.b.BalothWoodcrasher.class));
         cards.add(new SetCardInfo("Barren Moor", 266, Rarity.COMMON, mage.cards.b.BarrenMoor.class));
         cards.add(new SetCardInfo("Basandra, Battle Seraph", 184, Rarity.RARE, mage.cards.b.BasandraBattleSeraph.class));
+        cards.add(new SetCardInfo("Bathe in Light", 9, Rarity.UNCOMMON, mage.cards.b.BatheInLight.class));
         cards.add(new SetCardInfo("Bestial Menace", 144, Rarity.UNCOMMON, mage.cards.b.BestialMenace.class));
         cards.add(new SetCardInfo("Bladewing the Risen", 185, Rarity.RARE, mage.cards.b.BladewingTheRisen.class));
         cards.add(new SetCardInfo("Bojuka Bog", 267, Rarity.COMMON, mage.cards.b.BojukaBog.class));
@@ -153,10 +125,10 @@ public class Commander extends ExpansionSet {
         cards.add(new SetCardInfo("Flusterstorm", 46, Rarity.RARE, mage.cards.f.Flusterstorm.class));
         cards.add(new SetCardInfo("Fog Bank", 47, Rarity.UNCOMMON, mage.cards.f.FogBank.class));
         cards.add(new SetCardInfo("Footbottom Feast", 84, Rarity.COMMON, mage.cards.f.FootbottomFeast.class));
-        cards.add(new SetCardInfo("Forest", 315, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 316, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 317, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 318, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Forest", 315, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 316, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 317, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 318, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Forgotten Cave", 273, Rarity.COMMON, mage.cards.f.ForgottenCave.class));
         cards.add(new SetCardInfo("Fungal Reaches", 274, Rarity.UNCOMMON, mage.cards.f.FungalReaches.class));
         cards.add(new SetCardInfo("Furnace Whelp", 124, Rarity.UNCOMMON, mage.cards.f.FurnaceWhelp.class));
@@ -186,10 +158,10 @@ public class Commander extends ExpansionSet {
         cards.add(new SetCardInfo("Insurrection", 126, Rarity.RARE, mage.cards.i.Insurrection.class));
         cards.add(new SetCardInfo("Intet, the Dreamer", 204, Rarity.RARE, mage.cards.i.IntetTheDreamer.class));
         cards.add(new SetCardInfo("Invigorate", 162, Rarity.COMMON, mage.cards.i.Invigorate.class));
-        cards.add(new SetCardInfo("Island", 303, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 304, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 305, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 306, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Island", 303, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 304, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 305, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 306, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Izzet Boilerworks", 278, Rarity.COMMON, mage.cards.i.IzzetBoilerworks.class));
         cards.add(new SetCardInfo("Izzet Chronarch", 205, Rarity.COMMON, mage.cards.i.IzzetChronarch.class));
         cards.add(new SetCardInfo("Izzet Signet", 252, Rarity.COMMON, mage.cards.i.IzzetSignet.class));
@@ -212,6 +184,7 @@ public class Commander extends ExpansionSet {
         cards.add(new SetCardInfo("Malfegor", 208, Rarity.MYTHIC, mage.cards.m.Malfegor.class));
         cards.add(new SetCardInfo("Mana-Charged Dragon", 129, Rarity.RARE, mage.cards.m.ManaChargedDragon.class));
         cards.add(new SetCardInfo("Martyr's Bond", 19, Rarity.RARE, mage.cards.m.MartyrsBond.class));
+        cards.add(new SetCardInfo("Master Warcraft", 209, Rarity.RARE, mage.cards.m.MasterWarcraft.class));
         cards.add(new SetCardInfo("Memory Erosion", 50, Rarity.RARE, mage.cards.m.MemoryErosion.class));
         cards.add(new SetCardInfo("Minds Aglow", 51, Rarity.RARE, mage.cards.m.MindsAglow.class));
         cards.add(new SetCardInfo("Molten Slagheap", 282, Rarity.UNCOMMON, mage.cards.m.MoltenSlagheap.class));
@@ -219,10 +192,10 @@ public class Commander extends ExpansionSet {
         cards.add(new SetCardInfo("Mortify", 211, Rarity.UNCOMMON, mage.cards.m.Mortify.class));
         cards.add(new SetCardInfo("Mortivore", 89, Rarity.RARE, mage.cards.m.Mortivore.class));
         cards.add(new SetCardInfo("Mother of Runes", 21, Rarity.UNCOMMON, mage.cards.m.MotherOfRunes.class));
-        cards.add(new SetCardInfo("Mountain", 311, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 312, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 313, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 314, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Mountain", 311, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 312, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 313, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 314, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Mulldrifter", 52, Rarity.COMMON, mage.cards.m.Mulldrifter.class));
         cards.add(new SetCardInfo("Murmurs from Beyond", 53, Rarity.COMMON, mage.cards.m.MurmursFromBeyond.class));
         cards.add(new SetCardInfo("Nantuko Husk", 90, Rarity.UNCOMMON, mage.cards.n.NantukoHusk.class));
@@ -245,10 +218,10 @@ public class Commander extends ExpansionSet {
         cards.add(new SetCardInfo("Patron of the Nezumi", 93, Rarity.RARE, mage.cards.p.PatronOfTheNezumi.class));
         cards.add(new SetCardInfo("Penumbra Spider", 167, Rarity.COMMON, mage.cards.p.PenumbraSpider.class));
         cards.add(new SetCardInfo("Perilous Research", 54, Rarity.UNCOMMON, mage.cards.p.PerilousResearch.class));
-        cards.add(new SetCardInfo("Plains", 299, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 300, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 301, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 302, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Plains", 299, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 300, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 301, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 302, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Plumeveil", 218, Rarity.UNCOMMON, mage.cards.p.Plumeveil.class));
         cards.add(new SetCardInfo("Pollen Lullaby", 26, Rarity.UNCOMMON, mage.cards.p.PollenLullaby.class));
         cards.add(new SetCardInfo("Prison Term", 27, Rarity.UNCOMMON, mage.cards.p.PrisonTerm.class));
@@ -267,7 +240,7 @@ public class Commander extends ExpansionSet {
         cards.add(new SetCardInfo("Relic Crush", 168, Rarity.COMMON, mage.cards.r.RelicCrush.class));
         cards.add(new SetCardInfo("Repulse", 58, Rarity.COMMON, mage.cards.r.Repulse.class));
         cards.add(new SetCardInfo("Return to Dust", 28, Rarity.UNCOMMON, mage.cards.r.ReturnToDust.class));
-	cards.add(new SetCardInfo("Riddlekeeper", 59, Rarity.RARE, mage.cards.r.Riddlekeeper.class));
+        cards.add(new SetCardInfo("Riddlekeeper", 59, Rarity.RARE, mage.cards.r.Riddlekeeper.class));
         cards.add(new SetCardInfo("Righteous Cause", 29, Rarity.UNCOMMON, mage.cards.r.RighteousCause.class));
         cards.add(new SetCardInfo("Riku of Two Reflections", 220, Rarity.MYTHIC, mage.cards.r.RikuOfTwoReflections.class));
         cards.add(new SetCardInfo("Rise from the Grave", 96, Rarity.UNCOMMON, mage.cards.r.RiseFromTheGrave.class));
@@ -278,6 +251,7 @@ public class Commander extends ExpansionSet {
         cards.add(new SetCardInfo("Savage Twister", 222, Rarity.UNCOMMON, mage.cards.s.SavageTwister.class));
         cards.add(new SetCardInfo("Scattering Stroke", 60, Rarity.UNCOMMON, mage.cards.s.ScatteringStroke.class));
         cards.add(new SetCardInfo("Scavenging Ooze", 170, Rarity.RARE, mage.cards.s.ScavengingOoze.class));
+        cards.add(new SetCardInfo("Scythe Specter", 97, Rarity.RARE, mage.cards.s.ScytheSpecter.class));
         cards.add(new SetCardInfo("Secluded Steppe", 286, Rarity.COMMON, mage.cards.s.SecludedSteppe.class));
         cards.add(new SetCardInfo("Selesnya Evangel", 223, Rarity.COMMON, mage.cards.s.SelesnyaEvangel.class));
         cards.add(new SetCardInfo("Selesnya Guildmage", 224, Rarity.UNCOMMON, mage.cards.s.SelesnyaGuildmage.class));
@@ -311,10 +285,10 @@ public class Commander extends ExpansionSet {
         cards.add(new SetCardInfo("Stranglehold", 136, Rarity.RARE, mage.cards.s.Stranglehold.class));
         cards.add(new SetCardInfo("Sulfurous Blast", 137, Rarity.UNCOMMON, mage.cards.s.SulfurousBlast.class));
         cards.add(new SetCardInfo("Svogthos, the Restless Tomb", 289, Rarity.UNCOMMON, mage.cards.s.SvogthosTheRestlessTomb.class));
-        cards.add(new SetCardInfo("Swamp", 307, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 308, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 309, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 310, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Swamp", 307, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 308, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 309, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 310, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Symbiotic Wurm", 174, Rarity.RARE, mage.cards.s.SymbioticWurm.class));
         cards.add(new SetCardInfo("Syphon Flesh", 103, Rarity.UNCOMMON, mage.cards.s.SyphonFlesh.class));
         cards.add(new SetCardInfo("Syphon Mind", 104, Rarity.COMMON, mage.cards.s.SyphonMind.class));
@@ -325,6 +299,7 @@ public class Commander extends ExpansionSet {
         cards.add(new SetCardInfo("Terminate", 231, Rarity.COMMON, mage.cards.t.Terminate.class));
         cards.add(new SetCardInfo("Terramorphic Expanse", 291, Rarity.COMMON, mage.cards.t.TerramorphicExpanse.class));
         cards.add(new SetCardInfo("The Mimeoplasm", 210, Rarity.MYTHIC, mage.cards.t.TheMimeoplasm.class));
+        cards.add(new SetCardInfo("Trade Secrets", 64, Rarity.RARE, mage.cards.t.TradeSecrets.class));
         cards.add(new SetCardInfo("Tranquil Thicket", 292, Rarity.COMMON, mage.cards.t.TranquilThicket.class));
         cards.add(new SetCardInfo("Trench Gorger", 65, Rarity.RARE, mage.cards.t.TrenchGorger.class));
         cards.add(new SetCardInfo("Tribute to the Wild", 175, Rarity.UNCOMMON, mage.cards.t.TributeToTheWild.class));

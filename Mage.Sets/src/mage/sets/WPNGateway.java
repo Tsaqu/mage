@@ -5,21 +5,21 @@
  */
 package mage.sets;
 
-import mage.cards.i.IcatianJavelineers;
-import mage.constants.SetType;
 import mage.cards.ExpansionSet;
+import mage.cards.i.IcatianJavelineers;
 import mage.constants.Rarity;
+import mage.constants.SetType;
 
 /**
  *
  * @author fireshoes
  */
-public class WPNGateway extends ExpansionSet {
+public final class WPNGateway extends ExpansionSet {
 
-    private static final WPNGateway fINSTANCE = new WPNGateway();
+    private static final WPNGateway instance = new WPNGateway();
 
     public static WPNGateway getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     private WPNGateway() {

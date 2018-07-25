@@ -1,34 +1,9 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.e;
 
 import java.util.UUID;
 import mage.MageInt;
+import mage.MageObjectReference;
 import mage.abilities.Ability;
 import mage.abilities.common.EntersBattlefieldTriggeredAbility;
 import mage.abilities.common.SimpleActivatedAbility;
@@ -41,6 +16,7 @@ import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.CardType;
 import mage.constants.Outcome;
+import mage.constants.SubType;
 import mage.constants.Zone;
 import mage.filter.FilterCard;
 import mage.filter.predicate.mageobject.CardTypePredicate;
@@ -53,12 +29,12 @@ import mage.target.TargetCard;
  *
  * @author LevelX2
  */
-public class EliteArcanist extends CardImpl {
+public final class EliteArcanist extends CardImpl {
 
     public EliteArcanist(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{3}{U}");
-        this.subtype.add("Human");
-        this.subtype.add("Wizard");
+        super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{3}{U}");
+        this.subtype.add(SubType.HUMAN);
+        this.subtype.add(SubType.WIZARD);
 
         this.power = new MageInt(1);
         this.toughness = new MageInt(1);
@@ -78,7 +54,7 @@ public class EliteArcanist extends CardImpl {
 
     @Override
     public void adjustCosts(Ability ability, Game game) {
-        if(ability instanceof SimpleActivatedAbility){
+        if (ability instanceof SimpleActivatedAbility) {
             Permanent sourcePermanent = game.getPermanent(ability.getSourceId());
             if (sourcePermanent != null && sourcePermanent.getImprinted() != null && !sourcePermanent.getImprinted().isEmpty()) {
                 Card imprintedInstant = game.getCard(sourcePermanent.getImprinted().get(0));
@@ -102,7 +78,8 @@ public class EliteArcanist extends CardImpl {
 class EliteArcanistImprintEffect extends OneShotEffect {
 
     private static final FilterCard filter = new FilterCard("instant card from your hand");
-    static  {
+
+    static {
         filter.add(new CardTypePredicate(CardType.INSTANT));
     }
 
@@ -118,7 +95,7 @@ class EliteArcanistImprintEffect extends OneShotEffect {
     @Override
     public boolean apply(Game game, Ability source) {
         Player player = game.getPlayer(source.getControllerId());
-        if (player.getHand().size() > 0) {
+        if (!player.getHand().isEmpty()) {
             TargetCard target = new TargetCard(Zone.HAND, filter);
             if (target.canChoose(source.getSourceId(), source.getControllerId(), game)
                     && player.choose(Outcome.Benefit, player.getHand(), target, game)) {
@@ -128,7 +105,7 @@ class EliteArcanistImprintEffect extends OneShotEffect {
                     Permanent permanent = game.getPermanent(source.getSourceId());
                     if (permanent != null) {
                         permanent.imprint(card.getId(), game);
-                        permanent.addInfo("imprint", new StringBuilder("[Exiled card - ").append(card.getName()).append("]").toString(), game);
+                        permanent.addInfo("imprint", new StringBuilder("[Exiled card - ").append(card.getName()).append(']').toString(), game);
                     }
                     return true;
                 }
@@ -168,15 +145,15 @@ class EliteArcanistCopyEffect extends OneShotEffect {
         }
         if (sourcePermanent != null && sourcePermanent.getImprinted() != null && !sourcePermanent.getImprinted().isEmpty()) {
             Card imprintedInstant = game.getCard(sourcePermanent.getImprinted().get(0));
-            if (imprintedInstant != null && game.getState().getZone(imprintedInstant.getId()).equals(Zone.EXILED)) {
+            if (imprintedInstant != null && game.getState().getZone(imprintedInstant.getId()) == Zone.EXILED) {
                 Player controller = game.getPlayer(source.getControllerId());
                 if (controller != null) {
                     Card copiedCard = game.copyCard(imprintedInstant, source, source.getControllerId());
                     if (copiedCard != null) {
-                        game.getExile().add(source.getSourceId(), "",copiedCard);
+                        game.getExile().add(source.getSourceId(), "", copiedCard);
                         game.getState().setZone(copiedCard.getId(), Zone.EXILED);
                         if (controller.chooseUse(outcome, "Cast the copied card without paying mana cost?", source, game)) {
-                            return controller.cast(copiedCard.getSpellAbility(), game, true);
+                            return controller.cast(copiedCard.getSpellAbility(), game, true, new MageObjectReference(source.getSourceObject(game), game));
                         }
                     }
                 }

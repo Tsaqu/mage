@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package org.mage.test.cards.abilities.keywords;
 
 import mage.cards.Card;
@@ -48,7 +22,7 @@ public class HideawayTest extends CardTestPlayerBase {
      * at the top four cards of your library. Exile one of them face down and
      * put the rest on the bottom of your library in any order. The exiled card
      * gains ‘Any player who has controlled the permanent that exiled this card
-     * may look at this card in the exile zone.’”
+     * may look at this card in the exile zone.'”
      *
      */
     /**
@@ -73,7 +47,6 @@ public class HideawayTest extends CardTestPlayerBase {
         for (Card card : currentGame.getExile().getAllCards(currentGame)) {
             Assert.assertTrue("Exiled card is not face down", card.isFaceDown(currentGame));
         }
-
     }
 
     /**
@@ -85,12 +58,12 @@ public class HideawayTest extends CardTestPlayerBase {
     @Test
     public void testMosswortBridge() {
         // Hideaway (This land enters the battlefield tapped. When it does, look at the top four cards of your library, exile one face down, then put the rest on the bottom of your library.)
-        // {T}: Add {G} to your mana pool.
+        // {T}: Add {G}.
         // {G}, {T}: You may play the exiled card without paying its mana cost if creatures you control have total power 10 or greater.
         addCard(Zone.HAND, playerA, "Mosswort Bridge");
         // When you cast Ulamog, the Ceaseless Hunger, exile two target permanents.
         // Indestructible
-        // Whenever Ulamog attacks, defending player exiles the top twenty cards of his or her library.
+        // Whenever Ulamog attacks, defending player exiles the top twenty cards of their library.
         addCard(Zone.LIBRARY, playerA, "Ulamog, the Ceaseless Hunger");
         skipInitShuffling();
 
@@ -223,5 +196,79 @@ public class HideawayTest extends CardTestPlayerBase {
         assertPermanentCount(playerA, "Ghost Quarter", 1);
         assertTapped("Windbrisk Heights", true);
         Assert.assertEquals(playerA.getLandsPlayed(), 2);
+    }
+
+    /**
+     * Reported bug issue #3310: Shelldock's hideaway requirement is for any library to have 20 or fewer cards, it only allows itself to be activated
+     * sometimes when the owner of Shelldock's library has 20 or fewer cards, never the opponents is 20 or fewer
+     */
+    @Test
+    public void shelldockIsleHideawayConditionOwnLibrary() {
+
+         /*
+         Shelldock Isle
+         Land Hideaway
+         {T}: Add {U}.
+         {U}, {T}: You may play the exiled card without paying its mana cost if a library has twenty or fewer cards in it.
+        */
+        String sIsle = "Shelldock Isle";
+        String ulamog = "Ulamog's Crusher"; // {8} 8/8 annihilator 2 attacks each turn if able
+
+        addCard(Zone.BATTLEFIELD, playerA, "Island");
+        addCard(Zone.HAND, playerA, sIsle);
+        removeAllCardsFromLibrary(playerA);
+        addCard(Zone.LIBRARY, playerA, ulamog, 4);
+        skipInitShuffling();
+
+        playLand(1, PhaseStep.PRECOMBAT_MAIN, playerA, sIsle);
+        setChoice(playerA, ulamog);
+        activateAbility(3, PhaseStep.PRECOMBAT_MAIN, playerA, "{U}");
+
+        setStopAt(3, PhaseStep.BEGIN_COMBAT);
+        execute();
+
+        assertTappedCount("Island", true, 1);
+        assertPermanentCount(playerA, sIsle, 1);
+        assertLibraryCount(playerA, 2);
+        assertPermanentCount(playerA, ulamog, 1);
+    }
+
+    /**
+     * Reported bug issue #3310: Shelldock's hideaway requirement is for any library to have 20 or fewer cards, it only allows itself to be activated
+     * sometimes when the owner of Shelldock's library has 20 or fewer cards, never the opponents is 20 or fewer
+     *
+     * NOTE: test is currently failing due to bug in code. see issue #3310
+     */
+    @Test
+    public void shelldockIsleHideawayConditionOpponentsLibrary() {
+
+         /*
+         Shelldock Isle
+         Land Hideaway
+         {T}: Add {U}.
+         {U}, {T}: You may play the exiled card without paying its mana cost if a library has twenty or fewer cards in it.
+        */
+        String sIsle = "Shelldock Isle";
+        String ulamog = "Ulamog's Crusher"; // {8} 8/8 annihilator 2 attacks each turn if able
+        String bSable = "Bronze Sable"; // {2} 2/1 artifact creature
+
+        addCard(Zone.BATTLEFIELD, playerA, "Island");
+        addCard(Zone.HAND, playerA, sIsle);
+        removeAllCardsFromLibrary(playerB);
+        addCard(Zone.LIBRARY, playerA, ulamog, 4);
+        addCard(Zone.LIBRARY, playerB, bSable, 4);
+        skipInitShuffling();
+
+        playLand(1, PhaseStep.PRECOMBAT_MAIN, playerA, sIsle);
+        setChoice(playerA, ulamog);
+        activateAbility(3, PhaseStep.PRECOMBAT_MAIN, playerA, "{U}");
+
+        setStopAt(3, PhaseStep.BEGIN_COMBAT);
+        execute();
+
+        assertPermanentCount(playerA, sIsle, 1);
+        assertLibraryCount(playerB, 3); // opponents library less than 20 so should be able to activate shelldock
+        assertTappedCount("Island", true, 1);
+        assertPermanentCount(playerA, ulamog, 1);
     }
 }

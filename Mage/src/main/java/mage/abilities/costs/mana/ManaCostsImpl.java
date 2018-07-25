@@ -1,43 +1,18 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.abilities.costs.mana;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import mage.Mana;
 import mage.abilities.Ability;
 import mage.abilities.costs.Cost;
+import mage.abilities.costs.Costs;
+import mage.abilities.costs.CostsImpl;
 import mage.abilities.costs.VariableCost;
+import mage.abilities.costs.common.PayLifeCost;
 import mage.abilities.mana.ManaOptions;
 import mage.constants.ColoredManaSymbol;
+import mage.constants.ManaType;
+import mage.constants.Outcome;
 import mage.filter.Filter;
 import mage.game.Game;
 import mage.players.ManaPool;
@@ -51,7 +26,7 @@ import mage.util.ManaUtil;
  */
 public class ManaCostsImpl<T extends ManaCost> extends ArrayList<T> implements ManaCosts<T> {
 
-    protected UUID id;
+    protected final UUID id;
     protected String text = null;
 
     private static Map<String, ManaCosts> costs = new HashMap<>();
@@ -121,6 +96,15 @@ public class ManaCostsImpl<T extends ManaCost> extends ArrayList<T> implements M
     }
 
     @Override
+    public Mana getUsedManaToPay() {
+        Mana manaTotal = new Mana();
+        for (ManaCost cost : this) {
+            manaTotal.add(cost.getUsedManaToPay());
+        }
+        return manaTotal;
+    }
+
+    @Override
     public boolean pay(Ability ability, Game game, UUID sourceId, UUID controllerId, boolean noMana) {
         return pay(ability, game, sourceId, controllerId, noMana, this);
     }
@@ -133,7 +117,9 @@ public class ManaCostsImpl<T extends ManaCost> extends ArrayList<T> implements M
         }
 
         Player player = game.getPlayer(controllerId);
-        assignPayment(game, ability, player.getManaPool(), this);
+        if (!player.getManaPool().isForcedToPay()) {
+            assignPayment(game, ability, player.getManaPool(), this);
+        }
         game.getState().getSpecialActions().removeManaActions();
         while (!isPaid()) {
             ManaCost unpaid = this.getUnpaid();
@@ -161,12 +147,37 @@ public class ManaCostsImpl<T extends ManaCost> extends ArrayList<T> implements M
     @Override
     public boolean payOrRollback(Ability ability, Game game, UUID sourceId, UUID payingPlayerId) {
         int bookmark = game.bookmarkState();
+        handlePhyrexianManaCosts(payingPlayerId, ability, game);
         if (pay(ability, game, sourceId, payingPlayerId, false, null)) {
             game.removeBookmark(bookmark);
             return true;
         }
         game.restoreState(bookmark, ability.getRule());
         return false;
+    }
+
+    private void handlePhyrexianManaCosts(UUID payingPlayerId, Ability source, Game game) {
+        Player player = game.getPlayer(payingPlayerId);
+        if (this == null || player == null) {
+            return; // nothing to be done without any mana costs. prevents NRE from occurring here
+        }
+        Iterator<T> manaCostIterator = this.iterator();
+        Costs<PayLifeCost> tempCosts = new CostsImpl<>();
+
+        while (manaCostIterator.hasNext()) {
+            ManaCost manaCost = manaCostIterator.next();
+            if (manaCost instanceof PhyrexianManaCost) {
+                PhyrexianManaCost phyrexianManaCost = (PhyrexianManaCost) manaCost;
+                PayLifeCost payLifeCost = new PayLifeCost(2);
+                if (payLifeCost.canPay(source, source.getSourceId(), player.getId(), game)
+                        && player.chooseUse(Outcome.LoseLife, "Pay 2 life instead of " + phyrexianManaCost.getBaseText() + '?', source, game)) {
+                    manaCostIterator.remove();
+                    tempCosts.add(payLifeCost);
+                }
+            }
+        }
+
+        tempCosts.pay(source, game, source.getSourceId(), player.getId(), false, null);
     }
 
     @Override
@@ -226,15 +237,20 @@ public class ManaCostsImpl<T extends ManaCost> extends ArrayList<T> implements M
 
     @Override
     public void assignPayment(Game game, Ability ability, ManaPool pool, Cost costToPay) {
-        if (!pool.isAutoPayment() && pool.getUnlockedManaType() == null) {
+        boolean wasUnlockedManaType = (pool.getUnlockedManaType() != null);
+        if (!pool.isAutoPayment() && !wasUnlockedManaType) {
             // if auto payment is inactive and no mana type was clicked manually - do nothing
             return;
+        }
+        ManaCosts referenceCosts = null;
+        if (pool.isForcedToPay()) {
+            referenceCosts = this.copy();
         }
         // attempt to pay colorless costs (not generic) mana costs first
         for (ManaCost cost : this) {
             if (!cost.isPaid() && cost instanceof ColorlessManaCost) {
                 cost.assignPayment(game, ability, pool, costToPay);
-                if (pool.count() == 0) {
+                if (pool.isEmpty()) {
                     return;
                 }
             }
@@ -243,7 +259,7 @@ public class ManaCostsImpl<T extends ManaCost> extends ArrayList<T> implements M
         for (ManaCost cost : this) {
             if (!cost.isPaid() && cost instanceof ColoredManaCost) {
                 cost.assignPayment(game, ability, pool, costToPay);
-                if (pool.count() == 0) {
+                if (pool.isEmpty()) {
                     return;
                 }
             }
@@ -252,23 +268,23 @@ public class ManaCostsImpl<T extends ManaCost> extends ArrayList<T> implements M
         for (ManaCost cost : this) {
             if (!cost.isPaid() && cost instanceof HybridManaCost) {
                 cost.assignPayment(game, ability, pool, costToPay);
-                if (pool.count() == 0) {
+                if (pool.isEmpty()) {
                     return;
                 }
             }
         }
 
         // Mono Hybrid mana costs
-        // First try only to pay colored mana with the pool
+        // First try only to pay colored mana or conditional colored mana with the pool
         for (ManaCost cost : this) {
             if (!cost.isPaid() && cost instanceof MonoHybridManaCost) {
-                if (((cost.containsColor(ColoredManaSymbol.W)) && pool.getWhite() > 0)
-                        || ((cost.containsColor(ColoredManaSymbol.B)) && pool.getBlack() > 0)
-                        || ((cost.containsColor(ColoredManaSymbol.R)) && pool.getRed() > 0)
-                        || ((cost.containsColor(ColoredManaSymbol.G)) && pool.getGreen() > 0)
-                        || ((cost.containsColor(ColoredManaSymbol.U)) && pool.getBlue() > 0)) {
+                if (((cost.containsColor(ColoredManaSymbol.W)) && (pool.getWhite() > 0 || pool.ConditionalManaHasManaType(ManaType.WHITE)))
+                        || ((cost.containsColor(ColoredManaSymbol.B)) && (pool.getBlack() > 0 || pool.ConditionalManaHasManaType(ManaType.BLACK)))
+                        || ((cost.containsColor(ColoredManaSymbol.R)) && (pool.getRed() > 0 || pool.ConditionalManaHasManaType(ManaType.RED)))
+                        || ((cost.containsColor(ColoredManaSymbol.G)) && (pool.getGreen() > 0 || pool.ConditionalManaHasManaType(ManaType.GREEN)))
+                        || ((cost.containsColor(ColoredManaSymbol.U)) && (pool.getBlue() > 0) || pool.ConditionalManaHasManaType(ManaType.BLUE))) {
                     cost.assignPayment(game, ability, pool, costToPay);
-                    if (pool.count() == 0) {
+                    if (pool.isEmpty() && pool.getConditionalMana().isEmpty()) {
                         return;
                     }
                 }
@@ -278,7 +294,7 @@ public class ManaCostsImpl<T extends ManaCost> extends ArrayList<T> implements M
         for (ManaCost cost : this) {
             if (!cost.isPaid() && cost instanceof MonoHybridManaCost) {
                 cost.assignPayment(game, ability, pool, costToPay);
-                if (pool.count() == 0) {
+                if (pool.isEmpty()) {
                     return;
                 }
             }
@@ -287,7 +303,7 @@ public class ManaCostsImpl<T extends ManaCost> extends ArrayList<T> implements M
         for (ManaCost cost : this) {
             if (!cost.isPaid() && cost instanceof SnowManaCost) {
                 cost.assignPayment(game, ability, pool, costToPay);
-                if (pool.count() == 0) {
+                if (pool.isEmpty()) {
                     return;
                 }
             }
@@ -296,7 +312,7 @@ public class ManaCostsImpl<T extends ManaCost> extends ArrayList<T> implements M
         for (ManaCost cost : this) {
             if (!cost.isPaid() && cost instanceof GenericManaCost) {
                 cost.assignPayment(game, ability, pool, costToPay);
-                if (pool.count() == 0) {
+                if (pool.isEmpty()) {
                     return;
                 }
             }
@@ -309,6 +325,31 @@ public class ManaCostsImpl<T extends ManaCost> extends ArrayList<T> implements M
         }
         // stop using mana of the clicked mana type
         pool.lockManaType();
+        if (!wasUnlockedManaType) {
+            handleForcedToPayOnlyForCurrentPayment(game, pool, referenceCosts);
+        }
+    }
+
+    private void handleForcedToPayOnlyForCurrentPayment(Game game, ManaPool pool, ManaCosts referenceCosts) {
+        // for Word of Command
+        if (pool.isForcedToPay()) {
+            if (referenceCosts != null && this.getText().equals(referenceCosts.getText())) {
+                UUID playerId = pool.getPlayerId();
+                Player player = game.getPlayer(playerId);
+                if (player != null) {
+                    game.undo(playerId);
+                    this.clearPaid();
+                    this.setX(referenceCosts.getX());
+                    player.getManaPool().restoreMana(pool.getPoolBookmark());
+                    game.bookmarkState();
+                }
+            }
+        }
+    }
+
+    public void forceManaRollback(Game game, ManaPool pool) {
+        // for Word of Command
+        handleForcedToPayOnlyForCurrentPayment(game, pool, this);
     }
 
     @Override
@@ -323,10 +364,10 @@ public class ManaCostsImpl<T extends ManaCost> extends ArrayList<T> implements M
             if (mana == null || mana.isEmpty()) {
                 return;
             }
-            String[] symbols = mana.split("^\\{|\\}\\{|\\}$");
+            String[] symbols = mana.split("^\\{|}\\{|}$");
             int modifierForX = 0;
             for (String symbol : symbols) {
-                if (symbol.length() > 0) {
+                if (!symbol.isEmpty()) {
                     if (symbol.length() == 1 || isNumeric(symbol)) {
                         if (Character.isDigit(symbol.charAt(0))) {
                             this.add(new GenericManaCost(Integer.valueOf(symbol)));
@@ -360,6 +401,7 @@ public class ManaCostsImpl<T extends ManaCost> extends ArrayList<T> implements M
     }
 
     private boolean isNumeric(String symbol) {
+
         try {
             Integer.parseInt(symbol);
             return true;

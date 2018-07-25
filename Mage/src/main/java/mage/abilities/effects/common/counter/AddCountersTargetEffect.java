@@ -1,32 +1,7 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.abilities.effects.common.counter;
 
+import java.util.Locale;
 import java.util.UUID;
 import mage.MageObject;
 import mage.abilities.Ability;
@@ -97,12 +72,12 @@ public class AddCountersTargetEffect extends OneShotEffect {
                     }
                     newCounter.add(calculated);
                     int before = permanent.getCounters(game).getCount(counter.getName());
-                    permanent.addCounters(newCounter, game);
+                    permanent.addCounters(newCounter, source, game);
                     int numberAdded = permanent.getCounters(game).getCount(counter.getName()) - before;
                     affectedTargets++;
                     if (!game.isSimulation()) {
                         game.informPlayers(sourceObject.getLogName() + ": " + controller.getLogName() + " puts "
-                                + numberAdded + " " + counter.getName().toLowerCase() + " counter on " + permanent.getLogName());
+                                + numberAdded + ' ' + counter.getName().toLowerCase(Locale.ENGLISH) + " counter on " + permanent.getLogName());
                     }
                 } else if (player != null) {
                     Counter newCounter = counter.copy();
@@ -111,19 +86,19 @@ public class AddCountersTargetEffect extends OneShotEffect {
                     affectedTargets++;
                     if (!game.isSimulation()) {
                         game.informPlayers(sourceObject.getLogName() + ": " + controller.getLogName() + " puts "
-                                + counter.getCount() + " " + counter.getName().toLowerCase() + " counter on " + player.getLogName());
+                                + counter.getCount() + ' ' + counter.getName().toLowerCase(Locale.ENGLISH) + " counter on " + player.getLogName());
                     }
                 } else if (card != null) {
-                    card.addCounters(counter, game);
+                    card.addCounters(counter, source, game);
                     if (!game.isSimulation()) {
-                        game.informPlayers(new StringBuilder("Added ").append(counter.getCount()).append(" ").append(counter.getName())
+                        game.informPlayers(new StringBuilder("Added ").append(counter.getCount()).append(' ').append(counter.getName())
                                 .append(" counter to ").append(card.getName())
-                                .append(" (").append(card.getCounters(game).getCount(counter.getName())).append(")").toString());
+                                .append(" (").append(card.getCounters(game).getCount(counter.getName())).append(')').toString());
                     }
                     return true;
                 }
             }
-            return affectedTargets > 0;
+            return true;
         }
         return false;
     }
@@ -136,24 +111,25 @@ public class AddCountersTargetEffect extends OneShotEffect {
         StringBuilder sb = new StringBuilder();
         sb.append("put ");
         if (counter.getCount() > 1) {
-            sb.append(CardUtil.numberToText(counter.getCount())).append(" ");
+            sb.append(CardUtil.numberToText(counter.getCount())).append(' ');
         } else {
             sb.append("a ");
         }
-        sb.append(counter.getName().toLowerCase()).append(" counter");
+        sb.append(counter.getName().toLowerCase(Locale.ENGLISH)).append(" counter");
         if (counter.getCount() > 1) {
-            sb.append("s");
+            sb.append('s');
         }
         sb.append(" on ");
 
-        if (mode.getTargets().size() > 0) {
+        if (!mode.getTargets().isEmpty()) {
             Target target = mode.getTargets().get(0);
             if (target.getNumberOfTargets() == 0) {
                 sb.append("up to ");
             }
 
             if (target.getMaxNumberOfTargets() > 1 || target.getNumberOfTargets() == 0) {
-                sb.append(target.getMaxNumberOfTargets()).append(" target ").append(target.getTargetName());
+                sb.append(CardUtil.numberToText(target.getMaxNumberOfTargets()))
+                        .append(" target ").append(target.getTargetName());
             } else {
                 if (!target.getTargetName().startsWith("another")) {
                     sb.append("target ");
@@ -164,7 +140,7 @@ public class AddCountersTargetEffect extends OneShotEffect {
             sb.append("that creature");
         }
 
-        if (amount.getMessage().length() > 0) {
+        if (!amount.getMessage().isEmpty()) {
             sb.append(" for each ").append(amount.getMessage());
         }
         return sb.toString();

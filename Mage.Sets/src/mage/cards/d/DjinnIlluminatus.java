@@ -1,35 +1,6 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.d;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 import mage.MageInt;
 import mage.abilities.Ability;
 import mage.abilities.common.SimpleStaticAbility;
@@ -38,26 +9,26 @@ import mage.abilities.keyword.FlyingAbility;
 import mage.abilities.keyword.ReplicateAbility;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
-import mage.constants.CardType;
-import mage.constants.Duration;
-import mage.constants.Layer;
-import mage.constants.Outcome;
-import mage.constants.SubLayer;
-import mage.constants.Zone;
+import mage.constants.*;
 import mage.filter.common.FilterInstantOrSorcerySpell;
 import mage.game.Game;
 import mage.game.stack.Spell;
 import mage.game.stack.StackObject;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import mage.game.permanent.Permanent;
+
 /**
  *
  * @author LevelX2
  */
-public class DjinnIlluminatus extends CardImpl {
+public final class DjinnIlluminatus extends CardImpl {
 
     public DjinnIlluminatus(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{5}{U/R}{U/R}");
-        this.subtype.add("Djinn");
+        this.subtype.add(SubType.DJINN);
         this.power = new MageInt(3);
         this.toughness = new MageInt(5);
 
@@ -92,7 +63,7 @@ class DjinnIlluminatusGainReplicateEffect extends ContinuousEffectImpl {
 
     public DjinnIlluminatusGainReplicateEffect(final DjinnIlluminatusGainReplicateEffect effect) {
         super(effect);
-        this.replicateAbilities.putAll(replicateAbilities);
+        this.replicateAbilities.putAll(effect.replicateAbilities);
     }
 
     @Override
@@ -102,16 +73,20 @@ class DjinnIlluminatusGainReplicateEffect extends ContinuousEffectImpl {
 
     @Override
     public boolean apply(Game game, Ability source) {
+        Permanent djinn = game.getPermanent(source.getSourceId());
+        if (djinn == null) {
+            return false;
+        }
         for (StackObject stackObject : game.getStack()) {
             // only spells cast, so no copies of spells
-            if ((stackObject instanceof Spell) && !stackObject.isCopy() && stackObject.getControllerId().equals(source.getControllerId())) {
+            if ((stackObject instanceof Spell) 
+                    && !stackObject.isCopy() 
+                    && stackObject.isControlledBy(source.getControllerId())
+                    && djinn.isControlledBy(source.getControllerId())  // verify that the controller of the djinn cast that spell
+                    && !stackObject.getManaCost().isEmpty()) { //handle cases like Ancestral Vision
                 Spell spell = (Spell) stackObject;
                 if (filter.match(stackObject, game)) {
-                    ReplicateAbility replicateAbility = replicateAbilities.get(spell.getId());
-                    if (replicateAbility == null) {
-                        replicateAbility = new ReplicateAbility(spell.getCard(), spell.getSpellAbility().getManaCosts().getText());
-                        replicateAbilities.put(spell.getId(), replicateAbility);
-                    }
+                    ReplicateAbility replicateAbility = replicateAbilities.computeIfAbsent(spell.getId(), k -> new ReplicateAbility(spell.getCard(), spell.getSpellAbility().getManaCosts().getText()));
                     game.getState().addOtherAbility(spell.getCard(), replicateAbility, false); // Do not copy because paid and # of activations state is handled in the baility
                 }
             }

@@ -5,25 +5,22 @@
  */
 package org.mage.card.arcane;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Paint;
-import java.awt.Polygon;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-
-import mage.abilities.Ability;
+import mage.cards.ArtRect;
 import mage.client.dialog.PreferencesDialog;
 import mage.constants.AbilityType;
 import mage.constants.CardType;
-import mage.utils.CardUtil;
+import mage.constants.SubType;
+import mage.constants.SuperType;
 import mage.view.CardView;
 import mage.view.CounterView;
 import mage.view.PermanentView;
-import org.apache.log4j.Logger;
+
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.RasterFormatException;
+import java.util.ArrayList;
+import java.util.List;
+import java.awt.image.BufferedImage;
 
 /**
  * @author stravant@gmail.com
@@ -58,8 +55,6 @@ import org.apache.log4j.Logger;
  */
 public abstract class CardRenderer {
 
-    private static final Logger LOGGER = Logger.getLogger(CardPanel.class);
-
     ///////////////////////////////////////////////////////////////////////////
     // Common layout metrics between all cards
     // The card to be rendered
@@ -70,6 +65,9 @@ public abstract class CardRenderer {
 
     // The card image
     protected BufferedImage artImage;
+
+    // The face card image
+    protected BufferedImage faceArtImage;
 
     ///////////////////////////////////////////////////////////////////////////
     // Common layout metrics between all cards
@@ -96,7 +94,7 @@ public abstract class CardRenderer {
     }, 4);
 
     // Paint for a card back
-    public static Paint BG_TEXTURE_CARDBACK = new Color(153, 102, 51);
+    public static final Paint BG_TEXTURE_CARDBACK = new Color(153, 102, 51);
 
     // The size of the card
     protected int cardWidth;
@@ -107,18 +105,18 @@ public abstract class CardRenderer {
     protected boolean isSelected;
 
     // Radius of the corners of the cards
-    protected static float CORNER_RADIUS_FRAC = 0.1f; //x cardWidth
-    protected static int CORNER_RADIUS_MIN = 3;
+    protected static final float CORNER_RADIUS_FRAC = 0.1f; //x cardWidth
+    protected static final int CORNER_RADIUS_MIN = 3;
     protected int cornerRadius;
 
     // The inset of the actual card from the black / white border around it
-    protected static float BORDER_WIDTH_FRAC = 0.03f; //x cardWidth
-    protected static float BORDER_WIDTH_MIN = 2;
+    protected static final float BORDER_WIDTH_FRAC = 0.03f; //x cardWidth
+    protected static final float BORDER_WIDTH_MIN = 2;
     protected int borderWidth;
 
     // The parsed text of the card
-    protected ArrayList<TextboxRule> textboxRules = new ArrayList<>();
-    protected ArrayList<TextboxRule> textboxKeywords = new ArrayList<>();
+    protected final ArrayList<TextboxRule> textboxRules = new ArrayList<>();
+    protected final ArrayList<TextboxRule> textboxKeywords = new ArrayList<>();
 
     // The Construtor
     // The constructor should prepare all of the things that it can
@@ -130,20 +128,29 @@ public abstract class CardRenderer {
         this.cardView = card;
         this.isTransformed = isTransformed;
 
+        if (card.getArtRect() == ArtRect.SPLIT_FUSED) {
+            parseRules(card.getLeftSplitRules(), textboxKeywords, textboxRules);
+            parseRules(card.getRightSplitRules(), textboxKeywords, textboxRules);
+        } else {
+            parseRules(card.getRules(), textboxKeywords, textboxRules);
+        }
+    }
+
+    protected void parseRules(List<String> stringRules, ArrayList<TextboxRule> keywords, ArrayList<TextboxRule> rules) {
         // Translate the textbox text
-        for (String rule : card.getRules()) {
+        for (String rule : stringRules) {
             // Kill reminder text
             if (PreferencesDialog.getCachedValue(PreferencesDialog.KEY_CARD_RENDERING_REMINDER_TEXT, "false").equals("false")) {
                 rule = CardRendererUtils.killReminderText(rule).trim();
             }
             if (!rule.isEmpty()) {
-                TextboxRule tbRule = TextboxRuleParser.parse(card, rule);
+                TextboxRule tbRule = TextboxRuleParser.parse(cardView, rule);
                 if (tbRule.type == TextboxRuleType.SIMPLE_KEYWORD) {
-                    textboxKeywords.add(tbRule);
+                    keywords.add(tbRule);
                 } else if (tbRule.text.isEmpty()) {
                     // Nothing to do, rule is empty
                 } else {
-                    textboxRules.add(tbRule);
+                    rules.add(tbRule);
                 }
             }
         }
@@ -172,11 +179,12 @@ public abstract class CardRenderer {
     }
 
     /**
-     * How far does a card have to be spaced down from
-     * a rendered card to show it's entire name line?
-     * This function is a bit of a hack, as different card faces need
-     * slightly different spacing, but we need it in a static context
-     * so that spacing is consistent in GY / deck views etc.
+     * How far does a card have to be spaced down from a rendered card to show
+     * it's entire name line? This function is a bit of a hack, as different
+     * card faces need slightly different spacing, but we need it in a static
+     * context so that spacing is consistent in GY / deck views etc.
+     *
+     * @param cardWidth
      * @return
      */
     public static int getCardTopHeight(int cardWidth) {
@@ -187,13 +195,14 @@ public abstract class CardRenderer {
                 BOX_HEIGHT_MIN,
                 BOX_HEIGHT_FRAC * cardWidth * 1.4f);
         int borderWidth = getBorderWidth(cardWidth);
-        return 2*borderWidth + boxHeight;
+        return 2 * borderWidth + boxHeight;
     }
 
     // The Draw Method
     // The draw method takes the information caculated by the constructor
     // and uses it to draw to a concrete size of card and graphics.
-    public void draw(Graphics2D g, CardPanelAttributes attribs) {
+    public void draw(Graphics2D g, CardPanelAttributes attribs, BufferedImage image) {
+
         // Pre template method layout, to calculate shared layout info
         layout(attribs.cardWidth, attribs.cardHeight);
         isSelected = attribs.isSelected;
@@ -203,7 +212,7 @@ public abstract class CardRenderer {
         drawBorder(g);
         drawBackground(g);
         drawArt(g);
-        drawFrame(g);
+        drawFrame(g, image);
         if (!cardView.isAbility()) {
             drawOverlays(g);
             drawCounters(g);
@@ -218,7 +227,7 @@ public abstract class CardRenderer {
 
     protected abstract void drawArt(Graphics2D g);
 
-    protected abstract void drawFrame(Graphics2D g);
+    protected abstract void drawFrame(Graphics2D g, BufferedImage image);
 
     // Template methods that are possible to override, but unlikely to be
     // overridden.
@@ -231,7 +240,7 @@ public abstract class CardRenderer {
 
     // Draw summoning sickness overlay, and possibly other overlays
     protected void drawOverlays(Graphics2D g) {
-        if (CardUtil.isCreature(cardView) && cardView instanceof PermanentView) {
+        if (cardView.isCreature() && cardView instanceof PermanentView) {
             if (((PermanentView) cardView).hasSummoningSickness()) {
                 int x1 = (int) (0.2 * cardWidth);
                 int x2 = (int) (0.8 * cardWidth);
@@ -262,6 +271,77 @@ public abstract class CardRenderer {
         }
     }
 
+    protected void drawArtIntoRect(Graphics2D g, int x, int y, int w, int h, Rectangle2D artRect, boolean shouldPreserveAspect) {
+        // Perform a process to make sure that the art is scaled uniformly to fill the frame, cutting
+        // off the minimum amount necessary to make it completely fill the frame without "squashing" it.
+        double fullCardImgWidth = artImage.getWidth();
+        double fullCardImgHeight = artImage.getHeight();
+        double artWidth = artRect.getWidth() * fullCardImgWidth;
+        double artHeight = artRect.getHeight() * fullCardImgHeight;
+        double targetWidth = w;
+        double targetHeight = h;
+        double targetAspect = targetWidth / targetHeight;
+        if (!shouldPreserveAspect) {
+            // No adjustment to art
+        } else if (targetAspect * artHeight < artWidth) {
+            // Trim off some width
+            artWidth = targetAspect * artHeight;
+        } else {
+            // Trim off some height
+            artHeight = artWidth / targetAspect;
+        }
+        try {
+            BufferedImage subImg
+                    = artImage.getSubimage(
+                            (int) (artRect.getX() * fullCardImgWidth), (int) (artRect.getY() * fullCardImgHeight),
+                            (int) artWidth, (int) artHeight);
+            g.drawImage(subImg,
+                    x, y,
+                    (int) targetWidth, (int) targetHeight,
+                    null);
+        } catch (RasterFormatException e) {
+            // At very small card sizes we may encounter a problem with rounding error making the rect not fit
+        }
+    }
+
+    protected void drawFaceArtIntoRect(Graphics2D g, int x, int y, int w, int h, Rectangle2D artRect, boolean shouldPreserveAspect) {
+        // Perform a process to make sure that the art is scaled uniformly to fill the frame, cutting
+        // off the minimum amount necessary to make it completely fill the frame without "squashing" it.
+        double fullCardImgWidth = faceArtImage.getWidth();
+        double fullCardImgHeight = faceArtImage.getHeight();
+        double artWidth = fullCardImgWidth;
+        double artHeight = fullCardImgHeight;
+        double targetWidth = w;
+        double targetHeight = h;
+        double targetAspect = targetWidth / targetHeight;
+        if (!shouldPreserveAspect) {
+            // No adjustment to art
+        } else if (targetAspect * artHeight < artWidth) {
+            // Trim off some width
+            artWidth = targetAspect * artHeight;
+        } else {
+            // Trim off some height
+            artHeight = artWidth / targetAspect;
+        }
+        try {
+            /*BufferedImage subImg
+                    = faceArtImage.getSubimage(
+                    (int) (artRect.getX() * fullCardImgWidth), (int) (artRect.getY() * fullCardImgHeight),
+                    (int) artWidth, (int) artHeight);*/
+            RenderingHints rh = new RenderingHints(
+                    RenderingHints.KEY_INTERPOLATION,
+                    RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+            g.setRenderingHints(rh);
+            g.drawImage(faceArtImage,
+                    x, y,
+                    (int) targetWidth, (int) targetHeight,
+                    null);
+        } catch (RasterFormatException e) {
+            // At very small card sizes we may encounter a problem with rounding error making the rect not fit
+            System.out.println(e);
+        }
+    }
+
     // Draw +1/+1 and other counters
     protected void drawCounters(Graphics2D g) {
         int xPos = (int) (0.65 * cardWidth);
@@ -271,14 +351,19 @@ public abstract class CardRenderer {
                 // Don't render loyalty, we do that in the bottom corner
                 if (!v.getName().equals("loyalty")) {
                     Polygon p;
-                    if (v.getName().equals("+1/+1")) {
-                        p = PLUS_COUNTER_POLY;
-                    } else if (v.getName().equals("-1/-1")) {
-                        p = MINUS_COUNTER_POLY;
-                    } else if (v.getName().equals("time")) {
-                        p = TIME_COUNTER_POLY;
-                    } else {
-                        p = OTHER_COUNTER_POLY;
+                    switch (v.getName()) {
+                        case "+1/+1":
+                            p = PLUS_COUNTER_POLY;
+                            break;
+                        case "-1/-1":
+                            p = MINUS_COUNTER_POLY;
+                            break;
+                        case "time":
+                            p = TIME_COUNTER_POLY;
+                            break;
+                        default:
+                            p = OTHER_COUNTER_POLY;
+                            break;
                     }
                     double scale = (0.1 * 0.25 * cardWidth);
                     Graphics2D g2 = (Graphics2D) g.create();
@@ -289,7 +374,7 @@ public abstract class CardRenderer {
                     g2.setColor(Color.black);
                     g2.drawPolygon(p);
                     g2.setFont(new Font("Arial", Font.BOLD, 7));
-                    String cstr = "" + v.getCount();
+                    String cstr = String.valueOf(v.getCount());
                     int strW = g2.getFontMetrics().stringWidth(cstr);
                     g2.drawString(cstr, 5 - strW / 2, 8);
                     g2.dispose();
@@ -311,7 +396,7 @@ public abstract class CardRenderer {
             /*
             // Just draw the as a code
             String code = cardView.getExpansionSetCode();
-            code = (code != null) ? code.toUpperCase() : "";
+            code = (code != null) ? code.toUpperCase(Locale.ENGLISH) : "";
             FontMetrics metrics = g.getFontMetrics();
             setSymbolWidth = metrics.stringWidth(code);
             if (cardView.getRarity() == Rarity.COMMON) {
@@ -366,9 +451,9 @@ public abstract class CardRenderer {
     // Get a string representing the type line
     protected String getCardTypeLine() {
         if (cardView.isAbility()) {
-            if (AbilityType.TRIGGERED.equals(cardView.getAbilityType())) {
+            if (cardView.getAbilityType() == AbilityType.TRIGGERED) {
                 return "Triggered Ability";
-            } else if (AbilityType.ACTIVATED.equals(cardView.getAbilityType())) {
+            } else if (cardView.getAbilityType() == AbilityType.ACTIVATED) {
                 return "Activated Ability";
             } else if (cardView.getAbilityType() == null) {
                 // TODO: Triggered abilities waiting to be put onto the stack have abilityType = null. Figure out why
@@ -378,25 +463,53 @@ public abstract class CardRenderer {
             }
         } else {
             StringBuilder sbType = new StringBuilder();
-            for (String superType : cardView.getSuperTypes()) {
-                sbType.append(superType).append(" ");
-            }
-            for (CardType cardType : cardView.getCardTypes()) {
-                sbType.append(cardType.toString()).append(" ");
-            }
-            if (cardView.getSubTypes().size() > 0) {
-                sbType.append("- ");
-                for (String subType : cardView.getSubTypes()) {
-                    sbType.append(subType).append(" ");
+            String spType = getCardSuperTypeLine();
+            String subType = getCardSubTypeLine();
+            if (spType.equalsIgnoreCase("")) {
+                sbType.append(subType);
+            } else {
+                sbType.append(spType);
+                if (!subType.equalsIgnoreCase("")) {
+                    sbType.append("- ");
+                    sbType.append(subType);
                 }
             }
+
             return sbType.toString();
         }
+    }
+
+    protected String getCardSuperTypeLine() {
+        StringBuilder spType = new StringBuilder();
+        for (SuperType superType : cardView.getSuperTypes()) {
+            spType.append(superType).append(' ');
+        }
+        for (CardType cardType : cardView.getCardTypes()) {
+            spType.append(cardType.toString()).append(' ');
+        }
+        return spType.toString();
+    }
+
+    protected String getCardSubTypeLine() {
+        StringBuilder subType = new StringBuilder();
+
+        if (!cardView.getSubTypes().isEmpty()) {
+            for (SubType sType : cardView.getSubTypes()) {
+                subType.append(sType).append(' ');
+            }
+        }
+        return subType.toString();
     }
 
     // Set the card art image (CardPanel will give it to us when it
     // is loaded and ready)
     public void setArtImage(Image image) {
         artImage = CardRendererUtils.toBufferedImage(image);
+    }
+
+    // Set the card art image (CardPanel will give it to us when it
+    // is loaded and ready)
+    public void setFaceArtImage(Image image) {
+        faceArtImage = CardRendererUtils.toBufferedImage(image);
     }
 }

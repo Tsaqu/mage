@@ -29,22 +29,24 @@
  */
 package mage.cards.u;
 
-import java.util.UUID;
-import mage.constants.CardType;
-import mage.constants.Duration;
 import mage.abilities.effects.common.combat.CantBlockTargetEffect;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
+import mage.constants.CardType;
+import mage.constants.Duration;
+import mage.constants.SubType;
 import mage.target.common.TargetCreaturePermanent;
+
+import java.util.UUID;
 
 /**
  * @author LevelX
  */
-public class UnearthlyBlizzard extends CardImpl {
+public final class UnearthlyBlizzard extends CardImpl {
 
     public UnearthlyBlizzard(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId,setInfo,new CardType[]{CardType.SORCERY},"{2}{R}");
-        this.subtype.add("Arcane");
+        this.subtype.add(SubType.ARCANE);
 
 
         // Up to three target creatures can't block this turn.

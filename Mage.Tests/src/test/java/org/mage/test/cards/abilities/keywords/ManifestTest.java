@@ -1,35 +1,10 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package org.mage.test.cards.abilities.keywords;
 
 import mage.cards.Card;
 import mage.constants.PhaseStep;
 import mage.constants.Zone;
+import mage.game.permanent.Permanent;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mage.test.serverside.base.CardTestPlayerBase;
@@ -51,7 +26,7 @@ public class ManifestTest extends CardTestPlayerBase {
 
         // Tranquil Cove enters the battlefield tapped.
         // When Tranquil Cove enters the battlefield, you gain 1 life.
-        // {T}: Add {W} or {U} to your mana pool.
+        // {T}: Add {W} or {U}.
         addCard(Zone.LIBRARY, playerA, "Tranquil Cove");
         skipInitShuffling();
 
@@ -110,7 +85,7 @@ public class ManifestTest extends CardTestPlayerBase {
     @Test
     public void testETBTriggeredAbilities3() {
         addCard(Zone.BATTLEFIELD, playerB, "Island", 2);
-        // Exile target creature. Its controller manifests the top card of his or her library {1}{U}
+        // Exile target creature. Its controller manifests the top card of their library {1}{U}
         addCard(Zone.HAND, playerB, "Reality Shift");
 
         // Constellation - When Doomwake Giant or another enchantment enters the battlefield
@@ -147,7 +122,7 @@ public class ManifestTest extends CardTestPlayerBase {
     @Test
     public void testNylea() {
         addCard(Zone.BATTLEFIELD, playerB, "Island", 2);
-        // Exile target creature. Its controller manifests the top card of his or her library {1}{U}
+        // Exile target creature. Its controller manifests the top card of their library {1}{U}
         addCard(Zone.HAND, playerB, "Reality Shift");
 
         // As long as your devotion to white is less than five, Nylea isn't a creature.
@@ -181,7 +156,7 @@ public class ManifestTest extends CardTestPlayerBase {
     @Test
     public void testColorOfManifestedCardDoesNotCount() {
         addCard(Zone.BATTLEFIELD, playerB, "Island", 2);
-        // Exile target creature. Its controller manifests the top card of his or her library {1}{U}
+        // Exile target creature. Its controller manifests the top card of their library {1}{U}
         addCard(Zone.HAND, playerB, "Reality Shift");
 
         // Gore Swine {2}{R}
@@ -214,12 +189,11 @@ public class ManifestTest extends CardTestPlayerBase {
     /*
      I casted a Silence the Believers on a manifested card. It moved to the exile zone face-down.
      */
-
     @Test
     public void testCardGetsExiledFaceUp() {
         addCard(Zone.BATTLEFIELD, playerB, "Island", 2);
         addCard(Zone.BATTLEFIELD, playerB, "Swamp", 4);
-        // Exile target creature. Its controller manifests the top card of his or her library {1}{U}
+        // Exile target creature. Its controller manifests the top card of their library {1}{U}
         addCard(Zone.HAND, playerB, "Reality Shift");
         // Silence the Believers - Instant {2}{B}{B}
         // Strive — Silence the Believers costs more to cast for each target beyond the first.
@@ -273,7 +247,7 @@ public class ManifestTest extends CardTestPlayerBase {
 
         skipInitShuffling();
 
-        activateAbility(2, PhaseStep.PRECOMBAT_MAIN, playerB, "{1}{B},{T}, Sacrifice another creature");
+        activateAbility(2, PhaseStep.PRECOMBAT_MAIN, playerB, "{1}{B}, {T}, Sacrifice another creature");
         addTarget(playerB, "Silvercoat Lion");
 
         setStopAt(2, PhaseStep.BEGIN_COMBAT);
@@ -309,7 +283,7 @@ public class ManifestTest extends CardTestPlayerBase {
 
         skipInitShuffling();
 
-        activateAbility(2, PhaseStep.PRECOMBAT_MAIN, playerB, "{1}{B},{T}, Sacrifice another creature");
+        activateAbility(2, PhaseStep.PRECOMBAT_MAIN, playerB, "{1}{B}, {T}, Sacrifice another creature");
         addTarget(playerB, "Silvercoat Lion");
 
         activateAbility(2, PhaseStep.POSTCOMBAT_MAIN, playerB, "{5}{G}: Turn");
@@ -326,6 +300,8 @@ public class ManifestTest extends CardTestPlayerBase {
         assertPermanentCount(playerB, "", 0);
         assertPermanentCount(playerB, "Aerie Bowmasters", 1);
         assertPowerToughness(playerB, "Aerie Bowmasters", 4, 5); // 3/4  and the +1/+1 counter from Megamorph
+        Permanent aerie = getPermanent("Aerie Bowmasters", playerB);
+        Assert.assertTrue("Aerie Bowmasters has to be green", aerie != null && aerie.getColor(currentGame).isGreen());
 
     }
 
@@ -351,7 +327,7 @@ public class ManifestTest extends CardTestPlayerBase {
 
         skipInitShuffling();
 
-        activateAbility(2, PhaseStep.PRECOMBAT_MAIN, playerB, "{1}{B},{T}, Sacrifice another creature");
+        activateAbility(2, PhaseStep.PRECOMBAT_MAIN, playerB, "{1}{B}, {T}, Sacrifice another creature");
         addTarget(playerB, "Silvercoat Lion");
 
         setStopAt(2, PhaseStep.END_TURN);
@@ -429,7 +405,7 @@ public class ManifestTest extends CardTestPlayerBase {
 
         skipInitShuffling();
 
-        activateAbility(2, PhaseStep.PRECOMBAT_MAIN, playerB, "{1}{B},{T}, Sacrifice another creature");
+        activateAbility(2, PhaseStep.PRECOMBAT_MAIN, playerB, "{1}{B}, {T}, Sacrifice another creature");
         setChoice(playerB, "Silvercoat Lion");
 
         activateAbility(2, PhaseStep.POSTCOMBAT_MAIN, playerB, "Sacrifice a creature");

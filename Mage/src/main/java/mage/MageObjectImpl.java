@@ -1,33 +1,9 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import mage.abilities.Abilities;
@@ -37,14 +13,22 @@ import mage.abilities.common.PlanswalkerEntersWithLoyalityCountersAbility;
 import mage.abilities.costs.mana.ManaCost;
 import mage.abilities.costs.mana.ManaCosts;
 import mage.abilities.costs.mana.ManaCostsImpl;
+import mage.abilities.effects.ContinuousEffect;
+import mage.abilities.effects.Effect;
 import mage.abilities.keyword.ChangelingAbility;
-import mage.abilities.mana.ManaAbility;
+import mage.abilities.mana.ActivatedManaAbilityImpl;
+import mage.abilities.text.TextPart;
+import mage.abilities.text.TextPartSubType;
 import mage.cards.FrameStyle;
 import mage.constants.CardType;
+import mage.constants.SubLayer;
+import mage.constants.SubType;
+import mage.constants.SubTypeSet;
+import mage.constants.SuperType;
 import mage.game.Game;
 import mage.game.events.ZoneChangeEvent;
-import mage.util.CardUtil;
 import mage.util.GameLog;
+import mage.util.SubTypeList;
 
 public abstract class MageObjectImpl implements MageObject {
 
@@ -55,14 +39,16 @@ public abstract class MageObjectImpl implements MageObject {
     protected ObjectColor color;
     protected ObjectColor frameColor;
     protected FrameStyle frameStyle;
-    protected List<CardType> cardType = new ArrayList<>();
-    protected List<String> subtype = new ArrayList<>();
-    protected List<String> supertype = new ArrayList<>();
+    protected EnumSet<CardType> cardType = EnumSet.noneOf(CardType.class);
+    protected SubTypeList subtype = new SubTypeList();
+    protected boolean isAllCreatureTypes;
+    protected EnumSet<SuperType> supertype = EnumSet.noneOf(SuperType.class);
     protected Abilities<Ability> abilities;
     protected String text;
     protected MageInt power;
     protected MageInt toughness;
     protected boolean copy;
+    protected List<TextPart> textParts;
 
     public MageObjectImpl() {
         this(UUID.randomUUID());
@@ -77,6 +63,7 @@ public abstract class MageObjectImpl implements MageObject {
         frameStyle = FrameStyle.M15_NORMAL;
         manaCost = new ManaCostsImpl<>("");
         abilities = new AbilitiesImpl<>();
+        textParts = new ArrayList<>();
     }
 
     public MageObjectImpl(final MageObjectImpl object) {
@@ -92,8 +79,11 @@ public abstract class MageObjectImpl implements MageObject {
         abilities = object.abilities.copy();
         this.cardType.addAll(object.cardType);
         this.subtype.addAll(object.subtype);
-        this.supertype.addAll(object.supertype);
+        isAllCreatureTypes = object.isAllCreatureTypes;
+        supertype.addAll(object.supertype);
         this.copy = object.copy;
+        textParts = new ArrayList<>();
+        textParts.addAll(object.textParts);
     }
 
     @Override
@@ -108,7 +98,7 @@ public abstract class MageObjectImpl implements MageObject {
 
     @Override
     public String getIdName() {
-        return getName() + " [" + getId().toString().substring(0, 3) + "]";
+        return getName() + " [" + getId().toString().substring(0, 3) + ']';
     }
 
     @Override
@@ -127,17 +117,17 @@ public abstract class MageObjectImpl implements MageObject {
     }
 
     @Override
-    public List<CardType> getCardType() {
+    public EnumSet<CardType> getCardType() {
         return cardType;
     }
 
     @Override
-    public List<String> getSubtype(Game game) {
+    public SubTypeList getSubtype(Game game) {
         return subtype;
     }
 
     @Override
-    public List<String> getSupertype() {
+    public EnumSet<SuperType> getSuperType() {
         return supertype;
     }
 
@@ -164,12 +154,12 @@ public abstract class MageObjectImpl implements MageObject {
     public MageInt getToughness() {
         return toughness;
     }
-    
+
     @Override
     public int getStartingLoyalty() {
-        for (Ability ab: getAbilities()) {
+        for (Ability ab : getAbilities()) {
             if (ab instanceof PlanswalkerEntersWithLoyalityCountersAbility) {
-                return ((PlanswalkerEntersWithLoyalityCountersAbility)ab).getStartingLoyalty();
+                return ((PlanswalkerEntersWithLoyalityCountersAbility) ab).getStartingLoyalty();
             }
         }
         return 0;
@@ -179,19 +169,19 @@ public abstract class MageObjectImpl implements MageObject {
     public ObjectColor getColor(Game game) {
         return color;
     }
-    
+
     @Override
     public ObjectColor getFrameColor(Game game) {
         // For lands, add any colors of mana the land can produce to
         // its frame colors.
-        if (getCardType().contains(CardType.LAND)) {
+        if (this.isLand()) {
             ObjectColor cl = frameColor.copy();
-            for (Ability ab: getAbilities()) {
-                if (ab instanceof ManaAbility) {
-                    ManaAbility mana = (ManaAbility)ab;
+            for (Ability ab : getAbilities()) {
+                if (ab instanceof ActivatedManaAbilityImpl) {
+                    ActivatedManaAbilityImpl mana = (ActivatedManaAbilityImpl) ab;
                     try {
                         List<Mana> manaAdded = mana.getNetMana(game);
-                        for (Mana m: manaAdded) {
+                        for (Mana m : manaAdded) {
                             if (m.getAny() > 0) {
                                 return new ObjectColor("WUBRG");
                             }
@@ -253,22 +243,22 @@ public abstract class MageObjectImpl implements MageObject {
     }
 
     @Override
-    public boolean hasSubtype(String value, Game game) {
+    public boolean hasSubtype(SubType value, Game game) {
         if (value == null) {
             return false;
         }
-        List<String> subtypes = this.getSubtype(game);
+        SubTypeList subtypes = this.getSubtype(game);
         if (subtypes.contains(value)) {
             return true;
         } else {
             // checking for Changeling
             // first make sure input parameter is a creature subtype
             // if not, then ChangelingAbility doesn't matter
-            if (CardUtil.isNonCreatureSubtype(value)) {
+            if (value.getSubTypeSet() != SubTypeSet.CreatureType) {
                 return false;
             }
             // as it is creature subtype, then check the existence of Changeling
-            return abilities.contains(ChangelingAbility.getInstance()) || subtypes.contains(ChangelingAbility.ALL_CREATURE_TYPE);
+            return abilities.contains(ChangelingAbility.getInstance()) || isAllCreatureTypes();
         }
     }
 
@@ -297,4 +287,49 @@ public abstract class MageObjectImpl implements MageObject {
         game.getState().setZoneChangeCounter(objectId, value);
     }
 
+    @Override
+    public boolean isAllCreatureTypes() {
+        return isAllCreatureTypes;
+    }
+
+    @Override
+    public void setIsAllCreatureTypes(boolean value) {
+        isAllCreatureTypes = value;
+    }
+
+    @Override
+    public List<TextPart> getTextParts() {
+        return textParts;
+    }
+
+    @Override
+    public TextPart addTextPart(TextPart textPart) {
+        textParts.add(textPart);
+        return textPart;
+    }
+
+    @Override
+    public void changeSubType(SubType fromSubType, SubType toSubType) {
+        for (TextPart textPart : textParts) {
+            if (textPart instanceof TextPartSubType && textPart.getCurrentValue().equals(fromSubType)) {
+                textPart.replaceWith(toSubType);
+            }
+        }
+    }
+
+    /**
+     * Remove power/toughness character defining abilities
+     */
+    @Override
+    public void removePTCDA() {
+        for (Iterator<Ability> iter = this.getAbilities().iterator(); iter.hasNext();) {
+            Ability ability = iter.next();
+            for (Effect effect : ability.getEffects()) {
+                if (effect instanceof ContinuousEffect && ((ContinuousEffect) effect).getSublayer() == SubLayer.CharacteristicDefining_7a) {
+                    iter.remove();
+                    break;
+                }
+            }
+        }
+    }
 }

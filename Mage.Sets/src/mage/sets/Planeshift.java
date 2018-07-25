@@ -1,50 +1,23 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.sets;
 
+import mage.cards.ExpansionSet;
 import mage.cards.e.ErtaiTheCorrupted;
 import mage.cards.s.SkyshipWeatherlight;
 import mage.cards.t.TahngarthTalruumHero;
-import mage.constants.SetType;
-import mage.cards.ExpansionSet;
 import mage.constants.Rarity;
-import mage.cards.CardGraphicInfo;
+import mage.constants.SetType;
 
 /**
  *
  * @author North
  */
-public class Planeshift extends ExpansionSet {
+public final class Planeshift extends ExpansionSet {
 
-    private static final Planeshift fINSTANCE = new Planeshift();
+    private static final Planeshift instance = new Planeshift();
 
     public static Planeshift getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     private Planeshift() {
@@ -74,6 +47,7 @@ public class Planeshift extends ExpansionSet {
         cards.add(new SetCardInfo("Darigaaz's Caldera", 137, Rarity.UNCOMMON, mage.cards.d.DarigaazsCaldera.class));
         cards.add(new SetCardInfo("Darigaaz's Charm", 100, Rarity.UNCOMMON, mage.cards.d.DarigaazsCharm.class));
         cards.add(new SetCardInfo("Daring Leap", 101, Rarity.COMMON, mage.cards.d.DaringLeap.class));
+        cards.add(new SetCardInfo("Dark Suspicions", 40, Rarity.RARE, mage.cards.d.DarkSuspicions.class));
         cards.add(new SetCardInfo("Deadapult", 59, Rarity.RARE, mage.cards.d.Deadapult.class));
         cards.add(new SetCardInfo("Death Bomb", 41, Rarity.COMMON, mage.cards.d.DeathBomb.class));
         cards.add(new SetCardInfo("Destructive Flow", 102, Rarity.RARE, mage.cards.d.DestructiveFlow.class));
@@ -81,13 +55,14 @@ public class Planeshift extends ExpansionSet {
         cards.add(new SetCardInfo("Disciple of Kangee", 3, Rarity.COMMON, mage.cards.d.DiscipleOfKangee.class));
         cards.add(new SetCardInfo("Doomsday Specter", 103, Rarity.RARE, mage.cards.d.DoomsdaySpecter.class));
         cards.add(new SetCardInfo("Draco", 131, Rarity.RARE, mage.cards.d.Draco.class));
+        cards.add(new SetCardInfo("Dralnu's Crusade", 104, Rarity.RARE, mage.cards.d.DralnusCrusade.class));
         cards.add(new SetCardInfo("Dralnu's Pet", 23, Rarity.RARE, mage.cards.d.DralnusPet.class));
         cards.add(new SetCardInfo("Dromar's Cavern", 138, Rarity.UNCOMMON, mage.cards.d.DromarsCavern.class));
         cards.add(new SetCardInfo("Dromar's Charm", 105, Rarity.UNCOMMON, mage.cards.d.DromarsCharm.class));
         cards.add(new SetCardInfo("Eladamri's Call", 106, Rarity.RARE, mage.cards.e.EladamrisCall.class));
         cards.add(new SetCardInfo("Ertai's Trickery", 24, Rarity.UNCOMMON, mage.cards.e.ErtaisTrickery.class));
-        cards.add(new SetCardInfo("Ertai, the Corrupted", "107a", Rarity.RARE, ErtaiTheCorrupted.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Ertai, the Corrupted", "107b", Rarity.RARE, ErtaiTheCorrupted.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Ertai, the Corrupted", "107a", Rarity.RARE, ErtaiTheCorrupted.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Ertai, the Corrupted", "107b", Rarity.RARE, ErtaiTheCorrupted.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Escape Routes", 25, Rarity.COMMON, mage.cards.e.EscapeRoutes.class));
         cards.add(new SetCardInfo("Exotic Disease", 43, Rarity.UNCOMMON, mage.cards.e.ExoticDisease.class));
         cards.add(new SetCardInfo("Falling Timber", 79, Rarity.COMMON, mage.cards.f.FallingTimber.class));
@@ -98,6 +73,8 @@ public class Planeshift extends ExpansionSet {
         cards.add(new SetCardInfo("Gaea's Might", 81, Rarity.COMMON, mage.cards.g.GaeasMight.class));
         cards.add(new SetCardInfo("Gainsay", 26, Rarity.UNCOMMON, mage.cards.g.Gainsay.class));
         cards.add(new SetCardInfo("Gerrard's Command", 109, Rarity.COMMON, mage.cards.g.GerrardsCommand.class));
+        cards.add(new SetCardInfo("Goblin Game", 61, Rarity.RARE, mage.cards.g.GoblinGame.class));
+        cards.add(new SetCardInfo("Heroic Defiance", 6, Rarity.COMMON, mage.cards.h.HeroicDefiance.class));
         cards.add(new SetCardInfo("Hobble", 7, Rarity.COMMON, mage.cards.h.Hobble.class));
         cards.add(new SetCardInfo("Honorable Scout", 8, Rarity.COMMON, mage.cards.h.HonorableScout.class));
         cards.add(new SetCardInfo("Horned Kavu", 110, Rarity.COMMON, mage.cards.h.HornedKavu.class));
@@ -107,6 +84,7 @@ public class Planeshift extends ExpansionSet {
         cards.add(new SetCardInfo("Insolence", 63, Rarity.COMMON, mage.cards.i.Insolence.class));
         cards.add(new SetCardInfo("Kavu Recluse", 64, Rarity.COMMON, mage.cards.k.KavuRecluse.class));
         cards.add(new SetCardInfo("Keldon Mantle", 65, Rarity.COMMON, mage.cards.k.KeldonMantle.class));
+        cards.add(new SetCardInfo("Keldon Twilight", 112, Rarity.RARE, mage.cards.k.KeldonTwilight.class));
         cards.add(new SetCardInfo("Lashknife Barrier", 9, Rarity.UNCOMMON, mage.cards.l.LashknifeBarrier.class));
         cards.add(new SetCardInfo("Lava Zombie", 113, Rarity.COMMON, mage.cards.l.LavaZombie.class));
         cards.add(new SetCardInfo("Lord of the Undead", 44, Rarity.RARE, mage.cards.l.LordOfTheUndead.class));
@@ -132,9 +110,11 @@ public class Planeshift extends ExpansionSet {
         cards.add(new SetCardInfo("Phyrexian Bloodstock", 50, Rarity.COMMON, mage.cards.p.PhyrexianBloodstock.class));
         cards.add(new SetCardInfo("Phyrexian Scuta", 51, Rarity.RARE, mage.cards.p.PhyrexianScuta.class));
         cards.add(new SetCardInfo("Phyrexian Tyranny", 118, Rarity.RARE, mage.cards.p.PhyrexianTyranny.class));
+        cards.add(new SetCardInfo("Planar Overlay", 28, Rarity.RARE, mage.cards.p.PlanarOverlay.class));
         cards.add(new SetCardInfo("Planeswalker's Favor", 86, Rarity.RARE, mage.cards.p.PlaneswalkersFavor.class));
         cards.add(new SetCardInfo("Planeswalker's Fury", 70, Rarity.RARE, mage.cards.p.PlaneswalkersFury.class));
         cards.add(new SetCardInfo("Planeswalker's Mirth", 12, Rarity.RARE, mage.cards.p.PlaneswalkersMirth.class));
+        cards.add(new SetCardInfo("Planeswalker's Mischief", 29, Rarity.RARE, mage.cards.p.PlaneswalkersMischief.class));
         cards.add(new SetCardInfo("Planeswalker's Scorn", 52, Rarity.RARE, mage.cards.p.PlaneswalkersScorn.class));
         cards.add(new SetCardInfo("Pollen Remedy", 13, Rarity.COMMON, mage.cards.p.PollenRemedy.class));
         cards.add(new SetCardInfo("Primal Growth", 87, Rarity.COMMON, mage.cards.p.PrimalGrowth.class));
@@ -159,8 +139,8 @@ public class Planeshift extends ExpansionSet {
         cards.add(new SetCardInfo("Singe", 71, Rarity.COMMON, mage.cards.s.Singe.class));
         cards.add(new SetCardInfo("Sinister Strength", 54, Rarity.COMMON, mage.cards.s.SinisterStrength.class));
         cards.add(new SetCardInfo("Sisay's Ingenuity", 33, Rarity.COMMON, mage.cards.s.SisaysIngenuity.class));
-        cards.add(new SetCardInfo("Skyship Weatherlight", "133a", Rarity.RARE, SkyshipWeatherlight.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Skyship Weatherlight", "133b", Rarity.RARE, SkyshipWeatherlight.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Skyship Weatherlight", "133a", Rarity.RARE, SkyshipWeatherlight.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Skyship Weatherlight", "133b", Rarity.RARE, SkyshipWeatherlight.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Skyshroud Blessing", 92, Rarity.UNCOMMON, mage.cards.s.SkyshroudBlessing.class));
         cards.add(new SetCardInfo("Slay", 55, Rarity.UNCOMMON, mage.cards.s.Slay.class));
         cards.add(new SetCardInfo("Sleeping Potion", 34, Rarity.COMMON, mage.cards.s.SleepingPotion.class));
@@ -176,8 +156,9 @@ public class Planeshift extends ExpansionSet {
         cards.add(new SetCardInfo("Sunken Hope", 37, Rarity.RARE, mage.cards.s.SunkenHope.class));
         cards.add(new SetCardInfo("Sunscape Battlemage", 16, Rarity.UNCOMMON, mage.cards.s.SunscapeBattlemage.class));
         cards.add(new SetCardInfo("Sunscape Familiar", 17, Rarity.COMMON, mage.cards.s.SunscapeFamiliar.class));
-        cards.add(new SetCardInfo("Tahngarth, Talruum Hero", "74a", Rarity.RARE, TahngarthTalruumHero.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Tahngarth, Talruum Hero", "74b", Rarity.RARE, TahngarthTalruumHero.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Surprise Deployment", 18, Rarity.UNCOMMON, mage.cards.s.SurpriseDeployment.class));
+        cards.add(new SetCardInfo("Tahngarth, Talruum Hero", "74a", Rarity.RARE, TahngarthTalruumHero.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Tahngarth, Talruum Hero", "74b", Rarity.RARE, TahngarthTalruumHero.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Terminal Moraine", 142, Rarity.UNCOMMON, mage.cards.t.TerminalMoraine.class));
         cards.add(new SetCardInfo("Terminate", 128, Rarity.COMMON, mage.cards.t.Terminate.class));
         cards.add(new SetCardInfo("Thornscape Battlemage", 94, Rarity.UNCOMMON, mage.cards.t.ThornscapeBattlemage.class));

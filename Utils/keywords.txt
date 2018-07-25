@@ -1,10 +1,16 @@
+Afflict|number|
 Annihilator|number|
+Ascend|new|
+Assist|new|
 Basic landcycling|cost|
 Battle cry|new|
+Bestow|card, manaString|
 Bloodthirst|number|
 Bushido|number|
-Convoke|new|
+Buyback|manaString|
 Cascade|new|
+Changeling|instance|
+Convoke|new|
 Crew|number|
 Cumulative upkeep|cost|
 Cycling|cost|
@@ -14,10 +20,16 @@ Delve|new|
 Dethrone|new|
 Devoid|color|
 Defender|instance|
+Dredge|number|
 Double Strike|instance|
 Dredge|number|
+Echo|manaString|
+Embalm|cost, card|
+Enchant|type|
 Entwine|manaString|
+Eternalize|cost, card|
 Evoke|card, manaString|
+Evolve|new|
 Exalted|new|
 Exploit|new|
 Extort|new|
@@ -32,6 +44,7 @@ Forestcycling|cost|
 Forestwalk|new|
 Haste|instance|
 Hexproof|instance|
+Improvise|new|
 Indestructible|instance|
 Infect|instance|
 Intimidate|instance|
@@ -74,6 +87,7 @@ Totem armor|new|
 Trample|instance|
 Tribute|number|
 Unblockable|new|
+Undaunted|new|
 Undying|new|
 Unearth|cost|
 Unleash|new|

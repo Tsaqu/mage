@@ -1,39 +1,7 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.t;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import mage.abilities.Ability;
 import mage.abilities.DelayedTriggeredAbility;
 import mage.abilities.effects.ContinuousEffect;
@@ -48,7 +16,7 @@ import mage.constants.CardType;
 import mage.constants.Duration;
 import mage.constants.Outcome;
 import mage.constants.WatcherScope;
-import mage.filter.common.FilterCreaturePermanent;
+import mage.filter.StaticFilters;
 import mage.game.Game;
 import mage.game.events.GameEvent;
 import mage.game.events.GameEvent.EventType;
@@ -62,10 +30,10 @@ import mage.watchers.Watcher;
  *
  * @author LevelX2
  */
-public class TritonTactics extends CardImpl {
+public final class TritonTactics extends CardImpl {
 
     public TritonTactics(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.INSTANT},"{U}");
+        super(ownerId, setInfo, new CardType[]{CardType.INSTANT}, "{U}");
 
         // Up to two target creatures each get +0/+3 until end of turn. Untap those creatures.
         // At this turn's next end of combat, tap each creature that was blocked by one of those
@@ -191,7 +159,7 @@ class TritonTacticsEndOfCombatEffect extends OneShotEffect {
             attackerMap = (Map<Integer, Set<String>>) object;
             for (Set<String> attackerSet : attackerMap.values()) {
                 List<Permanent> doNotUntapNextUntapStep = new ArrayList<>();
-                for (Permanent creature : game.getBattlefield().getActivePermanents(new FilterCreaturePermanent(), source.getControllerId(), game)) {
+                for (Permanent creature : game.getBattlefield().getActivePermanents(StaticFilters.FILTER_PERMANENT_CREATURE, source.getControllerId(), game)) {
                     if (attackerSet.contains(CardUtil.getCardZoneString(null, creature.getId(), game))) {
                         // tap creature and add the not untap effect
                         creature.tap(game);
@@ -254,11 +222,7 @@ class BlockedCreaturesWatcher extends Watcher {
         } else {
             attackerMap = new HashMap<>();
         }
-        attackers = attackerMap.get(zoneChangeCounter);
-        if (attackers == null) {
-            attackers = new HashSet<>();
-            attackerMap.put(zoneChangeCounter, attackers);
-        }
+        attackers = attackerMap.computeIfAbsent(zoneChangeCounter, k -> new HashSet<>());
         attackers.add(CardUtil.getCardZoneString(null, attackerId, game));
         game.getState().setValue("blockedAttackers" + getSourceId().toString(), attackerMap);
     }

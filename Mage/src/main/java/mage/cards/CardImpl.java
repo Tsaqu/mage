@@ -1,61 +1,47 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import mage.MageObject;
 import mage.MageObjectImpl;
 import mage.Mana;
 import mage.ObjectColor;
-import mage.abilities.Abilities;
-import mage.abilities.AbilitiesImpl;
-import mage.abilities.Ability;
-import mage.abilities.PlayLandAbility;
-import mage.abilities.SpellAbility;
-import mage.abilities.mana.ManaAbility;
+import mage.abilities.*;
+import mage.abilities.costs.Cost;
+import mage.abilities.costs.VariableCost;
+import mage.abilities.costs.common.RemoveVariableCountersTargetCost;
+import mage.abilities.effects.common.ChooseACardNameEffect;
+import mage.abilities.mana.ActivatedManaAbilityImpl;
 import mage.cards.repository.PluginClassloaderRegistery;
-import mage.constants.CardType;
-import mage.constants.ColoredManaSymbol;
-import mage.constants.Rarity;
-import mage.constants.SpellAbilityType;
-import mage.constants.TimingRule;
-import mage.constants.Zone;
+import mage.constants.*;
 import mage.counters.Counter;
+import mage.counters.CounterType;
 import mage.counters.Counters;
+import mage.filter.FilterCard;
+import mage.filter.FilterMana;
+import mage.filter.FilterPermanent;
+import mage.filter.FilterSpell;
+import mage.filter.common.FilterCreaturePermanent;
+import mage.filter.predicate.mageobject.ColorPredicate;
+import mage.filter.predicate.mageobject.ConvertedManaCostPredicate;
+import mage.filter.predicate.mageobject.NamePredicate;
+import mage.filter.predicate.mageobject.PowerPredicate;
 import mage.game.*;
-import mage.game.command.Commander;
+import mage.game.command.CommandObject;
 import mage.game.events.GameEvent;
 import mage.game.events.ZoneChangeEvent;
 import mage.game.permanent.Permanent;
 import mage.game.stack.Spell;
 import mage.game.stack.StackObject;
+import mage.target.TargetCard;
+import mage.target.TargetPermanent;
+import mage.target.TargetSpell;
+import mage.target.common.TargetCardInOpponentsGraveyard;
+import mage.target.common.TargetCreaturePermanent;
 import mage.util.GameLog;
+import mage.util.SubTypeList;
 import mage.watchers.Watcher;
 import org.apache.log4j.Logger;
 
@@ -65,9 +51,15 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
 
     private static final Logger logger = Logger.getLogger(CardImpl.class);
 
+    private static final String regexBlack = ".*\\x7b.{0,2}B.{0,2}\\x7d.*";
+    private static final String regexBlue = ".*\\x7b.{0,2}U.{0,2}\\x7d.*";
+    private static final String regexRed = ".*\\x7b.{0,2}R.{0,2}\\x7d.*";
+    private static final String regexGreen = ".*\\x7b.{0,2}G.{0,2}\\x7d.*";
+    private static final String regexWhite = ".*\\x7b.{0,2}W.{0,2}\\x7d.*";
+
     protected UUID ownerId;
     protected String cardNumber;
-    public String expansionSetCode;
+    protected String expansionSetCode;
     protected String tokenSetCode;
     protected String tokenDescriptor;
     protected Rarity rarity;
@@ -82,6 +74,8 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
     protected boolean splitCard;
     protected boolean morphCard;
 
+    protected List<UUID> attachments = new ArrayList<>();
+
     public CardImpl(UUID ownerId, CardSetInfo setInfo, CardType[] cardTypes, String costs) {
         this(ownerId, setInfo, cardTypes, costs, SpellAbilityType.BASE);
     }
@@ -94,13 +88,13 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
         this.cardType.addAll(Arrays.asList(cardTypes));
         this.manaCost.load(costs);
         setDefaultColor();
-        if (cardType.contains(CardType.LAND)) {
+        if (this.isLand()) {
             Ability ability = new PlayLandAbility(name);
             ability.setSourceId(this.getId());
             abilities.add(ability);
         } else {
             SpellAbility ability = new SpellAbility(manaCost, name, Zone.HAND, spellAbilityType);
-            if (!cardType.contains(CardType.INSTANT)) {
+            if (!this.isInstant()) {
                 ability.setTiming(TimingRule.SORCERY);
             }
             ability.setSourceId(this.getId());
@@ -153,10 +147,17 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
             secondSideCardClazz = card.secondSideCardClazz;
             nightCard = card.nightCard;
         }
+        if (card.spellAbility != null) {
+            spellAbility = card.getSpellAbility().copy();
+        } else {
+            spellAbility = null;
+        }
+
         flipCard = card.flipCard;
         flipCardName = card.flipCardName;
         splitCard = card.splitCard;
         usesVariousArt = card.usesVariousArt;
+        this.attachments.addAll(card.attachments);
     }
 
     @Override
@@ -164,6 +165,9 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
         this.objectId = UUID.randomUUID();
         this.abilities.newOriginalId();
         this.abilities.setSourceId(objectId);
+        if (this.spellAbility != null) {
+            this.spellAbility.setSourceId(objectId);
+        }
     }
 
     public static Card createCard(String name, CardSetInfo setInfo) {
@@ -181,19 +185,34 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
     }
 
     public static Card createCard(Class<?> clazz, CardSetInfo setInfo) {
+        return createCard(clazz, setInfo, null);
+    }
+
+    public static Card createCard(Class<?> clazz, CardSetInfo setInfo, List<String> errorList) {
+        String setCode = null;
         try {
             Card card;
             if (setInfo == null) {
                 Constructor<?> con = clazz.getConstructor(UUID.class);
                 card = (Card) con.newInstance(new Object[]{null});
             } else {
+                setCode = setInfo.getExpansionSetCode();
                 Constructor<?> con = clazz.getConstructor(UUID.class, CardSetInfo.class);
                 card = (Card) con.newInstance(null, setInfo);
             }
-            card.build();
             return card;
         } catch (Exception e) {
-            logger.fatal("Error loading card: " + clazz.getCanonicalName(), e);
+            String err = "Error loading card: " + clazz.getCanonicalName() + " (" + setCode + ")";
+            if (errorList != null) {
+                errorList.add(err);
+            }
+
+            if (e instanceof InvocationTargetException) {
+                logger.fatal(err, ((InvocationTargetException) e).getTargetException());
+            } else {
+                logger.fatal(err, e);
+            }
+
             return null;
         }
     }
@@ -277,7 +296,7 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
     @Override
     public Abilities<Ability> getAbilities(Game game) {
         Abilities<Ability> otherAbilities = game.getState().getAllOtherAbilities(objectId);
-        if (otherAbilities == null) {
+        if (otherAbilities == null || otherAbilities.isEmpty()) {
             return abilities;
         }
         Abilities<Ability> all = new AbilitiesImpl<>();
@@ -286,7 +305,12 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
         return all;
     }
 
-    protected void addAbility(Ability ability) {
+    /**
+     * Public in order to support adding abilities to SplitCardHalf's
+     *
+     * @param ability
+     */
+    public void addAbility(Ability ability) {
         ability.setSourceId(this.getId());
         abilities.add(ability);
         for (Ability subAbility : ability.getSubAbilities()) {
@@ -310,12 +334,123 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
         if (spellAbility == null) {
             for (Ability ability : abilities.getActivatedAbilities(Zone.HAND)) {
                 if (ability instanceof SpellAbility
-                        && !((SpellAbility) ability).getSpellAbilityType().equals(SpellAbilityType.BASE_ALTERNATE)) {
+                        && ((SpellAbility) ability).getSpellAbilityType() != SpellAbilityType.BASE_ALTERNATE) {
                     return spellAbility = (SpellAbility) ability;
                 }
             }
         }
         return spellAbility;
+    }
+
+//    @Override
+//    public void adjustCosts(Ability ability, Game game) {
+//    }
+    @Override
+    public void adjustTargets(Ability ability, Game game) {
+        int xValue;
+        TargetPermanent oldTargetPermanent;
+        FilterPermanent permanentFilter;
+        int minTargets;
+        int maxTargets;
+        switch (ability.getTargetAdjustment()) {
+            case NONE:
+                break;
+            case X_CMC_EQUAL_PERM:
+                xValue = ability.getManaCostsToPay().getX();
+                oldTargetPermanent = (TargetPermanent) ability.getTargets().get(0);
+                minTargets = oldTargetPermanent.getMinNumberOfTargets();
+                maxTargets = oldTargetPermanent.getMaxNumberOfTargets();
+                permanentFilter = oldTargetPermanent.getFilter().copy();
+                permanentFilter.add(new ConvertedManaCostPredicate(ComparisonType.EQUAL_TO, xValue));
+                ability.getTargets().clear();
+                ability.getTargets().add(new TargetPermanent(minTargets, maxTargets, permanentFilter, false));
+                break;
+            case X_TARGETS:
+                xValue = ability.getManaCostsToPay().getX();
+                permanentFilter = ((TargetPermanent) ability.getTargets().get(0)).getFilter();
+                ability.getTargets().clear();
+                ability.addTarget(new TargetPermanent(xValue, permanentFilter));
+                break;
+            case X_POWER_LEQ:// Minamo Sightbender only
+                xValue = ability.getManaCostsToPay().getX();
+                oldTargetPermanent = (TargetPermanent) ability.getTargets().get(0);
+                minTargets = oldTargetPermanent.getMinNumberOfTargets();
+                maxTargets = oldTargetPermanent.getMaxNumberOfTargets();
+                permanentFilter = oldTargetPermanent.getFilter().copy();
+                permanentFilter.add(new PowerPredicate(ComparisonType.FEWER_THAN, xValue + 1));
+                ability.getTargets().clear();
+                ability.getTargets().add(new TargetPermanent(minTargets, maxTargets, permanentFilter, false));
+                break;
+            case VERSE_COUNTER_TARGETS:
+                Permanent sourcePermanent = game.getPermanentOrLKIBattlefield(ability.getSourceId());
+                if (sourcePermanent != null) {
+                    xValue = sourcePermanent.getCounters(game).getCount(CounterType.VERSE);
+                    permanentFilter = ((TargetPermanent) ability.getTargets().get(0)).getFilter();
+                    ability.getTargets().clear();
+                    ability.addTarget(new TargetPermanent(0, xValue, permanentFilter, false));
+                }
+                break;
+            case X_CMC_EQUAL_GY_CARD: //Geth, Lord of the Vault only
+                xValue = ability.getManaCostsToPay().getX();
+                TargetCard oldTarget = (TargetCard) ability.getTargets().get(0);
+                FilterCard filterCard = oldTarget.getFilter().copy();
+                filterCard.add(new ConvertedManaCostPredicate(ComparisonType.EQUAL_TO, xValue));
+                ability.getTargets().clear();
+                ability.getTargets().add(new TargetCardInOpponentsGraveyard(filterCard));
+                break;
+            case CHOSEN_NAME: //Declaration of Naught only
+                ability.getTargets().clear();
+                FilterSpell filterSpell = new FilterSpell("spell with the chosen name");
+                filterSpell.add(new NamePredicate((String) game.getState().getValue(ability.getSourceId().toString() + ChooseACardNameEffect.INFO_KEY)));
+                TargetSpell target = new TargetSpell(1, filterSpell);
+                ability.addTarget(target);
+                break;
+            case CHOSEN_COLOR: //Pentarch Paladin only
+                ObjectColor chosenColor = (ObjectColor) game.getState().getValue(ability.getSourceId() + "_color");
+                ability.getTargets().clear();
+                FilterPermanent filter = new FilterPermanent("permanent of the chosen color.");
+                if (chosenColor != null) {
+                    filter.add(new ColorPredicate(chosenColor));
+                } else {
+                    filter.add(new ConvertedManaCostPredicate(ComparisonType.FEWER_THAN, -5));// Pretty sure this is always false
+                }
+                oldTargetPermanent = new TargetPermanent(filter);
+                ability.addTarget(oldTargetPermanent);
+                break;
+            case TREASURE_COUNTER_POWER: //Legacy's Allure only
+                sourcePermanent = game.getPermanentOrLKIBattlefield(ability.getSourceId());
+                if (sourcePermanent != null) {
+                    xValue = sourcePermanent.getCounters(game).getCount(CounterType.TREASURE);
+                    FilterCreaturePermanent filter2 = new FilterCreaturePermanent("creature with power less than or equal to the number of treasure counters on {this}");
+                    filter2.add(new PowerPredicate(ComparisonType.FEWER_THAN, xValue + 1));
+                    ability.getTargets().clear();
+                    ability.getTargets().add(new TargetCreaturePermanent(filter2));
+                }
+                break;
+            case SIMIC_MANIPULATOR: //Simic Manipulator only
+                xValue = 0;
+                for (Cost cost : ability.getCosts()) {
+                    if (cost instanceof RemoveVariableCountersTargetCost) {
+                        xValue = ((RemoveVariableCountersTargetCost) cost).getAmount();
+                        break;
+                    }
+                }
+                ability.getTargets().clear();
+                FilterCreaturePermanent newFilter = new FilterCreaturePermanent("creature with power less than or equal to " + xValue);
+                newFilter.add(new PowerPredicate(ComparisonType.FEWER_THAN, xValue + 1));
+                ability.addTarget(new TargetCreaturePermanent(newFilter));
+                break;
+            case CREATURE_POWER_X_OR_LESS: // Aryel, Knight of Windgrace
+                int value = 0;
+                for (VariableCost cost : ability.getCosts().getVariableCosts()) {
+                    value = cost.getAmount();
+                }
+                FilterCreaturePermanent filterCreaturePermanent = new FilterCreaturePermanent("creature with power " + value + " or less");
+                filterCreaturePermanent.add(new PowerPredicate(ComparisonType.FEWER_THAN, value + 1));
+                ability.getTargets().clear();
+                ability.addTarget(new TargetCreaturePermanent(filterCreaturePermanent));
+                break;
+        }
     }
 
     @Override
@@ -342,7 +477,7 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
     @Override
     public List<Mana> getMana() {
         List<Mana> mana = new ArrayList<>();
-        for (ManaAbility ability : this.abilities.getManaAbilities(Zone.BATTLEFIELD)) {
+        for (ActivatedManaAbilityImpl ability : this.abilities.getActivatedManaAbilities(Zone.BATTLEFIELD)) {
             for (Mana netMana : ability.getNetMana(null)) {
                 mana.add(netMana);
             }
@@ -356,7 +491,7 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
     }
 
     @Override
-    public boolean moveToZone(Zone toZone, UUID sourceId, Game game, boolean flag, ArrayList<UUID> appliedEffects) {
+    public boolean moveToZone(Zone toZone, UUID sourceId, Game game, boolean flag, List<UUID> appliedEffects) {
         Zone fromZone = game.getState().getZone(objectId);
         ZoneChangeEvent event = new ZoneChangeEvent(this.objectId, sourceId, ownerId, fromZone, toZone, appliedEffects);
         ZoneChangeInfo zoneChangeInfo;
@@ -382,7 +517,7 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
         Card mainCard = getMainCard();
         ZoneChangeEvent event = new ZoneChangeEvent(mainCard.getId(), ability.getId(), controllerId, fromZone, Zone.STACK);
         ZoneChangeInfo.Stack info
-                = new ZoneChangeInfo.Stack(event, new Spell(this, ability.copy(), controllerId, event.getFromZone()));
+                = new ZoneChangeInfo.Stack(event, new Spell(this, ability.getSpellAbilityToResolve(game), controllerId, event.getFromZone()));
         return ZonesHandler.cast(info, game);
     }
 
@@ -392,7 +527,7 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
     }
 
     @Override
-    public boolean moveToExile(UUID exileId, String name, UUID sourceId, Game game, ArrayList<UUID> appliedEffects) {
+    public boolean moveToExile(UUID exileId, String name, UUID sourceId, Game game, List<UUID> appliedEffects) {
         Zone fromZone = game.getState().getZone(objectId);
         ZoneChangeEvent event = new ZoneChangeEvent(this.objectId, sourceId, ownerId, fromZone, Zone.EXILED, appliedEffects);
         ZoneChangeInfo.Exile info = new ZoneChangeInfo.Exile(event, exileId, name);
@@ -415,7 +550,7 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
     }
 
     @Override
-    public boolean putOntoBattlefield(Game game, Zone fromZone, UUID sourceId, UUID controllerId, boolean tapped, boolean faceDown, ArrayList<UUID> appliedEffects) {
+    public boolean putOntoBattlefield(Game game, Zone fromZone, UUID sourceId, UUID controllerId, boolean tapped, boolean faceDown, List<UUID> appliedEffects) {
         ZoneChangeEvent event = new ZoneChangeEvent(this.objectId, sourceId, controllerId, fromZone, Zone.BATTLEFIELD, appliedEffects);
         ZoneChangeInfo.Battlefield info = new ZoneChangeInfo.Battlefield(event, faceDown, tapped);
         return ZonesHandler.moveCard(info, game);
@@ -458,14 +593,18 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
                     stackObject = game.getStack().getSpell(getId());
                 }
                 if (stackObject != null) {
-                    removed = game.getStack().remove(stackObject);
+                    removed = game.getStack().remove(stackObject, game);
                     lkiObject = stackObject;
                 }
                 break;
             case COMMAND:
-                lkiObject = (Commander) game.getObject(objectId);
+                for (CommandObject commandObject : game.getState().getCommand()) {
+                    if (commandObject.getId().equals(objectId)) {
+                        lkiObject = commandObject;
+                    }
+                }
                 if (lkiObject != null) {
-                    removed = game.getState().getCommand().remove((Commander) game.getObject(objectId));
+                    removed = game.getState().getCommand().remove((CommandObject) lkiObject);
                 }
                 break;
             case OUTSIDE:
@@ -477,6 +616,9 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
                 } else if (game.getPhase() == null) {
                     // E.g. Commander of commander game
                     removed = true;
+                } else {
+                    // Unstable - Summon the Pack
+                    removed = true;
                 }
                 break;
             case BATTLEFIELD: // for sacrificing permanents or putting to library
@@ -485,11 +627,11 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
             default:
                 MageObject sourceObject = game.getObject(sourceId);
                 logger.fatal("Invalid from zone [" + fromZone + "] for card [" + this.getIdName()
-                        + "] source [" + (sourceObject != null ? sourceObject.getName() : "null") + "]");
+                        + "] source [" + (sourceObject != null ? sourceObject.getName() : "null") + ']');
                 break;
         }
         if (removed) {
-            if (!fromZone.equals(Zone.OUTSIDE)) {
+            if (fromZone != Zone.OUTSIDE) {
                 game.rememberLKI(lkiObject != null ? lkiObject.getId() : objectId, fromZone, lkiObject != null ? lkiObject : this);
             }
         } else {
@@ -503,7 +645,7 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
         Counters countersToAdd = game.getEnterWithCounters(permanent.getId());
         if (countersToAdd != null) {
             for (Counter counter : countersToAdd.values()) {
-                permanent.addCounters(counter, game);
+                permanent.addCounters(counter, null, game);
             }
             game.setEnterWithCounters(permanent.getId(), null);
         }
@@ -598,10 +740,6 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
     }
 
     @Override
-    public void build() {
-    }
-
-    @Override
     public boolean getUsesVariousArt() {
         return usesVariousArt;
     }
@@ -624,33 +762,45 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
     }
 
     @Override
-    public boolean addCounters(Counter counter, Game game) {
-        return addCounters(counter, game, null);
+    public boolean addCounters(Counter counter, Ability source, Game game) {
+        return addCounters(counter, source, game, null, true);
     }
 
     @Override
-    public boolean addCounters(Counter counter, Game game, ArrayList<UUID> appliedEffects) {
+    public boolean addCounters(Counter counter, Ability source, Game game, boolean isEffect) {
+        return addCounters(counter, source, game, null, isEffect);
+    }
+
+    @Override
+    public boolean addCounters(Counter counter, Ability source, Game game, List<UUID> appliedEffects) {
+        return addCounters(counter, source, game, appliedEffects, true);
+    }
+
+    @Override
+    public boolean addCounters(Counter counter, Ability source, Game game, List<UUID> appliedEffects, boolean isEffect) {
         boolean returnCode = true;
-        GameEvent countersEvent = GameEvent.getEvent(GameEvent.EventType.ADD_COUNTERS, objectId, getControllerOrOwner(), counter.getName(), counter.getCount());
+        UUID sourceId = (source == null ? getId() : source.getSourceId());
+        GameEvent countersEvent = GameEvent.getEvent(GameEvent.EventType.ADD_COUNTERS, objectId, sourceId, getControllerOrOwner(), counter.getName(), counter.getCount());
         countersEvent.setAppliedEffects(appliedEffects);
+        countersEvent.setFlag(isEffect);
         if (!game.replaceEvent(countersEvent)) {
             int amount = countersEvent.getAmount();
             int finalAmount = amount;
             for (int i = 0; i < amount; i++) {
                 Counter eventCounter = counter.copy();
                 eventCounter.remove(eventCounter.getCount() - 1);
-                GameEvent event = GameEvent.getEvent(GameEvent.EventType.ADD_COUNTER, objectId, getControllerOrOwner(), counter.getName(), 1);
+                GameEvent event = GameEvent.getEvent(GameEvent.EventType.ADD_COUNTER, objectId, sourceId, getControllerOrOwner(), counter.getName(), 1);
                 event.setAppliedEffects(appliedEffects);
                 if (!game.replaceEvent(event)) {
                     getCounters(game).addCounter(eventCounter);
-                    game.fireEvent(GameEvent.getEvent(GameEvent.EventType.COUNTER_ADDED, objectId, getControllerOrOwner(), counter.getName(), 1));
+                    game.fireEvent(GameEvent.getEvent(GameEvent.EventType.COUNTER_ADDED, objectId, sourceId, getControllerOrOwner(), counter.getName(), 1));
                 } else {
                     finalAmount--;
                     returnCode = false;
                 }
             }
             if (finalAmount > 0) {
-                game.fireEvent(GameEvent.getEvent(GameEvent.EventType.COUNTERS_ADDED, objectId, getControllerOrOwner(), counter.getName(), amount));
+                game.fireEvent(GameEvent.getEvent(GameEvent.EventType.COUNTERS_ADDED, objectId, sourceId, getControllerOrOwner(), counter.getName(), amount));
             }
         } else {
             returnCode = false;
@@ -661,7 +811,9 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
     @Override
     public void removeCounters(String name, int amount, Game game) {
         for (int i = 0; i < amount; i++) {
-            getCounters(game).removeCounter(name, 1);
+            if (!getCounters(game).removeCounter(name, 1)) {
+                break;
+            }
             GameEvent event = GameEvent.getEvent(GameEvent.EventType.COUNTER_REMOVED, objectId, getControllerOrOwner());
             event.setData(name);
             game.fireEvent(event);
@@ -670,7 +822,9 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
 
     @Override
     public void removeCounters(Counter counter, Game game) {
-        removeCounters(counter.getName(), counter.getCount(), game);
+        if (counter != null) {
+            removeCounters(counter.getName(), counter.getCount(), game);
+        }
     }
 
     @Override
@@ -685,6 +839,64 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
     @Override
     public Card getMainCard() {
         return this;
+    }
+
+    @Override
+    public FilterMana getColorIdentity() {
+        FilterMana mana = new FilterMana();
+        mana.setBlack(getManaCost().getText().matches(regexBlack));
+        mana.setBlue(getManaCost().getText().matches(regexBlue));
+        mana.setGreen(getManaCost().getText().matches(regexGreen));
+        mana.setRed(getManaCost().getText().matches(regexRed));
+        mana.setWhite(getManaCost().getText().matches(regexWhite));
+
+        for (String rule : getRules()) {
+            rule = rule.replaceAll("(?i)<i.*?</i>", ""); // Ignoring reminder text in italic
+            if (!mana.isBlack() && (rule.matches(regexBlack) || this.color.isBlack())) {
+                mana.setBlack(true);
+            }
+            if (!mana.isBlue() && (rule.matches(regexBlue) || this.color.isBlue())) {
+                mana.setBlue(true);
+            }
+            if (!mana.isGreen() && (rule.matches(regexGreen) || this.color.isGreen())) {
+                mana.setGreen(true);
+            }
+            if (!mana.isRed() && (rule.matches(regexRed) || this.color.isRed())) {
+                mana.setRed(true);
+            }
+            if (!mana.isWhite() && (rule.matches(regexWhite) || this.color.isWhite())) {
+                mana.setWhite(true);
+            }
+        }
+        if (isTransformable()) {
+            Card secondCard = getSecondCardFace();
+            ObjectColor color = secondCard.getColor(null);
+            mana.setBlack(mana.isBlack() || color.isBlack());
+            mana.setGreen(mana.isGreen() || color.isGreen());
+            mana.setRed(mana.isRed() || color.isRed());
+            mana.setBlue(mana.isBlue() || color.isBlue());
+            mana.setWhite(mana.isWhite() || color.isWhite());
+            for (String rule : secondCard.getRules()) {
+                rule = rule.replaceAll("(?i)<i.*?</i>", ""); // Ignoring reminder text in italic
+                if (!mana.isBlack() && rule.matches(regexBlack)) {
+                    mana.setBlack(true);
+                }
+                if (!mana.isBlue() && rule.matches(regexBlue)) {
+                    mana.setBlue(true);
+                }
+                if (!mana.isGreen() && rule.matches(regexGreen)) {
+                    mana.setGreen(true);
+                }
+                if (!mana.isRed() && rule.matches(regexRed)) {
+                    mana.setRed(true);
+                }
+                if (!mana.isWhite() && rule.matches(regexWhite)) {
+                    mana.setWhite(true);
+                }
+            }
+        }
+
+        return mana;
     }
 
     @Override
@@ -709,7 +921,7 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
     }
 
     @Override
-    public List<String> getSubtype(Game game) {
+    public SubTypeList getSubtype(Game game) {
         if (game != null) {
             CardAttribute cardAttribute = game.getState().getCardAttribute(getId());
             if (cardAttribute != null) {
@@ -717,5 +929,45 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
             }
         }
         return super.getSubtype(game);
+    }
+
+    @Override
+    public List<UUID> getAttachments() {
+        return attachments;
+    }
+
+    @Override
+    public boolean addAttachment(UUID permanentId, Game game) {
+        if (!this.attachments.contains(permanentId)) {
+            Permanent attachment = game.getPermanent(permanentId);
+            if (attachment == null) {
+                attachment = game.getPermanentEntering(permanentId);
+            }
+            if (attachment != null) {
+                if (!game.replaceEvent(new GameEvent(GameEvent.EventType.ATTACH, objectId, permanentId, attachment.getControllerId()))) {
+                    this.attachments.add(permanentId);
+                    attachment.attachTo(objectId, game);
+                    game.fireEvent(new GameEvent(GameEvent.EventType.ATTACHED, objectId, permanentId, attachment.getControllerId()));
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean removeAttachment(UUID permanentId, Game game) {
+        if (this.attachments.contains(permanentId)) {
+            Permanent attachment = game.getPermanent(permanentId);
+            if (attachment != null) {
+                attachment.unattach(game);
+            }
+            if (!game.replaceEvent(new GameEvent(GameEvent.EventType.UNATTACH, objectId, permanentId, attachment != null ? attachment.getControllerId() : null))) {
+                this.attachments.remove(permanentId);
+                game.fireEvent(new GameEvent(GameEvent.EventType.UNATTACHED, objectId, permanentId, attachment != null ? attachment.getControllerId() : null));
+                return true;
+            }
+        }
+        return false;
     }
 }

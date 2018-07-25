@@ -6,10 +6,14 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * Created by IGOUDT on 5-9-2016.
  */
-public class RandomUtil {
+public final class RandomUtil {
 
+    private RandomUtil() {
+    }
 
-    public static Random getRandom() {return ThreadLocalRandom.current();}
+    public static Random getRandom() {
+        return ThreadLocalRandom.current();
+    }
 
     public static int nextInt() {
         return ThreadLocalRandom.current().nextInt();
@@ -21,5 +25,9 @@ public class RandomUtil {
 
     public static boolean nextBoolean() {
         return ThreadLocalRandom.current().nextBoolean();
+    }
+
+    public static double nextDouble() {
+        return ThreadLocalRandom.current().nextDouble();
     }
 }

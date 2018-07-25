@@ -1,57 +1,33 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.d;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import mage.constants.*;
+import java.util.UUID;
 import mage.abilities.Ability;
 import mage.abilities.common.BeginningOfUpkeepTriggeredAbility;
 import mage.abilities.effects.OneShotEffect;
 import mage.cards.Card;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
+import mage.constants.CardType;
+import mage.constants.Outcome;
+import mage.constants.TargetController;
+import mage.constants.Zone;
 import mage.counters.CounterType;
 import mage.filter.FilterCard;
 import mage.filter.common.FilterControlledPermanent;
-import mage.game.Game;
-import mage.game.permanent.Permanent;
-import mage.players.Player;
-import mage.target.Target;
-import mage.target.TargetCard;
-import mage.target.common.TargetControlledPermanent;
-
-import java.util.UUID;
 import mage.filter.predicate.Predicates;
 import mage.filter.predicate.mageobject.CardIdPredicate;
 import mage.filter.predicate.permanent.PermanentIdPredicate;
+import mage.game.Game;
+import mage.game.permanent.Permanent;
+import mage.players.Player;
 import mage.players.PlayerList;
+import mage.target.Target;
+import mage.target.TargetCard;
+import mage.target.common.TargetControlledPermanent;
 
 /**
  * 5/1/2012 	For each despair counter on Descent into Madness, you'll exile a permanent 
@@ -70,13 +46,13 @@ import mage.players.PlayerList;
  * 
  * @author noxx
  */
-public class DescentIntoMadness extends CardImpl {
+public final class DescentIntoMadness extends CardImpl {
 
     public DescentIntoMadness(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId,setInfo,new CardType[]{CardType.ENCHANTMENT},"{3}{B}{B}");
 
 
-        // At the beginning of your upkeep, put a despair counter on Descent into Madness, then each player exiles X permanents he or she controls and/or cards from his or her hand, where X is the number of despair counters on Descent into Madness.
+        // At the beginning of your upkeep, put a despair counter on Descent into Madness, then each player exiles X permanents he or she controls and/or cards from their hand, where X is the number of despair counters on Descent into Madness.
         this.addAbility(new BeginningOfUpkeepTriggeredAbility(new DescentIntoMadnessEffect(), TargetController.YOU, false));
     }
 
@@ -94,7 +70,7 @@ class DescentIntoMadnessEffect extends OneShotEffect {
 
     public DescentIntoMadnessEffect() {
         super(Outcome.Sacrifice);
-        this.staticText = "put a despair counter on {this}, then each player exiles X permanents he or she controls and/or cards from his or her hand, where X is the number of despair counters on {this}";
+        this.staticText = "put a despair counter on {this}, then each player exiles X permanents he or she controls and/or cards from their hand, where X is the number of despair counters on {this}";
     }
 
     public DescentIntoMadnessEffect(final DescentIntoMadnessEffect effect) {
@@ -111,7 +87,7 @@ class DescentIntoMadnessEffect extends OneShotEffect {
         Player controller = game.getPlayer(source.getControllerId());
         Permanent sourcePermanent = game.getPermanent(source.getSourceId());
         if (sourcePermanent != null && controller != null) {
-            sourcePermanent.addCounters(CounterType.DESPAIR.createInstance(), game);
+            sourcePermanent.addCounters(CounterType.DESPAIR.createInstance(), source, game);
         }
         if (sourcePermanent == null) {
             sourcePermanent = (Permanent) game.getLastKnownInformation(source.getSourceId(), Zone.BATTLEFIELD);
@@ -130,7 +106,7 @@ class DescentIntoMadnessEffect extends OneShotEffect {
                 
                 // move permanents and hand cards to exile
                 for (UUID objectId : selectedObjects) {
-                    if (game.getState().getZone(objectId).equals(Zone.BATTLEFIELD)) {
+                    if (game.getState().getZone(objectId) == Zone.BATTLEFIELD) {
                         Permanent permanent = game.getPermanent(objectId);
                         if (permanent != null) {
                             Player player = game.getPlayer(permanent.getControllerId());
@@ -138,7 +114,7 @@ class DescentIntoMadnessEffect extends OneShotEffect {
                                 player.moveCardToExileWithInfo(permanent, null, "", source.getSourceId(), game, Zone.BATTLEFIELD, true);
                             }
                         }
-                    } else if (game.getState().getZone(objectId).equals(Zone.HAND)) {
+                    } else if (game.getState().getZone(objectId) == Zone.HAND) {
                         Card card = game.getCard(objectId);
                         if (card != null) {
                             Player player = game.getPlayer(card.getOwnerId());
@@ -212,7 +188,7 @@ class DescentIntoMadnessEffect extends OneShotEffect {
             }
         }
         if (cardsFromHand > 0) {
-            game.informPlayers(player.getLogName() + " selects " + cardsFromHand + (cardsFromHand == 1?" card":" cards") + " from his or her hand");
+            game.informPlayers(player.getLogName() + " selects " + cardsFromHand + (cardsFromHand == 1?" card":" cards") + " from their hand");
         }
     }
 }

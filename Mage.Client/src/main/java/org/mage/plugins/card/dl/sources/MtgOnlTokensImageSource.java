@@ -1,55 +1,20 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package org.mage.plugins.card.dl.sources;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
+
 import org.apache.log4j.Logger;
 import org.mage.plugins.card.images.CardDownloadData;
-import org.mage.plugins.card.images.DownloadPictures;
 
 /**
- *
  * @author spjspj
  */
-public class MtgOnlTokensImageSource implements CardImageSource {
+public enum MtgOnlTokensImageSource implements CardImageSource {
 
+    instance;
     private static final Logger logger = Logger.getLogger(MtgOnlTokensImageSource.class);
-    private static CardImageSource instance = new MtgOnlTokensImageSource();
     private static int maxTimes = 0;
-
-    public static CardImageSource getInstance() {
-        if (instance == null) {
-            instance = new MtgOnlTokensImageSource();
-        }
-        return instance;
-    }
 
     @Override
     public String getSourceName() {
@@ -57,7 +22,7 @@ public class MtgOnlTokensImageSource implements CardImageSource {
     }
 
     @Override
-    public Float getAverageSize() {
+    public float getAverageSize() {
         return 26.7f;
     }
 
@@ -94,7 +59,7 @@ public class MtgOnlTokensImageSource implements CardImageSource {
     }
 
     @Override
-    public String generateURL(CardDownloadData card) throws Exception {
+    public CardImageUrls generateURL(CardDownloadData card) throws Exception {
         return null;
     }
 
@@ -106,9 +71,9 @@ public class MtgOnlTokensImageSource implements CardImageSource {
         if (copyUrlToImage != null) {
             return;
         }
-        copyUrlToImage = new HashMap<String, String>();
-        copyImageToUrl = new HashMap<String, String>();
-        copyUrlToImageDone = new HashMap<String, Integer>();
+        copyUrlToImage = new HashMap<>();
+        copyImageToUrl = new HashMap<>();
+        copyUrlToImageDone = new HashMap<>();
         copyUrlToImage.put("Angel_B_3_3.jpg", "ANGEL.B.ANGEL.CREATURE.3.3.full.jpg");
         copyUrlToImage.put("Angel_W_3_3.jpg", "ANGEL.W.ANGEL.CREATURE.3.3.full.jpg");
         copyUrlToImage.put("Angel_W_4_4.jpg", "ANGEL.W.ANGEL.CREATURE.4.4.full.jpg");
@@ -359,7 +324,7 @@ public class MtgOnlTokensImageSource implements CardImageSource {
     }
 
     @Override
-    public String generateTokenUrl(CardDownloadData card) throws IOException {
+    public CardImageUrls generateTokenUrl(CardDownloadData card) throws IOException {
         if (copyUrlToImage == null) {
             setupLinks();
         }
@@ -367,7 +332,7 @@ public class MtgOnlTokensImageSource implements CardImageSource {
     }
 
     @Override
-    public Integer getTotalImages() {
+    public int getTotalImages() {
         if (copyUrlToImage == null) {
             setupLinks();
         }
@@ -376,13 +341,19 @@ public class MtgOnlTokensImageSource implements CardImageSource {
         }
         return -1;
     }
-    
+
     @Override
-    public Boolean isTokenSource() {
+    public boolean isTokenSource() {
         return true;
     }
-    
+
     @Override
     public void doPause(String httpImageUrl) {
     }
+
+    @Override
+    public boolean isImageProvided(String setCode, String cardName) {
+        return true;
+    }
+
 }

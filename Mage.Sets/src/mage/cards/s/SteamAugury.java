@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.s;
 
 import java.util.ArrayList;
@@ -54,15 +28,13 @@ import mage.util.GameLog;
  *
  * @author LevelX2
  */
-public class SteamAugury extends CardImpl {
+public final class SteamAugury extends CardImpl {
 
     public SteamAugury(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.INSTANT},"{2}{U}{R}");
+        super(ownerId, setInfo, new CardType[]{CardType.INSTANT}, "{2}{U}{R}");
 
         // Reveal the top five cards of your library and separate them into two piles. An opponent chooses one of those piles. Put that pile into your hand and the other into your graveyard.
         this.getSpellAbility().addEffect(new SteamAuguryEffect());
-        this.getSpellAbility().addTarget(new TargetOpponent());
-
     }
 
     public SteamAugury(final SteamAugury card) {
@@ -146,7 +118,7 @@ class SteamAuguryEffect extends OneShotEffect {
                 pile2Zone = Zone.GRAVEYARD;
             }
 
-            StringBuilder sb = new StringBuilder(sourceObject.getLogName() + ": Pile 1, going to ").append(pile1Zone.equals(Zone.HAND) ? "Hand" : "Graveyard").append(": ");
+            StringBuilder sb = new StringBuilder(sourceObject.getLogName() + ": Pile 1, going to ").append(pile1Zone == Zone.HAND ? "Hand" : "Graveyard").append(": ");
             int i = 0;
             for (UUID cardUuid : pile1CardsIds) {
                 i++;
@@ -161,13 +133,13 @@ class SteamAuguryEffect extends OneShotEffect {
             }
             game.informPlayers(sb.toString());
 
-            sb = new StringBuilder(sourceObject.getLogName() + ": Pile 2, going to ").append(pile2Zone.equals(Zone.HAND) ? "Hand" : "Graveyard").append(":");
+            sb = new StringBuilder(sourceObject.getLogName() + ": Pile 2, going to ").append(pile2Zone == Zone.HAND ? "Hand" : "Graveyard").append(':');
             i = 0;
             for (UUID cardUuid : pile2CardsIds) {
                 Card card = game.getCard(cardUuid);
                 if (card != null) {
                     i++;
-                    sb.append(" ").append(GameLog.getColoredObjectName(card));
+                    sb.append(' ').append(GameLog.getColoredObjectName(card));
                     if (i < pile2CardsIds.size()) {
                         sb.append(", ");
                     }

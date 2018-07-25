@@ -1,36 +1,6 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.abilities.keyword;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.UUID;
 import mage.abilities.Ability;
 import mage.abilities.SpellAbility;
 import mage.abilities.StaticAbility;
@@ -45,7 +15,6 @@ import mage.abilities.effects.OneShotEffect;
 import mage.cards.Card;
 import mage.constants.Outcome;
 import mage.constants.Zone;
-import mage.filter.common.FilterControlledCreaturePermanent;
 import mage.filter.predicate.Predicates;
 import mage.filter.predicate.mageobject.SharesColorWithSourcePredicate;
 import mage.filter.predicate.permanent.TappedPredicate;
@@ -56,6 +25,14 @@ import mage.game.stack.StackObject;
 import mage.players.Player;
 import mage.target.common.TargetControlledPermanent;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.UUID;
+import mage.constants.CardType;
+import mage.filter.common.FilterControlledPermanent;
+import mage.filter.predicate.mageobject.CardTypePredicate;
+
 /*
  * 702.77. Conspire
  * 702.77a Conspire is a keyword that represents two abilities.
@@ -65,7 +42,7 @@ import mage.target.common.TargetControlledPermanent;
  * you may tap two untapped creatures you control that each share a color with it"
  * and "When you cast this spell, if its conspire cost was paid, copy it.
  * If the spell has any targets, you may choose new targets for the copy."
- * Paying a spell’s conspire cost follows the rules for paying additional costs in rules 601.2b and 601.2e–g.
+ * Paying a spell's conspire cost follows the rules for paying additional costs in rules 601.2b and 601.2e–g.
  * 702.77b If a spell has multiple instances of conspire, each is paid separately and triggers
  * based on its own payment, not any other instance of conspire. *
  *
@@ -74,12 +51,13 @@ import mage.target.common.TargetControlledPermanent;
 public class ConspireAbility extends StaticAbility implements OptionalAdditionalSourceCosts {
 
     private static final String keywordText = "Conspire";
-    private static final FilterControlledCreaturePermanent filter = new FilterControlledCreaturePermanent("untapped creatures you control that share a color with it");
+    private static final FilterControlledPermanent filter = new FilterControlledPermanent("untapped creatures you control that share a color with it");
     protected static final String CONSPIRE_ACTIVATION_KEY = "ConspireActivation";
 
     static {
         filter.add(Predicates.not(new TappedPredicate()));
         filter.add(new SharesColorWithSourcePredicate());
+        filter.add(new CardTypePredicate(CardType.CREATURE));
     }
 
     public enum ConspireTargets {
@@ -165,7 +143,7 @@ public class ConspireAbility extends StaticAbility implements OptionalAdditional
                 if (conspireCost.canPay(ability, getSourceId(), getControllerId(), game)
                         && player.chooseUse(Outcome.Benefit, "Pay " + conspireCost.getText(false) + " ?", ability, game)) {
                     activateConspire(ability, game);
-                    for (Iterator it = ((Costs) conspireCost).iterator(); it.hasNext();) {
+                    for (Iterator it = conspireCost.iterator(); it.hasNext();) {
                         Cost cost = (Cost) it.next();
                         ability.getCosts().add(cost.copy());
                     }
@@ -195,7 +173,7 @@ public class ConspireAbility extends StaticAbility implements OptionalAdditional
         StringBuilder sb = new StringBuilder();
         if (conspireCost != null) {
             sb.append(conspireCost.getText(false));
-            sb.append(" ").append(conspireCost.getReminderText());
+            sb.append(' ').append(conspireCost.getReminderText());
         }
         return sb.toString();
     }

@@ -1,39 +1,15 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.target;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import mage.abilities.Ability;
 import mage.constants.Outcome;
 import mage.game.Game;
 import mage.game.events.GameEvent;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -44,6 +20,10 @@ public class Targets extends ArrayList<Target> {
     public Targets() {
     }
 
+    public Targets(Target target) {
+        this.add(target);
+    }
+
     public Targets(final Targets targets) {
         for (Target target : targets) {
             this.add(target.copy());
@@ -51,13 +31,7 @@ public class Targets extends ArrayList<Target> {
     }
 
     public List<Target> getUnchosen() {
-        List<Target> unchosen = new ArrayList<>();
-        for (Target target : this) {
-            if (!target.isChosen()) {
-                unchosen.add(target);
-            }
-        }
-        return unchosen;
+        return stream().filter(target -> !target.isChosen()).collect(Collectors.toList());
     }
 
     public void clearChosen() {
@@ -67,12 +41,7 @@ public class Targets extends ArrayList<Target> {
     }
 
     public boolean isChosen() {
-        for (Target target : this) {
-            if (!target.isChosen()) {
-                return false;
-            }
-        }
-        return true;
+        return stream().allMatch(Target::isChosen);
     }
 
     public boolean choose(Outcome outcome, UUID playerId, UUID sourceId, Game game) {
@@ -122,12 +91,8 @@ public class Targets extends ArrayList<Target> {
     public boolean stillLegal(Ability source, Game game) {
         // 608.2
         // The spell or ability is countered if all its targets, for every instance of the word "target," are now illegal
-        int illegalCount = 0;
-        for (Target target : this) {
-            if (!target.isLegal(source, game)) {
-                illegalCount++;
-            }
-        }
+        int illegalCount = (int) stream().filter(target -> !target.isLegal(source, game)).count();
+
         // it is legal when either there is no target or not all targets are illegal
         return this.isEmpty() || this.size() != illegalCount;
     }
@@ -142,12 +107,7 @@ public class Targets extends ArrayList<Target> {
      * @return - true if enough valid targets exist
      */
     public boolean canChoose(UUID sourceId, UUID sourceControllerId, Game game) {
-        for (Target target : this) {
-            if (!target.canChoose(sourceId, sourceControllerId, game)) {
-                return false;
-            }
-        }
-        return true;
+        return stream().allMatch(target -> target.canChoose(sourceId, sourceControllerId, game));
     }
 
     /**
@@ -160,12 +120,7 @@ public class Targets extends ArrayList<Target> {
      * @return - true if enough valid objects exist
      */
     public boolean canChoose(UUID sourceControllerId, Game game) {
-        for (Target target : this) {
-            if (!target.canChoose(sourceControllerId, game)) {
-                return false;
-            }
-        }
-        return true;
+        return stream().allMatch(target -> target.canChoose(sourceControllerId, game));
     }
 
     public UUID getFirstTarget() {

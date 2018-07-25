@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.abilities.effects.common.search;
 
 import java.util.UUID;
@@ -52,14 +26,14 @@ public abstract class SearchTargetGraveyardHandLibraryForCardNameAndExileEffect 
     protected String searchForText;
 
     /* Slaughter Games
-     * 10/1/2012: You can leave any cards with that name in the zone they are in. You don’t have to exile them.
+     * 10/1/2012: You can leave any cards with that name in the zone they are in. You don't have to exile them.
      *
      * Sowing Salt
      * 2/1/2005: The copies must be found if they are in publicly viewable zones. Finding copies while searching private zones is optional.
      */
-    protected Boolean graveyardExileOptional;
+    protected boolean graveyardExileOptional;
 
-    public SearchTargetGraveyardHandLibraryForCardNameAndExileEffect(Boolean graveyardExileOptional, String searchWhatText, String searchForText) {
+    public SearchTargetGraveyardHandLibraryForCardNameAndExileEffect(boolean graveyardExileOptional, String searchWhatText, String searchForText) {
         super(Outcome.Exile);
         this.searchWhatText = searchWhatText;
         this.searchForText = searchForText;
@@ -129,10 +103,10 @@ public abstract class SearchTargetGraveyardHandLibraryForCardNameAndExileEffect 
     @Override
     public String getText(Mode mode) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Search ").append(this.searchWhatText);
+        sb.append("search ").append(this.searchWhatText);
         sb.append(" graveyard, hand, and library for ");
         sb.append(this.searchForText);
-        sb.append(" and exile them. Then that player shuffles his or her library");
+        sb.append(" and exile them. Then that player shuffles their library");
         return sb.toString();
     }
 }

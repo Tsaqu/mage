@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.util.functions;
 
 import mage.MageObject;
@@ -32,6 +6,8 @@ import mage.abilities.Ability;
 import mage.abilities.keyword.MorphAbility;
 import mage.cards.Card;
 import mage.constants.CardType;
+import mage.constants.SubType;
+import mage.constants.SuperType;
 import mage.game.permanent.PermanentCard;
 import mage.game.permanent.PermanentToken;
 import mage.game.permanent.token.Token;
@@ -83,9 +59,7 @@ public class CopyTokenFunction implements Function<Token, Card> {
         } else {
             target.setOriginalExpansionSetCode(source.getExpansionSetCode());
             target.setOriginalCardNumber(source.getCardNumber());
-            if (source instanceof Card) {
-                target.setCopySourceCard(source);
-            }
+            target.setCopySourceCard(source);
         }
 
         target.setName(sourceObj.getName());
@@ -94,23 +68,23 @@ public class CopyTokenFunction implements Function<Token, Card> {
         target.getManaCost().add(sourceObj.getManaCost());
         target.getCardType().clear();
         for (CardType type : sourceObj.getCardType()) {
-            target.getCardType().add(type);
+            target.addCardType(type);
         }
         target.getSubtype(null).clear();
-        for (String type : sourceObj.getSubtype(null)) {
+        for (SubType type : sourceObj.getSubtype(null)) {
             target.getSubtype(null).add(type);
         }
-        target.getSupertype().clear();
-        for (String type : sourceObj.getSupertype()) {
-            target.getSupertype().add(type);
+        target.getSuperType().clear();
+        for (SuperType type : sourceObj.getSuperType()) {
+            target.addSuperType(type);
         }
 
         target.getAbilities().clear();
 
         for (Ability ability0 : sourceObj.getAbilities()) {
             Ability ability = ability0.copy();
-            ability.newId();
-            ability.setSourceId(target.getId());
+            ability.newOriginalId(); // The token is independant from the copy from object so it need a new original Id, otherwise there are problems to check for created continuous effects to check if the source (the Token) has still this ability
+
             target.addAbility(ability);
         }
 

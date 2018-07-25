@@ -1,30 +1,4 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage;
 
 import java.io.Serializable;
@@ -104,13 +78,13 @@ public class ConditionalMana extends Mana implements Serializable {
             if (!applied) {
                 // if one condition fails, return false only if All conditions should be met
                 // otherwise it may happen that Any other condition will be ok
-                if (scope.equals(Filter.ComparisonScope.All)) {
+                if (scope == Filter.ComparisonScope.All) {
                     return false;
                 }
             } else {
                 // if one condition succeeded, return true only if Any conditions should be met
                 // otherwise it may happen that any other condition will fail
-                if (scope.equals(Filter.ComparisonScope.Any)) {
+                if (scope == Filter.ComparisonScope.Any) {
                     return true;
                 }
             }
@@ -118,7 +92,7 @@ public class ConditionalMana extends Mana implements Serializable {
         // we are here
         // if All conditions should be met, then it's Ok (return true)
         // if Any, then it should have already returned true, so returning false here
-        return scope.equals(Filter.ComparisonScope.All);
+        return scope == Filter.ComparisonScope.All;
     }
 
     @Override
@@ -206,26 +180,20 @@ public class ConditionalMana extends Mana implements Serializable {
                 break;
             case BLUE:
                 blue += amount;
-                ;
                 break;
             case GREEN:
                 green += amount;
-                ;
                 break;
             case RED:
                 red += amount;
-                ;
                 break;
             case WHITE:
                 white += amount;
-                ;
                 break;
             case COLORLESS:
                 colorless += amount;
-                ;
             case GENERIC:
                 generic += amount;
-                ;
                 break;
         }
     }

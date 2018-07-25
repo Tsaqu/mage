@@ -1,30 +1,4 @@
-/*
-* Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are
-* permitted provided that the following conditions are met:
-*
-*    1. Redistributions of source code must retain the above copyright notice, this list of
-*       conditions and the following disclaimer.
-*
-*    2. Redistributions in binary form must reproduce the above copyright notice, this list
-*       of conditions and the following disclaimer in the documentation and/or other materials
-*       provided with the distribution.
-*
-* THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-* FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*
-* The views and conclusions contained in the software and documentation are those of the
-* authors and should not be interpreted as representing official policies, either expressed
-* or implied, of BetaSteward_at_googlemail.com.
-*/
+
 
 /*
  * Permanent.java
@@ -34,30 +8,24 @@
 
 package mage.client.cards;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
+import mage.cards.CardDimensions;
+import mage.cards.MagePermanent;
+import mage.cards.Sets;
+import mage.client.util.Config;
+import mage.client.util.TransformedImageCache;
+import mage.view.CounterView;
+import mage.view.PermanentView;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.swing.PopupFactory;
-import mage.cards.CardDimensions;
-import mage.cards.MagePermanent;
-import mage.cards.Sets;
+
 import static mage.client.constants.Constants.DAMAGE_MAX_LEFT;
 import static mage.client.constants.Constants.POWBOX_TEXT_MAX_TOP;
-import mage.client.util.Config;
-import mage.client.util.ImageHelper;
-import mage.constants.CardType;
-import mage.view.CounterView;
-import mage.view.PermanentView;
-import org.mage.plugins.card.images.ImageCache;
-import mage.client.util.TransformedImageCache;
 
 /**
  *
@@ -67,9 +35,9 @@ public class Permanent extends Card {
 
     protected PermanentView permanent;
 
-    protected List<MagePermanent> links = new ArrayList<>();
+    protected final List<MagePermanent> links = new ArrayList<>();
     protected boolean linked;
-    protected BufferedImage tappedImage;
+    protected final BufferedImage tappedImage;
     protected BufferedImage flippedImage;
 
     /** Creates new form Permanent
@@ -108,25 +76,25 @@ public class Permanent extends Card {
         if (permanent.getOriginal() != null) {
         sb.append("\n----- Originally -------\n");
         sb.append(permanent.getOriginal().getName());
-        if (permanent.getOriginal().getManaCost().size() > 0) {
-            sb.append("\n").append(permanent.getOriginal().getManaCost());
+        if (!permanent.getOriginal().getManaCost().isEmpty()) {
+            sb.append('\n').append(permanent.getOriginal().getManaCost());
         }
-        sb.append("\n").append(getType(permanent.getOriginal()));
+        sb.append('\n').append(getType(permanent.getOriginal()));
         if (permanent.getOriginal().getColor().hasColor()) {
-            sb.append("\n").append(permanent.getOriginal().getColor().toString());
+            sb.append('\n').append(permanent.getOriginal().getColor().toString());
         }
-        if (permanent.getOriginal().getCardTypes().contains(CardType.CREATURE)) {
-            sb.append("\n").append(permanent.getOriginal().getPower()).append("/").append(permanent.getOriginal().getToughness());
+        if (permanent.getOriginal().isCreature()) {
+            sb.append('\n').append(permanent.getOriginal().getPower()).append('/').append(permanent.getOriginal().getToughness());
         }
-        else if (permanent.getOriginal().getCardTypes().contains(CardType.PLANESWALKER)) {
-            sb.append("\n").append(permanent.getOriginal().getLoyalty());
+        else if (permanent.getOriginal().isPlanesWalker()) {
+            sb.append('\n').append(permanent.getOriginal().getLoyalty());
         }
         for (String rule: getRules()) {
-            sb.append("\n").append(rule);
+            sb.append('\n').append(rule);
         }
-        if (permanent.getOriginal().getExpansionSetCode().length() > 0) {
-            sb.append("\n").append(permanent.getCardNumber()).append(" - ");
-            sb.append("\n").append(Sets.getInstance().get(permanent.getOriginal().getExpansionSetCode()).getName()).append(" - ");
+        if (!permanent.getOriginal().getExpansionSetCode().isEmpty()) {
+            sb.append('\n').append(permanent.getCardNumber()).append(" - ");
+            sb.append('\n').append(Sets.getInstance().get(permanent.getOriginal().getExpansionSetCode()).getName()).append(" - ");
             sb.append(permanent.getOriginal().getRarity().toString());
         }
 //        sb.append("\n").append(card.getId());

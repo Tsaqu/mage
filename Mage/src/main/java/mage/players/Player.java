@@ -1,30 +1,3 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
 package mage.players;
 
 import java.io.Serializable;
@@ -36,6 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 import mage.MageItem;
 import mage.MageObject;
+import mage.MageObjectReference;
 import mage.abilities.Abilities;
 import mage.abilities.Ability;
 import mage.abilities.ActivatedAbility;
@@ -57,11 +31,14 @@ import mage.choices.Choice;
 import mage.constants.AbilityType;
 import mage.constants.ManaType;
 import mage.constants.Outcome;
+import mage.constants.PlanarDieRoll;
 import mage.constants.PlayerAction;
 import mage.constants.RangeOfInfluence;
 import mage.constants.Zone;
 import mage.counters.Counter;
 import mage.counters.Counters;
+import mage.designations.Designation;
+import mage.designations.DesignationType;
 import mage.filter.FilterPermanent;
 import mage.game.Game;
 import mage.game.Graveyard;
@@ -109,7 +86,9 @@ public interface Player extends MageItem, Copyable<Player> {
 
     void initLife(int life);
 
-    void setLife(int life, Game game);
+    void setLife(int life, Game game, Ability source);
+
+    void setLife(int life, Game game, UUID sourceId);
 
     /**
      *
@@ -120,11 +99,13 @@ public interface Player extends MageItem, Copyable<Player> {
      */
     int loseLife(int amount, Game game, boolean atCombat);
 
-    int gainLife(int amount, Game game);
+    int gainLife(int amount, Game game, Ability source);
+
+    int gainLife(int amount, Game game, UUID sourceId);
 
     int damage(int damage, UUID sourceId, Game game, boolean combatDamage, boolean preventable);
 
-    int damage(int damage, UUID sourceId, Game game, boolean combatDamage, boolean preventable, ArrayList<UUID> appliedEffects);
+    int damage(int damage, UUID sourceId, Game game, boolean combatDamage, boolean preventable, List<UUID> appliedEffects);
 
     // to handle rule changing effects (613.10)
     boolean isCanLoseLife();
@@ -212,6 +193,8 @@ public interface Player extends MageItem, Copyable<Player> {
 
     boolean hasLost();
 
+    boolean hasDrew();
+
     boolean hasWon();
 
     boolean hasQuit();
@@ -295,6 +278,8 @@ public interface Player extends MageItem, Copyable<Player> {
      */
     void setTurnControlledBy(UUID playerId);
 
+    List<UUID> getTurnControllers();
+
     UUID getTurnControlledBy();
 
     /**
@@ -322,6 +307,8 @@ public interface Player extends MageItem, Copyable<Player> {
      */
     void setGameUnderYourControl(boolean value);
 
+    void setGameUnderYourControl(boolean value, boolean fullRestore);
+
     boolean isTestMode();
 
     void setTestMode(boolean value);
@@ -348,9 +335,9 @@ public interface Player extends MageItem, Copyable<Player> {
 
     int drawCards(int num, Game game);
 
-    int drawCards(int num, Game game, ArrayList<UUID> appliedEffects);
+    int drawCards(int num, Game game, List<UUID> appliedEffects);
 
-    boolean cast(SpellAbility ability, Game game, boolean noMana);
+    boolean cast(SpellAbility ability, Game game, boolean noMana, MageObjectReference reference);
 
     SpellAbility chooseSpellAbilityForCast(SpellAbility ability, Game game, boolean noMana);
 
@@ -368,14 +355,19 @@ public interface Player extends MageItem, Copyable<Player> {
 
     boolean searchLibrary(TargetCardInLibrary target, Game game);
 
+    boolean searchLibrary(TargetCardInLibrary target, Game game, boolean triggerEvents);
+
+    boolean searchLibrary(TargetCardInLibrary target, Game game, UUID targetPlayerId);
+
     /**
      *
      * @param target
      * @param game
      * @param targetPlayerId player whose library will be searched
+     * @param triggerEvents whether searching will trigger any game events
      * @return true if search was successful
      */
-    boolean searchLibrary(TargetCardInLibrary target, Game game, UUID targetPlayerId);
+    boolean searchLibrary(TargetCardInLibrary target, Game game, UUID targetPlayerId, boolean triggerEvents);
 
     boolean canPlayLand();
 
@@ -390,7 +382,7 @@ public interface Player extends MageItem, Copyable<Player> {
      * to be the turn of the player playing that card.
      * @return
      */
-    boolean playCard(Card card, Game game, boolean noMana, boolean ignoreTiming);
+    boolean playCard(Card card, Game game, boolean noMana, boolean ignoreTiming, MageObjectReference reference);
 
     /**
      *
@@ -415,6 +407,16 @@ public interface Player extends MageItem, Copyable<Player> {
 
     boolean flipCoin(Game game, ArrayList<UUID> appliedEffects);
 
+    int rollDice(Game game, int numSides);
+
+    int rollDice(Game game, ArrayList<UUID> appliedEffects, int numSides);
+
+    PlanarDieRoll rollPlanarDie(Game game);
+
+    PlanarDieRoll rollPlanarDie(Game game, ArrayList<UUID> appliedEffects);
+
+    PlanarDieRoll rollPlanarDie(Game game, ArrayList<UUID> appliedEffects, int numberChaosSides, int numberPlanarSides);
+
     @Deprecated
     void discard(int amount, Ability source, Game game);
 
@@ -430,6 +432,8 @@ public interface Player extends MageItem, Copyable<Player> {
 
     void lostForced(Game game);
 
+    void drew(Game game);
+
     void won(Game game);
 
     void leave();
@@ -439,6 +443,8 @@ public interface Player extends MageItem, Copyable<Player> {
     void abort();
 
     void abortReset();
+
+    void signalPlayerConcede();
 
     void skip();
 
@@ -451,13 +457,40 @@ public interface Player extends MageItem, Copyable<Player> {
 
     void resetStoredBookmark(Game game);
 
+    void revealCards(Ability source, Cards cards, Game game);
+
     void revealCards(String name, Cards cards, Game game);
 
+    void revealCards(Ability source, String name, Cards cards, Game game);
+
     void revealCards(String name, Cards cards, Game game, boolean postToLog);
+
+    /**
+     * Adds the cards to the reveal window and adds the source object's id name
+     * to the title bar of the revealed cards window
+     *
+     * @param source
+     * @param name
+     * @param cards
+     * @param game
+     * @param postToLog
+     */
+    void revealCards(Ability source, String name, Cards cards, Game game, boolean postToLog);
 
     void lookAtCards(String name, Card card, Game game);
 
     void lookAtCards(String name, Cards cards, Game game);
+
+    /**
+     * Adds the cards to the look window and adds the source object's id name to
+     * the title bar of the lookedAt window
+     *
+     * @param source
+     * @param name
+     * @param cards
+     * @param game
+     */
+    void lookAtCards(Ability source, String name, Cards cards, Game game);
 
     @Override
     Player copy();
@@ -506,10 +539,22 @@ public interface Player extends MageItem, Copyable<Player> {
      * @param cards - list of cards that have to be moved
      * @param game - game
      * @param anyOrder - true if player can determine the order of the cards
+     * else random order
      * @param source - source ability
      * @return
      */
     boolean putCardsOnBottomOfLibrary(Cards cards, Game game, Ability source, boolean anyOrder);
+
+    /**
+     * Moves the card to the top x position of the library
+     *
+     * @param card
+     * @param game
+     * @param source
+     * @param xFromTheTop
+     * @return
+     */
+    boolean putCardOnTopXOfLibrary(Card card, Game game, Ability source, int xFromTheTop);
 
     /**
      * Moves the cards from cards to the top of players library.
@@ -564,6 +609,8 @@ public interface Player extends MageItem, Copyable<Player> {
     void declareAttacker(UUID attackerId, UUID defenderId, Game game, boolean allowUndo);
 
     void declareBlocker(UUID defenderId, UUID blockerId, UUID attackerId, Game game);
+
+    void declareBlocker(UUID defenderId, UUID blockerId, UUID attackerId, Game game, boolean allowUndo);
 
     List<Permanent> getAvailableAttackers(Game game);
 
@@ -647,14 +694,14 @@ public interface Player extends MageItem, Copyable<Player> {
      *
      * @param commanderId
      */
-    void setCommanderId(UUID commanderId);
+    void addCommanderId(UUID commanderId);
 
     /**
-     * Get the commanderId of the player
+     * Get the commanderIds of the player
      *
      * @return
      */
-    UUID getCommanderId();
+    Set<UUID> getCommandersIds();
 
     /**
      * Moves cards from one zone to another
@@ -669,7 +716,7 @@ public interface Player extends MageItem, Copyable<Player> {
 
     boolean moveCards(Card card, Zone toZone, Ability source, Game game);
 
-    boolean moveCards(Card card, Zone toZone, Ability source, Game game, boolean tapped, boolean faceDown, boolean byOwner, ArrayList<UUID> appliedEffects);
+    boolean moveCards(Card card, Zone toZone, Ability source, Game game, boolean tapped, boolean faceDown, boolean byOwner, List<UUID> appliedEffects);
 
     boolean moveCards(Set<Card> cards, Zone toZone, Ability source, Game game);
 
@@ -689,7 +736,7 @@ public interface Player extends MageItem, Copyable<Player> {
      * @param appliedEffects
      * @return
      */
-    boolean moveCards(Set<Card> cards, Zone toZone, Ability source, Game game, boolean tapped, boolean faceDown, boolean byOwner, ArrayList<UUID> appliedEffects);
+    boolean moveCards(Set<Card> cards, Zone toZone, Ability source, Game game, boolean tapped, boolean faceDown, boolean byOwner, List<UUID> appliedEffects);
 
     boolean moveCardsToExile(Card card, Ability source, Game game, boolean withName, UUID exileId, String exileZoneName);
 
@@ -718,7 +765,8 @@ public interface Player extends MageItem, Copyable<Player> {
 
     /**
      * Uses card.moveToExile and posts a inform message about moving the card to
-     * exile into the game log
+     * exile into the game log. Don't use this in replacement effects, because
+     * list of applied effects is not saved
      *
      * @param card
      * @param exileId exile zone id (optional)
@@ -729,6 +777,7 @@ public interface Player extends MageItem, Copyable<Player> {
      * @param withName
      * @return
      */
+    @Deprecated
     boolean moveCardToExileWithInfo(Card card, UUID exileId, String exileName, UUID sourceId, Game game, Zone fromZone, boolean withName);
 
     /**
@@ -811,6 +860,8 @@ public interface Player extends MageItem, Copyable<Player> {
 
     Set<UUID> getUsersAllowedToSeeHandCards();
 
+    void setPayManaMode(boolean payManaMode);
+
     boolean isInPayManaMode();
 
     void setMatchPlayer(MatchPlayer matchPlayer);
@@ -829,4 +880,11 @@ public interface Player extends MageItem, Copyable<Player> {
     boolean addTargets(Ability ability, Game game);
 
     String getHistory();
+
+    boolean hasDesignation(DesignationType designationName);
+
+    void addDesignation(Designation designation);
+
+    List<Designation> getDesignations();
+
 }

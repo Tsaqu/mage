@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.sets;
 
 import mage.cards.ExpansionSet;
@@ -33,20 +7,19 @@ import mage.cards.f.FeastOfTheUnicorn;
 import mage.cards.m.MesaFalcon;
 import mage.cards.s.SoldeviSage;
 import mage.cards.v.VodalianSoldiers;
-import mage.constants.SetType;
 import mage.constants.Rarity;
-import mage.cards.CardGraphicInfo;
+import mage.constants.SetType;
 
 /**
  *
  * @author North
  */
-public class ClassicSixthEdition extends ExpansionSet {
+public final class ClassicSixthEdition extends ExpansionSet {
 
-    private static final ClassicSixthEdition fINSTANCE = new ClassicSixthEdition();
+    private static final ClassicSixthEdition instance = new ClassicSixthEdition();
 
     public static ClassicSixthEdition getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     private ClassicSixthEdition() {
@@ -170,10 +143,10 @@ public class ClassicSixthEdition extends ExpansionSet {
         cards.add(new SetCardInfo("Fog", 230, Rarity.COMMON, mage.cards.f.Fog.class));
         cards.add(new SetCardInfo("Fog Elemental", 69, Rarity.COMMON, mage.cards.f.FogElemental.class));
         cards.add(new SetCardInfo("Forbidden Crypt", 132, Rarity.RARE, mage.cards.f.ForbiddenCrypt.class));
-        cards.add(new SetCardInfo("Forest", 347, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 348, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 349, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 350, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Forest", 347, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 348, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 349, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 350, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Forget", 70, Rarity.RARE, mage.cards.f.Forget.class));
         cards.add(new SetCardInfo("Fountain of Youth", 286, Rarity.UNCOMMON, mage.cards.f.FountainOfYouth.class));
         cards.add(new SetCardInfo("Fyndhorn Brownie", 231, Rarity.COMMON, mage.cards.f.FyndhornBrownie.class));
@@ -217,10 +190,10 @@ public class ClassicSixthEdition extends ExpansionSet {
         cards.add(new SetCardInfo("Insight", 75, Rarity.UNCOMMON, mage.cards.i.Insight.class));
         cards.add(new SetCardInfo("Inspiration", 76, Rarity.COMMON, mage.cards.i.Inspiration.class));
         cards.add(new SetCardInfo("Iron Star", 291, Rarity.UNCOMMON, mage.cards.i.IronStar.class));
-        cards.add(new SetCardInfo("Island", 335, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 336, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 337, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 338, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Island", 335, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 336, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 337, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 338, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Ivory Cup", 292, Rarity.UNCOMMON, mage.cards.i.IvoryCup.class));
         cards.add(new SetCardInfo("Jade Monolith", 293, Rarity.RARE, mage.cards.j.JadeMonolith.class));
         cards.add(new SetCardInfo("Jalum Tome", 294, Rarity.RARE, mage.cards.j.JalumTome.class));
@@ -255,10 +228,10 @@ public class ClassicSixthEdition extends ExpansionSet {
         cards.add(new SetCardInfo("Mind Warp", 143, Rarity.UNCOMMON, mage.cards.m.MindWarp.class));
         cards.add(new SetCardInfo("Mischievous Poltergeist", 144, Rarity.UNCOMMON, mage.cards.m.MischievousPoltergeist.class));
         cards.add(new SetCardInfo("Moss Diamond", 301, Rarity.UNCOMMON, mage.cards.m.MossDiamond.class));
-        cards.add(new SetCardInfo("Mountain", 343, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 344, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 345, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 346, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Mountain", 343, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 344, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 345, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 346, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Mountain Goat", 195, Rarity.COMMON, mage.cards.m.MountainGoat.class));
         cards.add(new SetCardInfo("Mystical Tutor", 83, Rarity.UNCOMMON, mage.cards.m.MysticalTutor.class));
         cards.add(new SetCardInfo("Mystic Compass", 302, Rarity.UNCOMMON, mage.cards.m.MysticCompass.class));
@@ -282,10 +255,10 @@ public class ClassicSixthEdition extends ExpansionSet {
         cards.add(new SetCardInfo("Phantom Warrior", 85, Rarity.UNCOMMON, mage.cards.p.PhantomWarrior.class));
         cards.add(new SetCardInfo("Phyrexian Vault", 307, Rarity.UNCOMMON, mage.cards.p.PhyrexianVault.class));
         cards.add(new SetCardInfo("Pillage", 198, Rarity.UNCOMMON, mage.cards.p.Pillage.class));
-        cards.add(new SetCardInfo("Plains", 331, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 332, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 333, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 334, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Plains", 331, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 332, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 333, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 334, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Polymorph", 86, Rarity.RARE, mage.cards.p.Polymorph.class));
         cards.add(new SetCardInfo("Power Sink", 87, Rarity.UNCOMMON, mage.cards.p.PowerSink.class));
         cards.add(new SetCardInfo("Pradesh Gypsies", 244, Rarity.COMMON, mage.cards.p.PradeshGypsies.class));
@@ -356,10 +329,10 @@ public class ClassicSixthEdition extends ExpansionSet {
         cards.add(new SetCardInfo("Summer Bloom", 255, Rarity.UNCOMMON, mage.cards.s.SummerBloom.class));
         cards.add(new SetCardInfo("Sunweb", 46, Rarity.RARE, mage.cards.s.Sunweb.class));
         cards.add(new SetCardInfo("Svyelunite Temple", 329, Rarity.UNCOMMON, mage.cards.s.SvyeluniteTemple.class));
-        cards.add(new SetCardInfo("Swamp", 339, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 340, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 341, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 342, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Swamp", 339, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 340, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 341, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 342, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Syphon Soul", 159, Rarity.COMMON, mage.cards.s.SyphonSoul.class));
         cards.add(new SetCardInfo("Talruum Minotaur", 210, Rarity.COMMON, mage.cards.t.TalruumMinotaur.class));
         cards.add(new SetCardInfo("Tariff", 47, Rarity.RARE, mage.cards.t.Tariff.class));

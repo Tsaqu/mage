@@ -90,7 +90,7 @@ $raritiesConversion{'Bonus'} = 'BONUS';
 
 # Get card name
 my $cardName = $ARGV[0];
-if(!$cardName) {
+if (!$cardName) {
     print 'Enter a card name: ';
     $cardName = <STDIN>;
     chomp $cardName;
@@ -100,17 +100,31 @@ if(!$cardName) {
 if (!exists $cards{$cardName}) {
     my $possible;
     foreach $possible (sort keys (%cards)) {
-        if ($possible =~ m/^$cardName.*/img && $cardName =~ m/..../) {
+        if ($possible =~ m/$cardName/img && $cardName =~ m/..../) {
             print ("Did you mean $possible ?\n");
         }
     }
     die "Card name doesn't exist: $cardName\n";
 }
 
+my $cardTemplate = 'cardClass.tmpl';
+my $splitDelimiter = '//';
+my $empty = '';
+my $splitSpell = 'false';
+my $originalName = $cardName;
+
+# Remove the // from name of split cards
+if (index($cardName, $splitDelimiter) != -1) {
+    $cardName  =~ s/$splitDelimiter/$empty/g;
+    $cardTemplate = 'cardSplitClass.tmpl';
+    $splitSpell = 'true';
+}
+
+
 # Check if card is already implemented
-my $fileName = "../Mage.Sets/src/mage/cards/".substr($cardName, 0, 1)."/".toCamelCase($cardName).".java";
+my $fileName = "../Mage.Sets/src/mage/cards/".lc(substr($cardName, 0, 1))."/".toCamelCase($cardName).".java";
 if(-e $fileName) {
-  die "$cardName is already implemented.\n";
+  die "$cardName is already implemented.\n$fileName\n";
 }
                                                                           
 # Generate lines to corresponding sets
@@ -119,11 +133,10 @@ $vars{'className'} = toCamelCase($cardName);
 $vars{'cardNameFirstLetter'} = lc substr($cardName, 0, 1);
 my @card;
 
-foreach my $setName (keys %{$cards{$cardName}}) {
+foreach my $setName (keys %{$cards{$originalName}}) {
   my $setFileName = "../Mage.Sets/src/mage/sets/".$knownSets{$setName}.".java";
-  @card = @{${cards{$cardName}{$setName}}}; 
-  my $line = "\tcards.add(new SetCardInfo(\"".$card[0]."\", ".$card[2].", Rarity.".$raritiesConversion{$card[3]}.", mage.cards.".$vars{'cardNameFirstLetter'}.".".$vars{'className'}.".class));\n";  
-  
+  @card = @{${cards{$originalName}{$setName}}};
+  my $line = "        cards.add(new SetCardInfo(\"".$card[0]."\", ".$card[2].", Rarity.".$raritiesConversion{$card[3]}.", mage.cards.".$vars{'cardNameFirstLetter'}.".".$vars{'className'}.".class));\n";
   @ARGV = ($setFileName);
   $^I = '.bak';
   my $last;
@@ -162,34 +175,51 @@ foreach my $setName (keys %{$cards{$cardName}}) {
   print "$setFileName\n";
 }
 
-# Generate the the card
+# Generate the card
 my $result;
-my $template = Text::Template->new(TYPE => 'FILE', SOURCE => 'cardClass.tmpl', DELIMITERS => [ '[=', '=]' ]);
+my $template = Text::Template->new(TYPE => 'FILE', SOURCE => $cardTemplate, DELIMITERS => [ '[=', '=]' ]);
 $vars{'author'} = $author;
 $vars{'manaCost'} = fixCost($card[4]);
 $vars{'power'} = $card[6];
 $vars{'toughness'} = $card[7];
 
 my @types;
+$vars{'planeswalker'} = 'false';
 $vars{'subType'} = '';
+$vars{'hasSubTypes'} = 'false';
+$vars{'hasSuperTypes'} = 'false';
+my $cardAbilities = $card[8];
 my $type = $card[5];
 while ($type =~ m/([a-zA-Z]+)( )*/g) {
     if (exists($cardTypes{$1})) {
-        push(@types, $cardTypes{$1});
+        push(@types, $cardTypes{$1}); 
+        if ($cardTypes{$1} eq $cardTypes{'Planeswalker'}) {
+            $vars{'planeswalker'} = 'true';
+            $cardAbilities = $card[7];
+        }
     } else {
         if (@types) {
-            $vars{'subType'} .= "\n        this.subtype.add(\"$1\");";
+            my $st = uc($1);
+            $vars{'subType'} .= "\n        this.subtype.add(SubType.$st);";
+			$vars{'hasSubTypes'} = 'true';
         } else {
-            $vars{'subType'} .= "\n        this.supertype.add(\"$1\");";
+            my $st = uc($1);
+            $vars{'subType'} .= "\n        this.addSuperType(SuperType.$st);";
+			$vars{'hasSuperTypes'} = 'true';
         }
     }
 }
-$vars{'type'} = join(', ', @types);
 
+$vars{'type'} = join(', ', @types);
 $vars{'abilitiesImports'} = '';
 $vars{'abilities'} = '';
 
-my @abilities = split('\$', $card[8]);
+my $strong = "<strong>";
+$cardAbilities  =~ s/$strong/$empty/g;
+$strong = "</strong>";
+$cardAbilities  =~ s/$strong/$empty/g;
+
+my @abilities = split('\$', $cardAbilities);
 foreach my $ability (@abilities) {
     $ability =~ s/ <i>.+?<\/i>//g;
 
@@ -205,6 +235,7 @@ foreach my $ability (@abilities) {
                         $kw = $kk;
                     }
                 }
+
                 if ($keywords{$kw}) {
                     $vars{'abilities'} .= "\n        // " . ucfirst($kwUnchanged);
                     if ($keywords{$kw} eq 'instance') {
@@ -227,11 +258,35 @@ foreach my $ability (@abilities) {
                         $ability =~ m/({.*})/g;
                         $vars{'abilities'} .= "\n        this.addAbility(new " . $kw . 'Ability(this, new ManaCostsImpl("' . fixCost($1) . '")));';
                         $vars{'abilitiesImports'} .= "\nimport mage.abilities.costs.mana.ManaCostsImpl;";
+					} elsif ($keywords{$kw} eq 'cost, card') {
+                        $ability =~ m/({.*})/g;
+                        $vars{'abilities'} .= "\n        this.addAbility(new " . $kw . 'Ability(new ManaCostsImpl("' . fixCost($1) . '"), this));';
+                        $vars{'abilitiesImports'} .= "\nimport mage.abilities.costs.mana.ManaCostsImpl;";
+                    } elsif ($keywords{$kw} eq 'type') {
+                        $ability =~ m/\s([a-zA-Z\s]*)/g;
+                        if ($1 =~ m/(^.*\s.*)/g) {
+                            $vars{'abilities'} .= "\n        TargetPermanent auraTarget = new TargetPermanent(filter);";
+                        } else {
+                            $vars{'abilities'} .= "\n        TargetPermanent auraTarget = new Target". toCamelCase($1) . "Permanent();";
+                            $vars{'abilitiesImports'} .= "\nimport mage.target.common.Target". toCamelCase($1) . "Permanent;";
+                        }
+                        $vars{'abilities'} .= "\n        this.getSpellAbility().addTarget(auraTarget);";
+                        $vars{'abilities'} .= "\n        this.getSpellAbility().addEffect(new AttachEffect(Outcome.BoostCreature));";
+                        $vars{'abilities'} .= "\n        Ability ability = new EnchantAbility(auraTarget.getTargetName());";
+                        $vars{'abilities'} .= "\n        this.addAbility(ability);";
+                        $vars{'abilitiesImports'} .= "\nimport mage.abilities.Ability;";
+                        $vars{'abilitiesImports'} .= "\nimport mage.abilities.effects.common.AttachEffect;";
+                        $vars{'abilitiesImports'} .= "\nimport mage.constants.Outcome;";
+                        $vars{'abilitiesImports'} .= "\nimport mage.target.TargetPermanent;";
+                    } elsif ($keywords{$kw} eq 'manaString') {
+                        $ability =~ m/({.*})/g;
+                        $vars{'abilities'} .= "\n        this.addAbility(new " . $kw . 'Ability("' . fixCost($1) . '"));';
                     }
                     $vars{'abilitiesImports'} .= "\nimport mage.abilities.keyword." . $kw . "Ability;";
                 } else {
                     $vars{'abilities'} .= "\n        // $kwUnchanged";
                 }
+                $vars{'abilities'} .= "\n";
             }
         }
     }

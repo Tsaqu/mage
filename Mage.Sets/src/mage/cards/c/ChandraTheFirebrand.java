@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.c;
 
 import java.util.UUID;
@@ -38,29 +12,32 @@ import mage.abilities.effects.common.DamageTargetEffect;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.CardType;
+import mage.constants.SubType;
 import mage.constants.Duration;
+import mage.constants.SuperType;
 import mage.game.Game;
 import mage.game.events.GameEvent;
 import mage.game.events.GameEvent.EventType;
 import mage.game.stack.Spell;
-import mage.target.common.TargetCreatureOrPlayer;
+import mage.target.common.TargetAnyTarget;
 import mage.target.targetpointer.FixedTarget;
 
 /**
  *
  * @author Loki
  */
-public class ChandraTheFirebrand extends CardImpl {
+public final class ChandraTheFirebrand extends CardImpl {
 
     public ChandraTheFirebrand(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.PLANESWALKER},"{3}{R}");
-        this.subtype.add("Chandra");
+        super(ownerId, setInfo, new CardType[]{CardType.PLANESWALKER}, "{3}{R}");
+        this.addSuperType(SuperType.LEGENDARY);
+        this.subtype.add(SubType.CHANDRA);
 
         this.addAbility(new PlanswalkerEntersWithLoyalityCountersAbility(3));
 
-        // +1: Chandra, the Firebrand deals 1 damage to target creature or player.
+        // +1: Chandra, the Firebrand deals 1 damage to any target.
         LoyaltyAbility ability1 = new LoyaltyAbility(new DamageTargetEffect(1), 1);
-        ability1.addTarget(new TargetCreatureOrPlayer());
+        ability1.addTarget(new TargetAnyTarget());
         this.addAbility(ability1);
 
         // -2: When you cast your next instant or sorcery spell this turn, copy that spell. You may choose new targets for the copy.
@@ -69,8 +46,8 @@ public class ChandraTheFirebrand extends CardImpl {
         this.addAbility(new LoyaltyAbility(effect, -2));
 
         // -6: Chandra, the Firebrand deals 6 damage to each of up to six target creatures and/or players
-        LoyaltyAbility ability2 = new LoyaltyAbility(new DamageTargetEffect(6, true, "each of up to six target creatures and/or players"), -6);
-        ability2.addTarget(new TargetCreatureOrPlayer(0, 6));
+        LoyaltyAbility ability2 = new LoyaltyAbility(new DamageTargetEffect(6, true, "each of up to six targets"), -6);
+        ability2.addTarget(new TargetAnyTarget(0, 6));
         this.addAbility(ability2);
     }
 
@@ -88,7 +65,7 @@ public class ChandraTheFirebrand extends CardImpl {
 class ChandraTheFirebrandAbility extends DelayedTriggeredAbility {
 
     ChandraTheFirebrandAbility() {
-        super(new CopyTargetSpellEffect(), Duration.EndOfTurn);
+        super(new CopyTargetSpellEffect(true), Duration.EndOfTurn);
     }
 
     ChandraTheFirebrandAbility(final ChandraTheFirebrandAbility ability) {
@@ -109,7 +86,7 @@ class ChandraTheFirebrandAbility extends DelayedTriggeredAbility {
     public boolean checkTrigger(GameEvent event, Game game) {
         if (event.getPlayerId().equals(this.getControllerId())) {
             Spell spell = game.getStack().getSpell(event.getTargetId());
-            if (spell != null && (spell.getCardType().contains(CardType.INSTANT) || spell.getCardType().contains(CardType.SORCERY))) {
+            if (spell != null && (spell.isInstant() || spell.isSorcery())) {
                 for (Effect effect : this.getEffects()) {
                     effect.setTargetPointer(new FixedTarget(event.getTargetId()));
                 }

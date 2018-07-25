@@ -1,33 +1,6 @@
-/*
- * Copyright 2011 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.sets;
 
-import mage.cards.CardGraphicInfo;
 import mage.cards.ExpansionSet;
 import mage.constants.Rarity;
 import mage.constants.SetType;
@@ -36,12 +9,12 @@ import mage.constants.SetType;
  *
  * @author fireshoes
  */
-public class AnthologyElvesVsGoblins extends ExpansionSet {
+public final class AnthologyElvesVsGoblins extends ExpansionSet {
 
-    private static final AnthologyElvesVsGoblins fINSTANCE = new AnthologyElvesVsGoblins();
+    private static final AnthologyElvesVsGoblins instance = new AnthologyElvesVsGoblins();
 
     public static AnthologyElvesVsGoblins getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     private AnthologyElvesVsGoblins() {
@@ -60,10 +33,10 @@ public class AnthologyElvesVsGoblins extends ExpansionSet {
         cards.add(new SetCardInfo("Elvish Warrior", 5, Rarity.COMMON, mage.cards.e.ElvishWarrior.class));
         cards.add(new SetCardInfo("Emberwilde Augur", 35, Rarity.COMMON, mage.cards.e.EmberwildeAugur.class));
         cards.add(new SetCardInfo("Flamewave Invoker", 36, Rarity.UNCOMMON, mage.cards.f.FlamewaveInvoker.class));
-        cards.add(new SetCardInfo("Forest", 28, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 29, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 30, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 31, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Forest", 28, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 29, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 30, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 31, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Forgotten Cave", 57, Rarity.COMMON, mage.cards.f.ForgottenCave.class));
         cards.add(new SetCardInfo("Gempalm Incinerator", 37, Rarity.UNCOMMON, mage.cards.g.GempalmIncinerator.class));
         cards.add(new SetCardInfo("Gempalm Strider", 6, Rarity.UNCOMMON, mage.cards.g.GempalmStrider.class));
@@ -83,10 +56,10 @@ public class AnthologyElvesVsGoblins extends ExpansionSet {
         cards.add(new SetCardInfo("Mogg Fanatic", 44, Rarity.UNCOMMON, mage.cards.m.MoggFanatic.class));
         cards.add(new SetCardInfo("Mogg War Marshal", 45, Rarity.COMMON, mage.cards.m.MoggWarMarshal.class));
         cards.add(new SetCardInfo("Moonglove Extract", 24, Rarity.COMMON, mage.cards.m.MoongloveExtract.class));
-        cards.add(new SetCardInfo("Mountain", 59, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 60, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 61, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 62, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Mountain", 59, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 60, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 61, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 62, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Mudbutton Torchrunner", 46, Rarity.COMMON, mage.cards.m.MudbuttonTorchrunner.class));
         cards.add(new SetCardInfo("Raging Goblin", 47, Rarity.COMMON, mage.cards.r.RagingGoblin.class));
         cards.add(new SetCardInfo("Reckless One", 48, Rarity.UNCOMMON, mage.cards.r.RecklessOne.class));

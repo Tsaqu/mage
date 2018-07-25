@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.b;
 
 import java.util.UUID;
@@ -33,17 +7,14 @@ import mage.abilities.Ability;
 import mage.abilities.TriggeredAbilityImpl;
 import mage.abilities.common.SimpleActivatedAbility;
 import mage.abilities.costs.mana.ManaCostsImpl;
-import mage.abilities.effects.ReplacementEffectImpl;
+import mage.abilities.effects.ContinuousRuleModifyingEffectImpl;
+import mage.abilities.effects.OneShotEffect;
 import mage.abilities.effects.common.GainLifeEffect;
 import mage.abilities.effects.common.LoseLifeTargetEffect;
 import mage.abilities.effects.common.combat.BlocksIfAbleAllEffect;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
-import mage.constants.CardType;
-import mage.constants.Duration;
-import mage.constants.Outcome;
-import mage.constants.TargetController;
-import mage.constants.Zone;
+import mage.constants.*;
 import mage.filter.common.FilterCreaturePermanent;
 import mage.filter.predicate.permanent.ControllerPredicate;
 import mage.game.Game;
@@ -51,12 +22,13 @@ import mage.game.events.GameEvent;
 import mage.game.permanent.Permanent;
 import mage.players.Player;
 import mage.target.targetpointer.FixedTarget;
+import mage.watchers.common.ChooseBlockersRedundancyWatcher;
 
 /**
  *
  * @author LevelX2
  */
-public class BrutalHordechief extends CardImpl {
+public final class BrutalHordechief extends CardImpl {
 
     private static final FilterCreaturePermanent filter = new FilterCreaturePermanent("Creatures your opponents control");
 
@@ -66,8 +38,7 @@ public class BrutalHordechief extends CardImpl {
 
     public BrutalHordechief(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{3}{B}");
-        this.subtype.add("Orc");
-        this.subtype.add("Warrior");
+        this.subtype.add(SubType.ORC, SubType.WARRIOR);
         this.power = new MageInt(3);
         this.toughness = new MageInt(3);
 
@@ -76,7 +47,9 @@ public class BrutalHordechief extends CardImpl {
 
         // {3}{R/W}{R/W}: Creatures your opponents control block this turn if able, and you choose how those creatures block.
         Ability ability = new SimpleActivatedAbility(Zone.BATTLEFIELD, new BlocksIfAbleAllEffect(filter, Duration.EndOfTurn), new ManaCostsImpl("{3}{R/W}{R/W}"));
-        ability.addEffect(new BrutalHordechiefReplacementEffect());
+        ability.addEffect(new BrutalHordechiefChooseBlockersEffect());
+        ability.addWatcher(new ChooseBlockersRedundancyWatcher());
+        ability.addEffect(new ChooseBlockersRedundancyWatcherIncrementEffect());
         this.addAbility(ability);
     }
 
@@ -87,6 +60,32 @@ public class BrutalHordechief extends CardImpl {
     @Override
     public BrutalHordechief copy() {
         return new BrutalHordechief(this);
+    }
+    
+    private class ChooseBlockersRedundancyWatcherIncrementEffect extends OneShotEffect {
+    
+        ChooseBlockersRedundancyWatcherIncrementEffect() {
+            super(Outcome.Neutral);
+        }
+    
+        ChooseBlockersRedundancyWatcherIncrementEffect(final ChooseBlockersRedundancyWatcherIncrementEffect effect) {
+            super(effect);
+        }
+    
+        @Override
+        public boolean apply(Game game, Ability source) {
+            ChooseBlockersRedundancyWatcher watcher = (ChooseBlockersRedundancyWatcher) game.getState().getWatchers().get(ChooseBlockersRedundancyWatcher.class.getSimpleName());
+            if (watcher != null) {
+                watcher.increment();
+                return true;
+            }
+            return false;
+        }
+    
+        @Override
+        public ChooseBlockersRedundancyWatcherIncrementEffect copy() {
+            return new ChooseBlockersRedundancyWatcherIncrementEffect(this);
+        }
     }
 }
 
@@ -114,7 +113,7 @@ class BrutalHordechiefTriggeredAbility extends TriggeredAbilityImpl {
     @Override
     public boolean checkTrigger(GameEvent event, Game game) {
         Permanent source = game.getPermanent(event.getSourceId());
-        if (source != null && source.getControllerId().equals(controllerId)) {
+        if (source != null && source.isControlledBy(controllerId)) {
             UUID defendingPlayerId = game.getCombat().getDefendingPlayerId(event.getSourceId(), game);
             this.getEffects().get(0).setTargetPointer(new FixedTarget(defendingPlayerId));
             return true;
@@ -128,20 +127,20 @@ class BrutalHordechiefTriggeredAbility extends TriggeredAbilityImpl {
     }
 }
 
-class BrutalHordechiefReplacementEffect extends ReplacementEffectImpl {
+class BrutalHordechiefChooseBlockersEffect extends ContinuousRuleModifyingEffectImpl {
 
-    public BrutalHordechiefReplacementEffect() {
-        super(Duration.EndOfCombat, Outcome.Benefit);
-        staticText = ", and you choose how those creatures block";
+    public BrutalHordechiefChooseBlockersEffect() {
+        super(Duration.EndOfTurn, Outcome.Benefit, false, false);
+        staticText = "You choose which creatures block this turn and how those creatures block";
     }
 
-    public BrutalHordechiefReplacementEffect(final BrutalHordechiefReplacementEffect effect) {
+    public BrutalHordechiefChooseBlockersEffect(final BrutalHordechiefChooseBlockersEffect effect) {
         super(effect);
     }
 
     @Override
-    public BrutalHordechiefReplacementEffect copy() {
-        return new BrutalHordechiefReplacementEffect(this);
+    public BrutalHordechiefChooseBlockersEffect copy() {
+        return new BrutalHordechiefChooseBlockersEffect(this);
     }
 
     @Override
@@ -156,16 +155,18 @@ class BrutalHordechiefReplacementEffect extends ReplacementEffectImpl {
 
     @Override
     public boolean applies(GameEvent event, Ability source, Game game) {
-        return event.getPlayerId().equals(source.getControllerId());
-    }
-    
-    @Override
-    public boolean replaceEvent(GameEvent event, Ability source, Game game) {
+        ChooseBlockersRedundancyWatcher watcher = (ChooseBlockersRedundancyWatcher) game.getState().getWatchers().get(ChooseBlockersRedundancyWatcher.class.getSimpleName());
+        watcher.decrement();
+        if (watcher.copyCountApply > 0) {
+            game.informPlayers(source.getSourceObject(game).getIdName() + " didn't apply");
+            return false;
+        }
+        watcher.copyCountApply = watcher.copyCount;
         Player blockController = game.getPlayer(source.getControllerId());
         if (blockController != null) {
             game.getCombat().selectBlockers(blockController, game);
             return true;
         }
         return false;
-    }    
+    }
 }

@@ -1,33 +1,8 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.h;
 
 import java.util.UUID;
+import mage.MageObject;
 import mage.abilities.Ability;
 import mage.abilities.common.SimpleActivatedAbility;
 import mage.abilities.common.SimpleStaticAbility;
@@ -37,15 +12,8 @@ import mage.abilities.dynamicvalue.DynamicValue;
 import mage.abilities.effects.Effect;
 import mage.abilities.effects.OneShotEffect;
 import mage.abilities.effects.common.continuous.BoostControlledEffect;
-import mage.cards.Card;
-import mage.cards.CardImpl;
-import mage.cards.CardSetInfo;
-import mage.cards.Cards;
-import mage.cards.CardsImpl;
-import mage.constants.CardType;
-import mage.constants.Duration;
-import mage.constants.Outcome;
-import mage.constants.Zone;
+import mage.cards.*;
+import mage.constants.*;
 import mage.filter.common.FilterControlledCreaturePermanent;
 import mage.filter.common.FilterCreatureCard;
 import mage.filter.common.FilterCreaturePermanent;
@@ -58,17 +26,17 @@ import mage.target.TargetCard;
  *
  * @author LevelX2
  */
-public class HeroesPodium extends CardImpl {
+public final class HeroesPodium extends CardImpl {
 
     private static final FilterCreaturePermanent filter = new FilterCreaturePermanent("Each legendary creature you control");
 
     static {
-        filter.add(new SupertypePredicate("Legendary"));
+        filter.add(new SupertypePredicate(SuperType.LEGENDARY));
     }
-    
+
     public HeroesPodium(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.ARTIFACT},"{5}");
-        this.supertype.add("Legendary");
+        super(ownerId, setInfo, new CardType[]{CardType.ARTIFACT}, "{5}");
+        addSuperType(SuperType.LEGENDARY);
 
         // Each legendary creature you control gets +1/+1 for each other legendary creature you control.
         DynamicValue xValue = new HeroesPodiumLegendaryCount();
@@ -95,8 +63,9 @@ public class HeroesPodium extends CardImpl {
 class HeroesPodiumLegendaryCount implements DynamicValue {
 
     private static final FilterControlledCreaturePermanent filter = new FilterControlledCreaturePermanent("other legendary creature you control");
+
     static {
-        filter.add(new SupertypePredicate("Legendary"));
+        filter.add(new SupertypePredicate(SuperType.LEGENDARY));
     }
 
     @Override
@@ -127,8 +96,9 @@ class HeroesPodiumLegendaryCount implements DynamicValue {
 class HeroesPodiumEffect extends OneShotEffect {
 
     private static final FilterCreatureCard filter = new FilterCreatureCard("a legendary creature card");
+
     static {
-        filter.add(new SupertypePredicate(("Legendary")));
+        filter.add(new SupertypePredicate(SuperType.LEGENDARY));
     }
 
     public HeroesPodiumEffect() {
@@ -147,54 +117,36 @@ class HeroesPodiumEffect extends OneShotEffect {
 
     @Override
     public boolean apply(Game game, Ability source) {
-
-        Player player = game.getPlayer(source.getControllerId());
-        if (player == null) {
+        Player controller = game.getPlayer(source.getControllerId());
+        MageObject sourceObject = source.getSourceObject(game);
+        if (controller == null || sourceObject == null) {
             return false;
         }
 
         Cards cards = new CardsImpl();
-        int count = source.getManaCostsToPay().getX();
-        count = Math.min(player.getLibrary().size(), count);
-        boolean legendaryIncluded = false;
-        for (int i = 0; i < count; i++) {
-            Card card = player.getLibrary().removeFromTop(game);
-            if (card != null) {
-                cards.add(card);
-                if (filter.match(card, game)) {
-                    legendaryIncluded = true;
-                }
-            }
-        }
-        player.lookAtCards("Heroes' Podium", cards, game);
+        cards.addAll(controller.getLibrary().getTopCards(game, source.getManaCostsToPay().getX()));
+        boolean legendaryIncluded = cards.count(filter, game) > 0;
+        controller.lookAtCards(sourceObject.getIdName(), cards, game);
 
         // You may reveal a legendary creature card from among them and put it into your hand.
-        if (!cards.isEmpty() && legendaryIncluded && player.chooseUse(outcome, "Put a legendary creature card into your hand?", source, game)) {
+        if (!cards.isEmpty() && legendaryIncluded && controller.chooseUse(outcome, "Put a legendary creature card into your hand?", source, game)) {
             if (cards.size() == 1) {
-                Card card = cards.getRandom(game);
-                cards.remove(card);
-                card.moveToZone(Zone.HAND, source.getSourceId(), game, false);
+                controller.moveCards(cards, Zone.HAND, source, game);
                 return true;
             } else {
                 TargetCard target = new TargetCard(Zone.LIBRARY, filter);
-                if (player.choose(outcome, cards, target, game)) {
+                if (controller.choose(outcome, cards, target, game)) {
                     Card card = cards.get(target.getFirstTarget(), game);
                     if (card != null) {
                         cards.remove(card);
-                        card.moveToZone(Zone.HAND, source.getSourceId(), game, false);
+                        controller.moveCards(card, Zone.HAND, source, game);
                     }
                 }
             }
         }
 
         // Put the rest on the bottom of your library in a random order
-        while (cards.size() > 0) {
-            Card card = cards.getRandom(game);
-            if (card != null) {
-                cards.remove(card);
-                card.moveToZone(Zone.LIBRARY, source.getSourceId(), game, false);
-            }
-        }
+        controller.putCardsOnBottomOfLibrary(cards, game, source, false);
         return true;
     }
 }

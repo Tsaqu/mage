@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package mage.abilities.effects.common.ruleModifying;
 
 import mage.abilities.Ability;
@@ -16,7 +12,6 @@ import mage.game.Game;
 import mage.game.events.GameEvent;
 
 /**
- *
  * @author LevelX2
  */
 public class CastOnlyDuringPhaseStepSourceEffect extends ContinuousRuleModifyingEffectImpl {
@@ -42,20 +37,20 @@ public class CastOnlyDuringPhaseStepSourceEffect extends ContinuousRuleModifying
 
     @Override
     public boolean checksEventType(GameEvent event, Game game) {
-        return GameEvent.EventType.CAST_SPELL.equals(event.getType());
+        return event.getType() == GameEvent.EventType.CAST_SPELL;
     }
 
     @Override
     public boolean applies(GameEvent event, Ability source, Game game) {
         // has to return true, if the spell cannot be cast in the current phase / step
         if (event.getSourceId().equals(source.getSourceId())) {
-            if ((turnPhase != null && !game.getPhase().getType().equals(turnPhase))
-                    || (phaseStep != null && !game.getTurn().getStepType().equals(phaseStep))
+            if ((turnPhase != null && game.getPhase().getType() != turnPhase)
+                    || (phaseStep != null && (game.getTurn().getStepType() != phaseStep))
                     || (condition != null && !condition.apply(game, source))) {
                 return true;
             }
         }
-        return false; // casr not prevented by this effect
+        return false; // cast not prevented by this effect
     }
 
     @Override
@@ -64,7 +59,7 @@ public class CastOnlyDuringPhaseStepSourceEffect extends ContinuousRuleModifying
     }
 
     private String setText() {
-        StringBuilder sb = new StringBuilder("cast {this} only during ");
+        StringBuilder sb = new StringBuilder("cast this spell only during ");
         if (turnPhase != null) {
             sb.append(turnPhase.toString());
         }
@@ -72,7 +67,7 @@ public class CastOnlyDuringPhaseStepSourceEffect extends ContinuousRuleModifying
             sb.append("the ").append(phaseStep.getStepText());
         }
         if (condition != null) {
-            sb.append(" ").append(condition.toString());
+            sb.append(' ').append(condition.toString());
         }
         return sb.toString();
     }

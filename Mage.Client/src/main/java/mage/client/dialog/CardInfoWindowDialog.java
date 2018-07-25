@@ -1,30 +1,4 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 
  /*
  * CardInfoWindowDialog.java
@@ -37,13 +11,13 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.beans.PropertyVetoException;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
+
 import mage.client.cards.BigCard;
 import mage.client.util.GUISizeHelper;
 import mage.client.util.ImageHelper;
@@ -58,20 +32,19 @@ import org.apache.log4j.Logger;
 import org.mage.plugins.card.utils.impl.ImageManagerImpl;
 
 /**
- *
  * @author BetaSteward_at_googlemail.com
  */
 public class CardInfoWindowDialog extends MageDialog {
 
     private static final Logger LOGGER = Logger.getLogger(CardInfoWindowDialog.class);
 
-    public static enum ShowType {
+    public enum ShowType {
         REVEAL, REVEAL_TOP_LIBRARY, LOOKED_AT, EXILE, GRAVEYARD, OTHER
-    };
+    }
 
-    private ShowType showType;
+    private final ShowType showType;
     private boolean positioned;
-    private String name;
+    private final String name;
 
     public CardInfoWindowDialog(ShowType showType, String name) {
         this.name = name;
@@ -83,11 +56,11 @@ public class CardInfoWindowDialog extends MageDialog {
         this.setModal(false);
         switch (this.showType) {
             case LOOKED_AT:
-                this.setFrameIcon(new ImageIcon(ImageManagerImpl.getInstance().getLookedAtImage()));
+                this.setFrameIcon(new ImageIcon(ImageManagerImpl.instance.getLookedAtImage()));
                 this.setClosable(true);
                 break;
             case REVEAL:
-                this.setFrameIcon(new ImageIcon(ImageManagerImpl.getInstance().getRevealedImage()));
+                this.setFrameIcon(new ImageIcon(ImageManagerImpl.instance.getRevealedImage()));
                 this.setClosable(true);
                 break;
             case REVEAL_TOP_LIBRARY:
@@ -106,10 +79,10 @@ public class CardInfoWindowDialog extends MageDialog {
                 });
                 break;
             case EXILE:
-                this.setFrameIcon(new ImageIcon(ImageManagerImpl.getInstance().getExileImage()));
+                this.setFrameIcon(new ImageIcon(ImageManagerImpl.instance.getExileImage()));
                 break;
             default:
-            // no icon yet
+                // no icon yet
         }
         this.setTitelBarToolTip(name);
         setGUISize();
@@ -134,10 +107,10 @@ public class CardInfoWindowDialog extends MageDialog {
 
     public void loadCards(ExileView exile, BigCard bigCard, UUID gameId) {
         boolean changed = cards.loadCards(exile, bigCard, gameId, true);
-        String titel = name + " (" + exile.size() + ")";
+        String titel = name + " (" + exile.size() + ')';
         setTitle(titel);
         this.setTitelBarToolTip(titel);
-        if (exile.size() > 0) {
+        if (!exile.isEmpty()) {
             show();
             if (changed) {
                 try {
@@ -162,7 +135,7 @@ public class CardInfoWindowDialog extends MageDialog {
 
     public void loadCards(CardsView showCards, BigCard bigCard, UUID gameId, boolean revertOrder) {
         cards.loadCards(showCards, bigCard, gameId, revertOrder);
-        if (showType.equals(ShowType.GRAVEYARD)) {
+        if (showType == ShowType.GRAVEYARD) {
             int qty = qtyCardTypes(showCards);
             String titel = name + "'s Graveyard (" + showCards.size() + ")  -  " + qty + ((qty == 1) ? " Card Type" : " Card Types");
             setTitle(titel);
@@ -173,7 +146,7 @@ public class CardInfoWindowDialog extends MageDialog {
 
     @Override
     public void show() {
-        if (showType.equals(ShowType.EXILE)) {
+        if (showType == ShowType.EXILE) {
             if (cards == null || cards.getNumberOfCards() == 0) {
                 return;
             }
@@ -185,37 +158,36 @@ public class CardInfoWindowDialog extends MageDialog {
     }
 
     private void showAndPositionWindow() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                int width = CardInfoWindowDialog.this.getWidth();
-                int height = CardInfoWindowDialog.this.getHeight();
-                if (width > 0 && height > 0) {
-                    Point centered = SettingsManager.getInstance().getComponentPosition(width, height);
-                    if (!positioned) {
-                        int xPos = centered.x / 2;
-                        int yPos = centered.y / 2;
-                        CardInfoWindowDialog.this.setLocation(xPos, yPos);
-                        show();
-                        positioned = true;
-                    }
-                    GuiDisplayUtil.keepComponentInsideFrame(centered.x, centered.y, CardInfoWindowDialog.this);
+        SwingUtilities.invokeLater(() -> {
+            int width = CardInfoWindowDialog.this.getWidth();
+            int height = CardInfoWindowDialog.this.getHeight();
+            if (width > 0 && height > 0) {
+                Point centered = SettingsManager.instance.getComponentPosition(width, height);
+                if (!positioned) {
+                    int xPos = centered.x / 2;
+                    int yPos = centered.y / 2;
+                    CardInfoWindowDialog.this.setLocation(xPos, yPos);
+                    show();
+                    positioned = true;
                 }
+                GuiDisplayUtil.keepComponentInsideFrame(centered.x, centered.y, CardInfoWindowDialog.this);
             }
         });
     }
 
-        private int qtyCardTypes(mage.view.CardsView cardsView){
-        Set<String> cardTypesPresent = new LinkedHashSet<String>() {};
-        for (CardView card : cardsView.values()){
-            List<CardType> cardTypes = card.getCardTypes();
-            for (CardType cardType : cardTypes){
+    private int qtyCardTypes(mage.view.CardsView cardsView) {
+        Set<String> cardTypesPresent = new LinkedHashSet<String>() {
+        };
+        for (CardView card : cardsView.values()) {
+            Set<CardType> cardTypes = card.getCardTypes();
+            for (CardType cardType : cardTypes) {
                 cardTypesPresent.add(cardType.toString());
             }
         }
         if (cardTypesPresent.isEmpty()) return 0;
         else return cardTypesPresent.size();
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -230,24 +202,24 @@ public class CardInfoWindowDialog extends MageDialog {
         setIconifiable(true);
         setResizable(true);
         setPreferredSize(new Dimension((int) Math.round(GUISizeHelper.otherZonesCardDimension.width * 1.3),
-            (int) Math.round(GUISizeHelper.otherZonesCardDimension.height * 1.2)));
+                (int) Math.round(GUISizeHelper.otherZonesCardDimension.height * 1.2)));
 
-    javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-    getContentPane().setLayout(layout);
-    layout.setHorizontalGroup(
-        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-        .addGroup(layout.createSequentialGroup()
-            .addComponent(cards, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGap(0, 0, 0))
-    );
-    layout.setVerticalGroup(
-        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-        .addGroup(layout.createSequentialGroup()
-            .addComponent(cards, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGap(0, 0, 0))
-    );
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(cards, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(0, 0, 0))
+        );
+        layout.setVerticalGroup(
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(cards, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(0, 0, 0))
+        );
 
-    pack();
+        pack();
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

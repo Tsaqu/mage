@@ -94,13 +94,15 @@ foreach my $card (sort cardSort @setCards) {
 
     $cardNames {@{$card}[0]} = 1;
 
-    my $currentFileName = "../Mage.Sets/src/mage/sets/" . $knownSets{$setName} . "/" . $className . ".java";
+    my $currentFileName = "../Mage.Sets/src/mage/cards/" . lc(substr($className, 0, 1)) . "/" . $className . ".java";
 	if(! -e $currentFileName) {
         $cardNames {@{$card}[0]} = 0;
 		if ($toPrint) {
 			$toPrint .= "\n";
-		}   
-		$toPrint .= "@{$card}[2]|@{$card}[0]"; 
+		}
+                my $cardName = @{$card}[0];
+                $cardName =~ s/ /+/g;
+		$toPrint .= "@{$card}[2]|[@{$card}[0]](https://magiccards.info/query?q=!$cardName)";
 	}
 }
 
@@ -112,7 +114,7 @@ close CARD;
 print ("Unimplemented cards are here: " . lc($sets{$setName}) ."_unimplemented.txt\n");
 
 open ISSUE_TRACKER, "> " . lc($sets{$setName}) ."_issue_tracker.txt";
-print ISSUE_TRACKER "# Cards in set:\n- [x] [Example Card Name] (example URL here)\n";
+print ISSUE_TRACKER "# Cards in set:\n";
 
 
 my $cn;
@@ -125,7 +127,7 @@ foreach $cn (sort keys (%cardNames))
     }
     my $cn2 = $cn;
     $cn2 =~ s/ /+/g;
-    print ISSUE_TRACKER "- $x_or_not [$cn] (https://www.google.com.au/search?q=$cn2+MTG&tbm=isch)\n";
+    print ISSUE_TRACKER "- $x_or_not [$cn](https://magiccards.info/query?q=!$cn2)\n";
 }
 close ISSUE_TRACKER;
 print ("Tracking Issue text for a new Github issue (similar to https://github.com/magefree/mage/issues/2215): " . lc($sets{$setName}) ."_issue_tracker.txt\n");

@@ -1,40 +1,6 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.abilities.effects.common;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 import mage.MageItem;
 import mage.MageObject;
 import mage.abilities.Ability;
@@ -51,9 +17,11 @@ import mage.target.Target;
 import mage.target.TargetImpl;
 import mage.util.TargetAddress;
 
+import java.util.*;
+
 /**
- * @author duncant
  * @param <T>
+ * @author duncant
  */
 public abstract class CopySpellForEachItCouldTargetEffect<T extends MageItem> extends OneShotEffect {
 
@@ -158,7 +126,7 @@ public abstract class CopySpellForEachItCouldTargetEffect<T extends MageItem> ex
                             targetInstance.add(objId, game);
                         }
                         if (!playerTargetCopyMap.containsKey(copy.getControllerId())) {
-                            playerTargetCopyMap.put(copy.getControllerId(), new HashMap<UUID, Spell>());
+                            playerTargetCopyMap.put(copy.getControllerId(), new HashMap<>());
                         }
                         playerTargetCopyMap.get(copy.getControllerId()).put(objId, copy);
                     }
@@ -170,7 +138,7 @@ public abstract class CopySpellForEachItCouldTargetEffect<T extends MageItem> ex
                 if (playerTargetCopyMap.containsKey(player.getId())) {
                     Map<UUID, Spell> targetCopyMap = playerTargetCopyMap.get(player.getId());
                     if (targetCopyMap != null) {
-                        while (targetCopyMap.size() > 0) {
+                        while (!targetCopyMap.isEmpty()) {
                             FilterInPlay<T> setFilter = filter.copy();
                             setFilter.add(new FromSetPredicate(targetCopyMap.keySet()));
                             Target target = new TargetWithAdditionalFilter(sampleTarget, setFilter);
@@ -197,10 +165,7 @@ public abstract class CopySpellForEachItCouldTargetEffect<T extends MageItem> ex
                                     madeACopy = true;
                                 }
                             }
-
-                            for (UUID idToDelete : toDelete) {
-                                targetCopyMap.remove(idToDelete);
-                            }
+                            targetCopyMap.keySet().removeAll((toDelete));
                         }
                     }
                 }
@@ -261,9 +226,6 @@ class TargetWithAdditionalFilter<T extends MageItem> extends TargetImpl {
 
     protected final FilterInPlay<T> additionalFilter;
     protected final Target originalTarget;
-    protected static final Integer minNumberOfTargets = null;
-    protected static final Integer maxNumberOfTargets = null;
-    protected static final Zone zone = null;
 
     public TargetWithAdditionalFilter(final TargetWithAdditionalFilter target) {
         this(target.originalTarget, target.additionalFilter, false);
@@ -274,12 +236,16 @@ class TargetWithAdditionalFilter<T extends MageItem> extends TargetImpl {
     }
 
     public TargetWithAdditionalFilter(Target originalTarget, FilterInPlay<T> additionalFilter, boolean notTarget) {
-        originalTarget = originalTarget.copy();
-        originalTarget.clearChosen();
-        this.originalTarget = originalTarget;
+        this.originalTarget = originalTarget.copy();
+        this.originalTarget.clearChosen();
         this.targetName = originalTarget.getFilter().getMessage();
         this.notTarget = notTarget;
         this.additionalFilter = additionalFilter;
+    }
+
+    @Override
+    public Target getOriginalTarget() {
+        return originalTarget;
     }
 
     @Override
@@ -465,11 +431,11 @@ class TargetWithAdditionalFilter<T extends MageItem> extends TargetImpl {
         for (UUID targetId : getTargets()) {
             MageObject object = game.getObject(targetId);
             if (object != null) {
-                sb.append(object.getLogName()).append(" ");
+                sb.append(object.getLogName()).append(' ');
             } else {
                 Player player = game.getPlayer(targetId);
                 if (player != null) {
-                    sb.append(player.getLogName()).append(" ");
+                    sb.append(player.getLogName()).append(' ');
                 }
             }
         }

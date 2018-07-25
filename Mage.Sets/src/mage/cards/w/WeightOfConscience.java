@@ -1,33 +1,8 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.w;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import mage.abilities.Ability;
@@ -40,10 +15,7 @@ import mage.abilities.effects.common.combat.CantAttackAttachedEffect;
 import mage.abilities.keyword.EnchantAbility;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
-import mage.constants.AttachmentType;
-import mage.constants.CardType;
-import mage.constants.Outcome;
-import mage.constants.Zone;
+import mage.constants.*;
 import mage.filter.common.FilterControlledCreaturePermanent;
 import mage.filter.predicate.Predicates;
 import mage.filter.predicate.permanent.TappedPredicate;
@@ -53,17 +25,16 @@ import mage.players.Player;
 import mage.target.TargetPermanent;
 import mage.target.common.TargetControlledCreaturePermanent;
 import mage.target.common.TargetCreaturePermanent;
-import mage.util.CardUtil;
 
 /**
  *
  * @author emerald000
  */
-public class WeightOfConscience extends CardImpl {
+public final class WeightOfConscience extends CardImpl {
 
     public WeightOfConscience(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId,setInfo,new CardType[]{CardType.ENCHANTMENT},"{1}{W}");
-        this.subtype.add("Aura");
+        this.subtype.add(SubType.AURA);
 
         // Enchant creature
         TargetPermanent auraTarget = new TargetCreaturePermanent();
@@ -142,9 +113,9 @@ class WeightOfConscienceTarget extends TargetControlledCreaturePermanent {
             // Choosing first target
             if (this.getTargets().isEmpty()) {
                 for (Permanent permanent : game.getBattlefield().getActivePermanents(filterUntapped, sourceControllerId, game)) {
-                    for (String subtype : permanent.getSubtype(game)) {
-                        if (!CardUtil.isNonCreatureSubtype(subtype)) {
-                            if (game.getBattlefield().contains(new FilterControlledCreaturePermanent(subtype, subtype), sourceControllerId, game, 2)) {
+                    for (SubType subtype : permanent.getSubtype(game)) {
+                        if (subtype.getSubTypeSet() == SubTypeSet.CreatureType) {
+                            if (game.getBattlefield().contains(new FilterControlledCreaturePermanent(subtype, subtype.toString()), sourceControllerId, game, 2)) {
                                 possibleTargets.add(permanent.getId());
                             }
                         }
@@ -157,7 +128,7 @@ class WeightOfConscienceTarget extends TargetControlledCreaturePermanent {
                 Permanent firstTargetCreature = game.getPermanent(firstTargetId);
                 if (firstTargetCreature != null) {
                     for (Permanent permanent : game.getBattlefield().getActivePermanents(filterUntapped, sourceControllerId, game)) {
-                        if (!permanent.getId().equals(firstTargetId) && CardUtil.shareSubtypes(firstTargetCreature, permanent, game)) {
+                        if (!permanent.getId().equals(firstTargetId) && firstTargetCreature.shareSubtypes(permanent, game)) {
                             possibleTargets.add(permanent.getId());
                         }
                     }
@@ -171,7 +142,7 @@ class WeightOfConscienceTarget extends TargetControlledCreaturePermanent {
     public boolean canChoose(UUID sourceId, UUID sourceControllerId, Game game) {
         for (Permanent permanent1 : game.getBattlefield().getActivePermanents(filterUntapped, sourceControllerId, game)) {
             for (Permanent permanent2 : game.getBattlefield().getActivePermanents(filterUntapped, sourceControllerId, game)) {
-                if (permanent1 != permanent2 && CardUtil.shareSubtypes(permanent1, permanent2, game)) {
+                if (!Objects.equals(permanent1, permanent2) && permanent1.shareSubtypes(permanent2, game)) {
                     return true;
                 }
             }
@@ -186,9 +157,9 @@ class WeightOfConscienceTarget extends TargetControlledCreaturePermanent {
             if (targetPermanent != null) {
                 if (this.getTargets().isEmpty()) {
                     for (Permanent permanent : game.getBattlefield().getActivePermanents(filterUntapped, source.getControllerId(), game)) {
-                        for (String subtype : permanent.getSubtype(game)) {
-                            if (!CardUtil.isNonCreatureSubtype(subtype)) {
-                                if (game.getBattlefield().contains(new FilterControlledCreaturePermanent(subtype, subtype), source.getControllerId(), game, 2)) {
+                        for (SubType subtype : permanent.getSubtype(game)) {
+                            if (subtype.getSubTypeSet() == SubTypeSet.CreatureType) {
+                                if (game.getBattlefield().contains(new FilterControlledCreaturePermanent(subtype, subtype.toString()), source.getControllerId(), game, 2)) {
                                     return true;
                                 }
                             }
@@ -197,7 +168,7 @@ class WeightOfConscienceTarget extends TargetControlledCreaturePermanent {
                 }
                 else {
                     Permanent firstTarget = game.getPermanent(this.getTargets().get(0));
-                    if (firstTarget != null && CardUtil.shareSubtypes(firstTarget, targetPermanent, game)) {
+                    if (firstTarget != null && firstTarget.shareSubtypes(targetPermanent, game)) {
                         return true;
                     }
                 }

@@ -1,41 +1,11 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.d;
 
 import java.util.UUID;
 import mage.MageObject;
 import mage.abilities.Ability;
 import mage.abilities.effects.OneShotEffect;
-import mage.cards.Card;
-import mage.cards.CardImpl;
-import mage.cards.CardSetInfo;
-import mage.cards.Cards;
-import mage.cards.CardsImpl;
+import mage.cards.*;
 import mage.cards.repository.CardRepository;
 import mage.choices.Choice;
 import mage.choices.ChoiceImpl;
@@ -49,10 +19,10 @@ import mage.players.Player;
  *
  * @author emerald000
  */
-public class DemonicConsultation extends CardImpl {
+public final class DemonicConsultation extends CardImpl {
 
     public DemonicConsultation(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.INSTANT},"{B}");
+        super(ownerId, setInfo, new CardType[]{CardType.INSTANT}, "{B}");
 
         // Name a card. Exile the top six cards of your library, then reveal cards from the top of your library until you reveal the named card. Put that card into your hand and exile all other cards revealed this way.
         this.getSpellAbility().addEffect(new DemonicConsultationEffect());
@@ -92,10 +62,8 @@ class DemonicConsultationEffect extends OneShotEffect {
             // Name a card.
             Choice choice = new ChoiceImpl();
             choice.setChoices(CardRepository.instance.getNames());
-            while (!controller.choose(Outcome.Benefit, choice, game)) {
-                if (!controller.canRespond()) {
-                    return false;
-                }
+            if (!controller.choose(Outcome.Benefit, choice, game)) {
+                return false;
             }
             String name = choice.getChoice();
             game.informPlayers("Card named: " + name);
@@ -106,8 +74,7 @@ class DemonicConsultationEffect extends OneShotEffect {
             // then reveal cards from the top of your library until you reveal the named card.
             Cards cardsToReaveal = new CardsImpl();
             Card cardToHand = null;
-            while (controller.getLibrary().size() > 0) {
-                Card card = controller.getLibrary().removeFromTop(game);
+            for (Card card : controller.getLibrary().getCards(game)) {
                 if (card != null) {
                     cardsToReaveal.add(card);
                     // Put that card into your hand

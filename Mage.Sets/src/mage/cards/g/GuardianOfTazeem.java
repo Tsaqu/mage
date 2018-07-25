@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.g;
 
 import java.util.UUID;
@@ -39,10 +13,7 @@ import mage.abilities.effects.common.TapTargetEffect;
 import mage.abilities.keyword.FlyingAbility;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
-import mage.constants.CardType;
-import mage.constants.Outcome;
-import mage.constants.TargetController;
-import mage.constants.Zone;
+import mage.constants.*;
 import mage.filter.common.FilterCreaturePermanent;
 import mage.filter.predicate.permanent.ControllerPredicate;
 import mage.game.Game;
@@ -55,7 +26,7 @@ import mage.target.targetpointer.FixedTarget;
  *
  * @author fireshoes
  */
-public class GuardianOfTazeem extends CardImpl {
+public final class GuardianOfTazeem extends CardImpl {
 
     private static final FilterCreaturePermanent filter = new FilterCreaturePermanent("creature an opponent controls");
 
@@ -65,14 +36,14 @@ public class GuardianOfTazeem extends CardImpl {
 
     public GuardianOfTazeem(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{3}{U}{U}");
-        this.subtype.add("Sphinx");
+        this.subtype.add(SubType.SPHINX);
         this.power = new MageInt(4);
         this.toughness = new MageInt(5);
 
         // Flying
         this.addAbility(FlyingAbility.getInstance());
 
-        // <i>Landfall</i> - Whenever a land enters the battlefield under you control, tap target creature an opponent controls. If that land is an Island, that creature doesn't untap during its controller's next untap step.
+        // <i>Landfall</i> &mdash; Whenever a land enters the battlefield under you control, tap target creature an opponent controls. If that land is an Island, that creature doesn't untap during its controller's next untap step.
         Ability ability = new GuardianOfTazeemTriggeredAbility();
         ability.addTarget(new TargetCreaturePermanent(filter));
         this.addAbility(ability);
@@ -113,8 +84,8 @@ class GuardianOfTazeemTriggeredAbility extends TriggeredAbilityImpl {
     public boolean checkTrigger(GameEvent event, Game game) {
         Permanent permanent = game.getPermanent(event.getTargetId());
         if (permanent != null
-                && permanent.getCardType().contains(CardType.LAND)
-                && permanent.getControllerId().equals(getControllerId())) {
+                && permanent.isLand()
+                && permanent.isControlledBy(getControllerId())) {
             for (Effect effect : getEffects()) {
                 if (effect instanceof GuardianOfTazeemEffect) {
                     effect.setTargetPointer(new FixedTarget(permanent, game));
@@ -127,7 +98,7 @@ class GuardianOfTazeemTriggeredAbility extends TriggeredAbilityImpl {
 
     @Override
     public String getRule() {
-        return "<i>Landfall</i> - Whenever a land enters the battlefield under your control, " + super.getRule();
+        return "<i>Landfall</i> &mdash; Whenever a land enters the battlefield under your control, " + super.getRule();
     }
 }
 
@@ -151,7 +122,7 @@ class GuardianOfTazeemEffect extends OneShotEffect {
     public boolean apply(Game game, Ability source) {
         Permanent land = game.getPermanentOrLKIBattlefield(getTargetPointer().getFirst(game, source));
         Permanent targetCreature = game.getPermanent(source.getFirstTarget());
-        if (land != null && targetCreature != null && land.hasSubtype("Island", game)) {
+        if (land != null && targetCreature != null && land.hasSubtype(SubType.ISLAND, game)) {
             ContinuousEffect effect = new DontUntapInControllersNextUntapStepTargetEffect("that creature");
             effect.setTargetPointer(new FixedTarget(targetCreature, game));
             game.addEffect(effect, source);

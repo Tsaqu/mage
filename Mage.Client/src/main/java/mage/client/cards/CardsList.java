@@ -1,30 +1,4 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 
  /*
  * CardsList.java
@@ -33,26 +7,6 @@
  */
 package mage.client.cards;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.beans.Beans;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 import mage.cards.MageCard;
 import mage.client.constants.Constants.DeckEditorMode;
 import mage.client.constants.Constants.SortBy;
@@ -61,29 +15,33 @@ import mage.client.deckeditor.table.TableModel;
 import mage.client.deckeditor.table.UpdateCountsCallback;
 import mage.client.dialog.PreferencesDialog;
 import mage.client.plugins.impl.Plugins;
-import mage.client.util.CardViewCardTypeComparator;
-import mage.client.util.CardViewColorComparator;
-import mage.client.util.CardViewColorIdentityComparator;
-import mage.client.util.CardViewCostComparator;
-import mage.client.util.CardViewNameComparator;
-import mage.client.util.CardViewRarityComparator;
+import mage.client.util.*;
 import mage.client.util.Event;
-import mage.client.util.GUISizeHelper;
-import mage.client.util.Listener;
 import mage.client.util.gui.TableSpinnerEditor;
-import mage.constants.CardType;
 import mage.view.CardView;
 import mage.view.CardsView;
 import mage.view.SimpleCardView;
 import org.mage.card.arcane.CardPanel;
+import org.mage.card.arcane.ManaSymbolsCellRenderer;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.beans.Beans;
+import java.util.*;
+import java.util.List;
 
 /**
- *
  * @author BetaSteward_at_googlemail.com
  */
 public class CardsList extends javax.swing.JPanel implements MouseListener, ICardGrid {
 
-    protected CardEventSource cardEventSource = new CardEventSource();
+    protected final CardEventSource cardEventSource = new CardEventSource();
     private Dimension cardDimension;
     private int rowHeight;
     private CardsView cards;
@@ -181,6 +139,9 @@ public class CardsList extends javax.swing.JPanel implements MouseListener, ICar
         mainTable.getColumnModel().getColumn(6).setPreferredWidth(15);
         mainTable.getColumnModel().getColumn(7).setPreferredWidth(15);
 
+        // new mana render (svg support)
+        mainTable.getColumnModel().getColumn(mainModel.COLUMN_INDEX_COST).setCellRenderer(new ManaSymbolsCellRenderer());
+
         if (PreferencesDialog.getCachedValue(PreferencesDialog.KEY_DRAFT_VIEW, "cardView").equals("listView")) {
             jToggleListView.setSelected(true);
             panelCardArea.setViewportView(mainTable);
@@ -217,7 +178,7 @@ public class CardsList extends javax.swing.JPanel implements MouseListener, ICar
 
     // if you use the deck ediot to build a free deck, numbers can be set directly in deck and sideboard
     public void setDeckEditorMode(DeckEditorMode mode) {
-        if (mode.equals(DeckEditorMode.FREE_BUILDING)) {
+        if (mode == DeckEditorMode.FREE_BUILDING) {
             // activate spinner for card number change
             mainModel.setNumberEditable(true);
             TableColumnModel tcm = mainTable.getColumnModel();
@@ -322,7 +283,7 @@ public class CardsList extends javax.swing.JPanel implements MouseListener, ICar
             cardArea.remove(card);
         }
 
-        if (cards != null && cards.size() > 0) {
+        if (cards != null && !cards.isEmpty()) {
             Rectangle rectangle = new Rectangle(cardDimension.width, cardDimension.height);
             List<CardView> sortedCards = new ArrayList<>(cards.values());
             switch (sortSetting.getSortBy()) {
@@ -346,8 +307,8 @@ public class CardsList extends javax.swing.JPanel implements MouseListener, ICar
                     break;
             }
             if (comparator != null) {
-                Collections.sort(sortedCards, new CardViewNameComparator());
-                Collections.sort(sortedCards, comparator);
+                sortedCards.sort(new CardViewNameComparator());
+                sortedCards.sort(comparator);
             }
             CardView lastCard = null;
             for (CardView card : sortedCards) {
@@ -398,22 +359,22 @@ public class CardsList extends javax.swing.JPanel implements MouseListener, ICar
         int artifactCount = 0;
 
         for (CardView card : cards.values()) {
-            if (card.getCardTypes().contains(CardType.LAND)) {
+            if (card.isLand()) {
                 landCount++;
             }
-            if (card.getCardTypes().contains(CardType.CREATURE)) {
+            if (card.isCreature()) {
                 creatureCount++;
             }
-            if (card.getCardTypes().contains(CardType.SORCERY)) {
+            if (card.isSorcery()) {
                 sorceryCount++;
             }
-            if (card.getCardTypes().contains(CardType.INSTANT)) {
+            if (card.isInstant()) {
                 instantCount++;
             }
-            if (card.getCardTypes().contains(CardType.ENCHANTMENT)) {
+            if (card.isEnchantment()) {
                 enchantmentCount++;
             }
-            if (card.getCardTypes().contains(CardType.ARTIFACT)) {
+            if (card.isArtifact()) {
                 artifactCount++;
             }
         }
@@ -425,7 +386,7 @@ public class CardsList extends javax.swing.JPanel implements MouseListener, ICar
     }
 
     private MageCard addCard(CardView card, BigCard bigCard, UUID gameId) {
-        MageCard cardImg = Plugins.getInstance().getMageCard(card, bigCard, cardDimension, gameId, true, true);
+        MageCard cardImg = Plugins.instance.getMageCard(card, bigCard, cardDimension, gameId, true, true);
         cardArea.add(cardImg);
         cardImg.update(card);
         cardImg.addMouseListener(this);
@@ -491,9 +452,9 @@ public class CardsList extends javax.swing.JPanel implements MouseListener, ICar
 
         setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         setMinimumSize(new java.awt.Dimension(30, 30));
-        setPreferredSize((!Beans.isDesignTime())?
-            (GUISizeHelper.editorCardDimension)
-            :(new Dimension(600, 600)));
+        setPreferredSize((!Beans.isDesignTime()) ?
+                (GUISizeHelper.editorCardDimension)
+                : (new Dimension(600, 600)));
         setRequestFocusEnabled(false);
 
         panelControl.setMaximumSize(new java.awt.Dimension(32767, 23));
@@ -536,24 +497,16 @@ public class CardsList extends javax.swing.JPanel implements MouseListener, ICar
         chkPiles.setText("Piles");
         chkPiles.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         chkPiles.setMargin(new java.awt.Insets(3, 2, 2, 2));
-        chkPiles.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkPilesActionPerformed(evt);
-            }
-        });
+        chkPiles.addActionListener(evt -> chkPilesActionPerformed(evt));
 
-        cbSortBy.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "SortBy" }));
+        cbSortBy.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"SortBy"}));
         cbSortBy.setToolTipText("Sort the cards if card view is active.");
         cbSortBy.setMaximumSize(new java.awt.Dimension(120, 20));
         cbSortBy.setMinimumSize(new java.awt.Dimension(120, 20));
         cbSortBy.setName("SortBy"); // NOI18N
         cbSortBy.setOpaque(false);
         cbSortBy.setPreferredSize(new java.awt.Dimension(120, 20));
-        cbSortBy.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbSortByActionPerformed(evt);
-            }
-        });
+        cbSortBy.addActionListener(evt -> cbSortByActionPerformed(evt));
 
         bgView.add(jToggleListView);
         jToggleListView.setIcon(new javax.swing.ImageIcon(getClass().getResource("/buttons/list_panel.png"))); // NOI18N
@@ -564,11 +517,7 @@ public class CardsList extends javax.swing.JPanel implements MouseListener, ICar
         jToggleListView.setMaximumSize(new java.awt.Dimension(37, 25));
         jToggleListView.setMinimumSize(new java.awt.Dimension(37, 25));
         jToggleListView.setPreferredSize(new java.awt.Dimension(44, 22));
-        jToggleListView.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jToggleListViewActionPerformed(evt);
-            }
-        });
+        jToggleListView.addActionListener(evt -> jToggleListViewActionPerformed(evt));
 
         bgView.add(jToggleCardView);
         jToggleCardView.setIcon(new javax.swing.ImageIcon(getClass().getResource("/buttons/card_panel.png"))); // NOI18N
@@ -576,45 +525,41 @@ public class CardsList extends javax.swing.JPanel implements MouseListener, ICar
         jToggleCardView.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
         jToggleCardView.setMargin(new java.awt.Insets(2, 6, 2, 6));
         jToggleCardView.setPreferredSize(new java.awt.Dimension(40, 22));
-        jToggleCardView.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jToggleCardViewActionPerformed(evt);
-            }
-        });
+        jToggleCardView.addActionListener(evt -> jToggleCardViewActionPerformed(evt));
 
         javax.swing.GroupLayout panelControlLayout = new javax.swing.GroupLayout(panelControl);
         panelControl.setLayout(panelControlLayout);
         panelControlLayout.setHorizontalGroup(
-            panelControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelControlLayout.createSequentialGroup()
-                .addComponent(lblCount)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblLandCount)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblCreatureCount)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkPiles)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(cbSortBy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jToggleListView, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jToggleCardView, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                panelControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(panelControlLayout.createSequentialGroup()
+                                .addComponent(lblCount)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblLandCount)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblCreatureCount)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chkPiles)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(cbSortBy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jToggleListView, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jToggleCardView, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelControlLayout.setVerticalGroup(
-            panelControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelControlLayout.createSequentialGroup()
-                .addGroup(panelControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(lblCount)
-                        .addComponent(lblLandCount)
-                        .addComponent(lblCreatureCount)
-                        .addComponent(chkPiles))
-                    .addComponent(cbSortBy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jToggleListView, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jToggleCardView, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 0, 0))
+                panelControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(panelControlLayout.createSequentialGroup()
+                                .addGroup(panelControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(panelControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(lblCount)
+                                                .addComponent(lblLandCount)
+                                                .addComponent(lblCreatureCount)
+                                                .addComponent(chkPiles))
+                                        .addComponent(cbSortBy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jToggleListView, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jToggleCardView, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 0, 0))
         );
 
         jToggleListView.getAccessibleContext().setAccessibleDescription("Switch between image and table view.");
@@ -625,16 +570,16 @@ public class CardsList extends javax.swing.JPanel implements MouseListener, ICar
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panelControl, javax.swing.GroupLayout.PREFERRED_SIZE, 467, Short.MAX_VALUE)
-            .addComponent(panelCardArea)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(panelControl, javax.swing.GroupLayout.PREFERRED_SIZE, 467, Short.MAX_VALUE)
+                        .addComponent(panelCardArea)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(panelControl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addComponent(panelCardArea, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(panelControl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(2, 2, 2)
+                                .addComponent(panelCardArea, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -692,15 +637,15 @@ public class CardsList extends javax.swing.JPanel implements MouseListener, ICar
                 e.consume();
                 if (obj instanceof Card) {
                     if (e.isAltDown()) {
-                        cardEventSource.altDoubleClick(((Card) obj).getOriginal(), "alt-double-click");
+                        cardEventSource.fireEvent(((Card) obj).getOriginal(), ClientEventType.ALT_DOUBLE_CLICK);
                     } else {
-                        cardEventSource.doubleClick(((Card) obj).getOriginal(), "double-click");
+                        cardEventSource.fireEvent(((Card) obj).getOriginal(), ClientEventType.DOUBLE_CLICK);
                     }
                 } else if (obj instanceof MageCard) {
                     if (e.isAltDown()) {
-                        cardEventSource.altDoubleClick(((MageCard) obj).getOriginal(), "alt-double-click");
+                        cardEventSource.fireEvent(((MageCard) obj).getOriginal(), ClientEventType.ALT_DOUBLE_CLICK);
                     } else {
-                        cardEventSource.doubleClick(((MageCard) obj).getOriginal(), "double-click");
+                        cardEventSource.fireEvent(((MageCard) obj).getOriginal(), ClientEventType.DOUBLE_CLICK);
                     }
                 }
             }
@@ -727,7 +672,7 @@ public class CardsList extends javax.swing.JPanel implements MouseListener, ICar
     private void checkMenu(MouseEvent Me, SimpleCardView card) {
         if (Me.isPopupTrigger()) {
             Me.consume();
-            cardEventSource.showPopupMenuEvent(card, Me.getComponent(), Me.getX(), Me.getY(), "show-popup-menu");
+            cardEventSource.fireEvent(card, Me.getComponent(), Me.getX(), Me.getY(), ClientEventType.SHOW_POP_UP_MENU);
         }
     }
 

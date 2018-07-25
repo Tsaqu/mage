@@ -4,6 +4,7 @@
  */
 package mage.abilities.effects.common;
 
+import java.util.Objects;
 import mage.MageObject;
 import mage.abilities.Ability;
 import mage.abilities.DelayedTriggeredAbility;
@@ -25,16 +26,16 @@ import mage.players.Player;
  *
  * 702.49. Epic 702.49a Epic represents two spell abilities, one of which
  * creates a delayed triggered ability. “Epic” means “For the rest of the game,
- * you can’t cast spells,” and “At the beginning of each of your upkeeps for the
+ * you can't cast spells,” and “At the beginning of each of your upkeeps for the
  * rest of the game, copy this spell except for its epic ability. If the spell
  * has any targets, you may choose new targets for the copy.” See rule 706.10.
- * 702.49b A player can’t cast spells once a spell with epic he or she controls
+ * 702.49b A player can't cast spells once a spell with epic he or she controls
  * resolves, but effects (such as the epic ability itself) can still put copies
  * of spells onto the stack. *
  */
 public class EpicEffect extends OneShotEffect {
 
-    final String rule = "<br>Epic <i>(For the rest of the game, you can't cast spells.  At the beginning of each of your upkeeps for the rest of the game, copy this spell except for its epic ability.  If the spell has targets, you may choose new targets for the copy)";
+    static final String rule = "<br>Epic <i>(For the rest of the game, you can't cast spells. At the beginning of each of your upkeeps for the rest of the game, copy this spell except for its epic ability. If the spell has targets, you may choose new targets for the copy)";
 
     public EpicEffect() {
         super(Outcome.Benefit);
@@ -51,6 +52,9 @@ public class EpicEffect extends OneShotEffect {
         if (controller != null) {
             StackObject stackObject = game.getStack().getStackObject(source.getId());
             Spell spell = (Spell) stackObject;
+            if (spell == null) {
+                return false;
+            }
             spell = spell.copySpell(source.getControllerId());
             // Remove Epic effect from the spell
             Effect epicEffect = null;
@@ -100,7 +104,7 @@ class EpicReplacementEffect extends ContinuousRuleModifyingEffectImpl {
     public String getInfoMessage(Ability source, GameEvent event, Game game) {
         MageObject mageObject = game.getObject(source.getSourceId());
         if (mageObject != null) {
-            return "For the rest of the game, you can't cast spells (Epic - " + mageObject.getName() + ")";
+            return "For the rest of the game, you can't cast spells (Epic - " + mageObject.getName() + ')';
         }
         return null;
     }
@@ -112,7 +116,7 @@ class EpicReplacementEffect extends ContinuousRuleModifyingEffectImpl {
 
     @Override
     public boolean applies(GameEvent event, Ability source, Game game) {
-        if (source.getControllerId() == event.getPlayerId()) {
+        if (Objects.equals(source.getControllerId(), event.getPlayerId())) {
             MageObject object = game.getObject(event.getSourceId());
             if (object != null) {
                 return true;

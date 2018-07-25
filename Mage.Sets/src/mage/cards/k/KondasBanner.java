@@ -38,35 +38,31 @@ import mage.abilities.effects.common.continuous.BoostAllEffect;
 import mage.abilities.keyword.EquipAbility;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
-import mage.constants.CardType;
-import mage.constants.Duration;
-import mage.constants.Outcome;
-import mage.constants.Zone;
+import mage.constants.*;
+import mage.filter.StaticFilters;
 import mage.filter.common.FilterControlledCreaturePermanent;
-import mage.filter.common.FilterCreaturePermanent;
 import mage.filter.predicate.mageobject.SupertypePredicate;
 import mage.game.Game;
 import mage.game.permanent.Permanent;
 import mage.target.Target;
 import mage.target.common.TargetControlledCreaturePermanent;
-import mage.util.CardUtil;
 
 /**
  *
  * @author LevelX
  */
-public class KondasBanner extends CardImpl {
+public final class KondasBanner extends CardImpl {
 
     private static final FilterControlledCreaturePermanent legendaryFilter = new FilterControlledCreaturePermanent("legendary creatures");
 
     static {
-        legendaryFilter.add(new SupertypePredicate("Legendary"));
+        legendaryFilter.add(new SupertypePredicate(SuperType.LEGENDARY));
     }
 
     public KondasBanner(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.ARTIFACT},"{2}");
-        this.supertype.add("Legendary");
-        this.subtype.add("Equipment");
+        super(ownerId, setInfo, new CardType[]{CardType.ARTIFACT}, "{2}");
+        addSuperType(SuperType.LEGENDARY);
+        this.subtype.add(SubType.EQUIPMENT);
 
         Target target = new TargetControlledCreaturePermanent(1, 1, legendaryFilter, false);
         // Konda's Banner can be attached only to a legendary creature.
@@ -98,7 +94,7 @@ class KondasBannerTypeBoostEffect extends BoostAllEffect {
     private static final String effectText = "Creatures that share a creature type with equipped creature get +1/+1";
 
     KondasBannerTypeBoostEffect() {
-        super(1, 1, Duration.WhileOnBattlefield, new FilterCreaturePermanent(), false);
+        super(1, 1, Duration.WhileOnBattlefield, StaticFilters.FILTER_PERMANENT_CREATURE, false);
         staticText = effectText;
     }
 
@@ -114,7 +110,7 @@ class KondasBannerTypeBoostEffect extends BoostAllEffect {
             Permanent equipedCreature = game.getPermanent(equipment.getAttachedTo());
             if (equipedCreature != null) {
                 for (Permanent perm : game.getBattlefield().getActivePermanents(filter, source.getControllerId(), source.getSourceId(), game)) {
-                    if (CardUtil.shareSubtypes(perm, equipedCreature, game)) {
+                    if (perm.shareSubtypes(equipedCreature, game)) {
                         perm.addPower(power.calculate(game, source, this));
                         perm.addToughness(toughness.calculate(game, source, this));
 
@@ -138,7 +134,7 @@ class KondasBannerColorBoostEffect extends BoostAllEffect {
     private static final String effectText = "Creatures that share a color with equipped creature get +1/+1.";
 
     KondasBannerColorBoostEffect() {
-        super(1, 1, Duration.WhileOnBattlefield, new FilterCreaturePermanent(), false);
+        super(1, 1, Duration.WhileOnBattlefield, StaticFilters.FILTER_PERMANENT_CREATURE, false);
         staticText = effectText;
     }
 

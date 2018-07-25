@@ -14,6 +14,7 @@ import mage.abilities.effects.common.SacrificeEffect;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.CardType;
+import mage.constants.SubType;
 import mage.constants.TargetController;
 import mage.constants.Zone;
 import mage.filter.FilterPermanent;
@@ -29,9 +30,9 @@ import mage.target.targetpointer.FixedTarget;
  *
  * @author wanderer120
  */
-public class GreaterHarvester extends CardImpl {
+public final class GreaterHarvester extends CardImpl {
 
-    public static final FilterPermanent filter = new FilterPermanent("a permanent");
+    static final FilterPermanent filter = new FilterPermanent("a permanent");
 
     static {
         filter.add(Predicates.or(new CardTypePredicate(CardType.ARTIFACT),
@@ -43,7 +44,7 @@ public class GreaterHarvester extends CardImpl {
 
     public GreaterHarvester(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{2}{B}{B}{B}");
-        this.subtype.add("Horror");
+        this.subtype.add(SubType.HORROR);
 
         this.power = new MageInt(5);
         this.toughness = new MageInt(6);
@@ -82,7 +83,7 @@ class GreaterHarvesterAbility extends TriggeredAbilityImpl {
 
     @Override
     public boolean checkEventType(GameEvent event, Game game) {
-        return EventType.DAMAGED_PLAYER.equals(event.getType());
+        return EventType.DAMAGED_PLAYER == event.getType();
     }
 
     

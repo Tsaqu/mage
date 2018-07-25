@@ -1,36 +1,7 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 
 package mage.player.ai;
 
-import mage.constants.Outcome;
-import mage.constants.PhaseStep;
-import mage.constants.RangeOfInfluence;
 import mage.abilities.Ability;
 import mage.abilities.ActivatedAbility;
 import mage.abilities.common.PassAbility;
@@ -38,6 +9,9 @@ import mage.abilities.effects.Effect;
 import mage.abilities.effects.SearchEffect;
 import mage.cards.Cards;
 import mage.choices.Choice;
+import mage.constants.Outcome;
+import mage.constants.PhaseStep;
+import mage.constants.RangeOfInfluence;
 import mage.game.Game;
 import mage.game.combat.Combat;
 import mage.game.combat.CombatGroup;
@@ -161,9 +135,9 @@ public class ComputerPlayer2 extends ComputerPlayer implements Player {
             else
                 addActions(root, Integer.MIN_VALUE, Integer.MAX_VALUE);
             logger.info(name + " simulated " + nodeCount + " nodes in " + thinkTime/1000000000.0 + "s - average " + nodeCount/(thinkTime/1000000000.0) + " nodes/s");
-            if (root.children.size() > 0) {
+            if (!root.children.isEmpty()) {
                 root = root.children.get(0);
-                actions = new LinkedList<Ability>(root.abilities);
+                actions = new LinkedList<>(root.abilities);
                 combat = root.combat;
                 if (logger.isDebugEnabled())
                     logger.debug("adding actions:" + actions);
@@ -174,17 +148,17 @@ public class ComputerPlayer2 extends ComputerPlayer implements Player {
     }
 
     protected boolean getNextAction(Game game) {
-        if (root != null && root.children.size() > 0) {
+        if (root != null && !root.children.isEmpty()) {
             SimulationNode test = root;
             root = root.children.get(0);
-            while (root.children.size() > 0 && !root.playerId.equals(playerId)) {
+            while (!root.children.isEmpty() && !root.playerId.equals(playerId)) {
                 test = root;
                 root = root.children.get(0);
             }
             logger.debug("simlating -- game value:" + game.getState().getValue(true) + " test value:" + test.gameValue);
             if (root.playerId.equals(playerId) && root.abilities != null && game.getState().getValue(true).hashCode() == test.gameValue) {
                 logger.debug("simulating -- continuing previous action chain");
-                actions = new LinkedList<Ability>(root.abilities);
+                actions = new LinkedList<>(root.abilities);
                 combat = root.combat;
                 return true;
             }
@@ -284,10 +258,9 @@ public class ComputerPlayer2 extends ComputerPlayer implements Player {
     }
 
     protected void addActionsTimed() {
-        FutureTask<Integer> task = new FutureTask<Integer>(new Callable<Integer>() {
+        FutureTask<Integer> task = new FutureTask<>(new Callable<Integer>() {
             @Override
-            public Integer call() throws Exception
-            {
+            public Integer call() throws Exception {
                 return addActions(root, Integer.MIN_VALUE, Integer.MAX_VALUE);
             }
         });
@@ -297,7 +270,7 @@ public class ComputerPlayer2 extends ComputerPlayer implements Player {
             task.get(maxThink, TimeUnit.SECONDS);
             long endTime = System.nanoTime();
             long duration = endTime - startTime;
-            logger.info("Calculated " + SimulationNode.nodeCount + " nodes in " + duration/1000000000.0 + "s");
+            logger.info("Calculated " + SimulationNode.nodeCount + " nodes in " + duration/1000000000.0 + 's');
             nodeCount += SimulationNode.nodeCount;
             thinkTime += duration;
         } catch (TimeoutException e) {
@@ -311,7 +284,7 @@ public class ComputerPlayer2 extends ComputerPlayer implements Player {
             }
             long endTime = System.nanoTime();
             long duration = endTime - startTime;
-            logger.info("Timeout - Calculated " + SimulationNode.nodeCount + " nodes in " + duration/1000000000.0 + "s");
+            logger.info("Timeout - Calculated " + SimulationNode.nodeCount + " nodes in " + duration/1000000000.0 + 's');
             nodeCount += SimulationNode.nodeCount;
             thinkTime += duration;
         } catch (ExecutionException e) {
@@ -331,11 +304,11 @@ public class ComputerPlayer2 extends ComputerPlayer implements Player {
             return GameStateEvaluator.evaluate(playerId, game);
         }
         int val;
-        if (node.depth > maxDepth || game.gameOver(null)) {
+        if (node.depth > maxDepth || game.checkIfGameIsOver()) {
             logger.debug(indent(node.depth) + "simulating -- reached end state");
             val = GameStateEvaluator.evaluate(playerId, game);
         }
-        else if (node.getChildren().size() > 0) {
+        else if (!node.getChildren().isEmpty()) {
             logger.debug(indent(node.depth) + "simulating -- somthing added children:" + node.getChildren().size());
             val = minimaxAB(node, alpha, beta);
         }
@@ -358,10 +331,10 @@ public class ComputerPlayer2 extends ComputerPlayer implements Player {
                 }
             }
 
-            if (game.gameOver(null)) {
+            if (game.checkIfGameIsOver()) {
                 val = GameStateEvaluator.evaluate(playerId, game);
             }
-            else if (node.getChildren().size() > 0) {
+            else if (!node.getChildren().isEmpty()) {
                 //declared attackers or blockers or triggered abilities
                 logger.debug(indent(node.depth) + "simulating -- attack/block/trigger added children:" + node.getChildren().size());
                 val = minimaxAB(node, alpha, beta);
@@ -404,7 +377,7 @@ public class ComputerPlayer2 extends ComputerPlayer implements Player {
                     logger.debug(indent(node.depth) + "found useless action: " + action);
                     continue;
                 }
-                if (!sim.gameOver(null) && action.isUsesStack()) {
+                if (!sim.checkIfGameIsOver() && action.isUsesStack()) {
                     // only pass if the last action uses the stack
                     sim.getPlayer(currentPlayer.getId()).pass(game);
                     sim.getPlayerList().getNext();
@@ -430,9 +403,9 @@ public class ComputerPlayer2 extends ComputerPlayer implements Player {
                         alpha = val;
                         bestNode = newNode;
                         node.setCombat(newNode.getCombat());
-                        if (node.getTargets().size() > 0)
+                        if (!node.getTargets().isEmpty())
                             targets = node.getTargets();
-                        if (node.getChoices().size() > 0)
+                        if (!node.getChoices().isEmpty())
                             choices = node.getChoices();
                     }
                     if (val == GameStateEvaluator.WIN_SCORE) {
@@ -474,18 +447,16 @@ public class ComputerPlayer2 extends ComputerPlayer implements Player {
 
     @Override
     public boolean choose(Outcome outcome, Choice choice, Game game) {
-        if (choices.isEmpty())
+        if (choices.isEmpty()) {
             return super.choose(outcome, choice, game);
-        if (!choice.isChosen()) {
-            for (String achoice: choices) {
-                choice.setChoice(achoice);
-                if (choice.isChosen()) {
-                    choices.clear();
-                    return true;
-                }
-            }
-            return false;
         }
+
+        if (!choice.isChosen()) {
+            if(!choice.setChoiceByAnswers(choices, true)){
+                choice.setRandomChoice();
+            }
+        }
+
         return true;
     }
 
@@ -589,7 +560,7 @@ public class ComputerPlayer2 extends ComputerPlayer implements Player {
                     break;
                 case CLEANUP:
                     game.getPhase().getStep().beginStep(game, activePlayerId);
-                    if (!game.checkStateAndTriggered() && !game.gameOver(null)) {
+                    if (!game.checkStateAndTriggered() && !game.checkIfGameIsOver()) {
                         game.getState().setActivePlayerId(game.getState().getPlayerList(game.getActivePlayerId()).getNext());
                         game.getTurn().setPhase(new BeginningPhase());
                         game.getPhase().setStep(new UntapStep());
@@ -673,7 +644,7 @@ public class ComputerPlayer2 extends ComputerPlayer implements Player {
     @Override
     public void selectBlockers(Game game, UUID defendingPlayerId) {
         logger.debug("selectBlockers");
-        if (combat != null && combat.getGroups().size() > 0) {
+        if (combat != null && !combat.getGroups().isEmpty()) {
             List<CombatGroup> groups = game.getCombat().getGroups();
             for (int i = 0; i < groups.size(); i++) {
                 if (i < combat.getGroups().size()) {

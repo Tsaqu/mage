@@ -1,30 +1,4 @@
-/*
- *  Copyright 2011 BetaSteward_at_googlemail.com. All rights reserved.
- * 
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- * 
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- * 
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- * 
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.player.ai;
 
 import mage.abilities.Ability;
@@ -52,7 +26,7 @@ public class MCTSPlayer extends ComputerPlayer {
     private NextAction nextAction;
 
     public enum NextAction {
-        PRIORITY, SELECT_ATTACKERS, SELECT_BLOCKERS;
+        PRIORITY, SELECT_ATTACKERS, SELECT_BLOCKERS
     }
 
     public MCTSPlayer(UUID id) {
@@ -78,12 +52,12 @@ public class MCTSPlayer extends ComputerPlayer {
     }
 
     public List<Ability> getPlayableOptions(Game game) {
-        List<Ability> all = new ArrayList<Ability>();
+        List<Ability> all = new ArrayList<>();
         List<Ability> playables = getPlayableAbilities(game);
         for (Ability ability: playables) {
             List<Ability> options = game.getPlayer(playerId).getPlayableOptions(ability, game);
             if (options.isEmpty()) {
-                if (ability.getManaCosts().getVariableCosts().size() > 0) {
+                if (!ability.getManaCosts().getVariableCosts().isEmpty()) {
                     simulateVariableCosts(ability, all, game);
                 }
                 else {
@@ -92,7 +66,7 @@ public class MCTSPlayer extends ComputerPlayer {
             }
             else {
                 for (Ability option: options) {
-                    if (ability.getManaCosts().getVariableCosts().size() > 0) {
+                    if (!ability.getManaCosts().getVariableCosts().isEmpty()) {
                         simulateVariableCosts(option, all, game);
                     }
                     else {
@@ -122,7 +96,7 @@ public class MCTSPlayer extends ComputerPlayer {
     }
 
     public List<List<UUID>> getAttacks(Game game) {
-        List<List<UUID>> engagements = new ArrayList<List<UUID>>();
+        List<List<UUID>> engagements = new ArrayList<>();
         List<Permanent> attackersList = super.getAvailableAttackers(game);
         //use binary digits to calculate powerset of attackers
         int powerElements = (int) Math.pow(2, attackersList.size());
@@ -131,9 +105,9 @@ public class MCTSPlayer extends ComputerPlayer {
             binary.setLength(0);
             binary.append(Integer.toBinaryString(i));
             while (binary.length() < attackersList.size()) {
-                binary.insert(0, "0");
+                binary.insert(0, '0');
             }
-            List<UUID> engagement = new ArrayList<UUID>();
+            List<UUID> engagement = new ArrayList<>();
             for (int j = 0; j < attackersList.size(); j++) {
                 if (binary.charAt(j) == '1') {
                     engagement.add(attackersList.get(j).getId());
@@ -145,14 +119,14 @@ public class MCTSPlayer extends ComputerPlayer {
     }
 
     public List<List<List<UUID>>> getBlocks(Game game) {
-        List<List<List<UUID>>> engagements = new ArrayList<List<List<UUID>>>();
+        List<List<List<UUID>>> engagements = new ArrayList<>();
         int numGroups = game.getCombat().getGroups().size();
         if (numGroups == 0) {
             return engagements;
         }
 
         //add a node with no blockers
-        List<List<UUID>> engagement = new ArrayList<List<UUID>>();
+        List<List<UUID>> engagement = new ArrayList<>();
         for (int i = 0; i < numGroups; i++) {
             engagement.add(new ArrayList<UUID>());
         }
@@ -165,9 +139,9 @@ public class MCTSPlayer extends ComputerPlayer {
     }
 
     private List<List<UUID>> copyEngagement(List<List<UUID>> engagement) {
-        List<List<UUID>> newEngagement = new ArrayList<List<UUID>>();
+        List<List<UUID>> newEngagement = new ArrayList<>();
         for (List<UUID> group: engagement) {
-            newEngagement.add(new ArrayList<UUID>(group));
+            newEngagement.add(new ArrayList<>(group));
         }
         return newEngagement;
     }

@@ -1,16 +1,15 @@
 package mage.sets;
 
 import mage.cards.ExpansionSet;
+import mage.constants.Rarity;
 import mage.constants.SetType;
 
-import mage.constants.Rarity;
-import mage.cards.CardGraphicInfo;
+public final class ElspethVsTezzeret extends ExpansionSet {
 
-public class ElspethVsTezzeret extends ExpansionSet {
-    private static final ElspethVsTezzeret fINSTANCE = new ElspethVsTezzeret();
+    private static final ElspethVsTezzeret instance = new ElspethVsTezzeret();
 
     public static ElspethVsTezzeret getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     private ElspethVsTezzeret() {
@@ -48,10 +47,10 @@ public class ElspethVsTezzeret extends ExpansionSet {
         cards.add(new SetCardInfo("Glory Seeker", 7, Rarity.COMMON, mage.cards.g.GlorySeeker.class));
         cards.add(new SetCardInfo("Goldmeadow Harrier", 3, Rarity.COMMON, mage.cards.g.GoldmeadowHarrier.class));
         cards.add(new SetCardInfo("Infantry Veteran", 4, Rarity.COMMON, mage.cards.i.InfantryVeteran.class));
-        cards.add(new SetCardInfo("Island", 76, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 77, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 78, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 79, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Island", 76, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 77, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 78, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 79, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Journey to Nowhere", 23, Rarity.COMMON, mage.cards.j.JourneyToNowhere.class));
         cards.add(new SetCardInfo("Juggernaut", 52, Rarity.UNCOMMON, mage.cards.j.Juggernaut.class));
         cards.add(new SetCardInfo("Kabira Crossroads", 33, Rarity.COMMON, mage.cards.k.KabiraCrossroads.class));
@@ -66,10 +65,10 @@ public class ElspethVsTezzeret extends ExpansionSet {
         cards.add(new SetCardInfo("Moonglove Extract", 67, Rarity.COMMON, mage.cards.m.MoongloveExtract.class));
         cards.add(new SetCardInfo("Mosquito Guard", 6, Rarity.COMMON, mage.cards.m.MosquitoGuard.class));
         cards.add(new SetCardInfo("Pentavus", 58, Rarity.RARE, mage.cards.p.Pentavus.class));
-        cards.add(new SetCardInfo("Plains", 35, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 36, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 37, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 38, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Plains", 35, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 36, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 37, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 38, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Qumulox", 59, Rarity.UNCOMMON, mage.cards.q.Qumulox.class));
         cards.add(new SetCardInfo("Raise the Alarm", 25, Rarity.COMMON, mage.cards.r.RaiseTheAlarm.class));
         cards.add(new SetCardInfo("Razor Barrier", 26, Rarity.COMMON, mage.cards.r.RazorBarrier.class));

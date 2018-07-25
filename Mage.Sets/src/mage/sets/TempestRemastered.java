@@ -1,48 +1,20 @@
-/*
-* Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are
-* permitted provided that the following conditions are met:
-*
-*    1. Redistributions of source code must retain the above copyright notice, this list of
-*       conditions and the following disclaimer.
-*
-*    2. Redistributions in binary form must reproduce the above copyright notice, this list
-*       of conditions and the following disclaimer in the documentation and/or other materials
-*       provided with the distribution.
-*
-* THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-* FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*
-* The views and conclusions contained in the software and documentation are those of the
-* authors and should not be interpreted as representing official policies, either expressed
-* or implied, of BetaSteward_at_googlemail.com.
-*/
 
 package mage.sets;
 
 import mage.cards.ExpansionSet;
-import mage.constants.SetType;
 import mage.constants.Rarity;
-import mage.cards.CardGraphicInfo;
+import mage.constants.SetType;
 
 /**
  *
  * @author fireshoes
  */
-public class TempestRemastered extends ExpansionSet {
+public final class TempestRemastered extends ExpansionSet {
 
-    private static final TempestRemastered fINSTANCE = new TempestRemastered();
+    private static final TempestRemastered instance = new TempestRemastered();
 
     public static TempestRemastered getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     private TempestRemastered() {
@@ -61,8 +33,8 @@ public class TempestRemastered extends ExpansionSet {
         cards.add(new SetCardInfo("Angelic Blessing", 1, Rarity.COMMON, mage.cards.a.AngelicBlessing.class));
         cards.add(new SetCardInfo("Angelic Protector", 2, Rarity.UNCOMMON, mage.cards.a.AngelicProtector.class));
         cards.add(new SetCardInfo("Anoint", 3, Rarity.COMMON, mage.cards.a.Anoint.class));
-        cards.add(new SetCardInfo("Armored Pegasus", 5, Rarity.COMMON, mage.cards.a.ArmoredPegasus.class));
         cards.add(new SetCardInfo("Armor Sliver", 4, Rarity.COMMON, mage.cards.a.ArmorSliver.class));
+        cards.add(new SetCardInfo("Armored Pegasus", 5, Rarity.COMMON, mage.cards.a.ArmoredPegasus.class));
         cards.add(new SetCardInfo("Avenging Angel", 6, Rarity.UNCOMMON, mage.cards.a.AvengingAngel.class));
         cards.add(new SetCardInfo("Bandage", 7, Rarity.COMMON, mage.cards.b.Bandage.class));
         cards.add(new SetCardInfo("Barbed Sliver", 126, Rarity.COMMON, mage.cards.b.BarbedSliver.class));
@@ -103,8 +75,8 @@ public class TempestRemastered extends ExpansionSet {
         cards.add(new SetCardInfo("Dauthi Warlord", 98, Rarity.UNCOMMON, mage.cards.d.DauthiWarlord.class));
         cards.add(new SetCardInfo("Deadshot", 129, Rarity.UNCOMMON, mage.cards.d.Deadshot.class));
         cards.add(new SetCardInfo("Death Pits of Rath", 99, Rarity.RARE, mage.cards.d.DeathPitsOfRath.class));
-        cards.add(new SetCardInfo("Death's Duet", 101, Rarity.COMMON, mage.cards.d.DeathsDuet.class));
         cards.add(new SetCardInfo("Death Stroke", 100, Rarity.COMMON, mage.cards.d.DeathStroke.class));
+        cards.add(new SetCardInfo("Death's Duet", 101, Rarity.COMMON, mage.cards.d.DeathsDuet.class));
         cards.add(new SetCardInfo("Diabolic Edict", 102, Rarity.COMMON, mage.cards.d.DiabolicEdict.class));
         cards.add(new SetCardInfo("Disenchant", 11, Rarity.COMMON, mage.cards.d.Disenchant.class));
         cards.add(new SetCardInfo("Dismiss", 45, Rarity.UNCOMMON, mage.cards.d.Dismiss.class));
@@ -128,10 +100,10 @@ public class TempestRemastered extends ExpansionSet {
         cards.add(new SetCardInfo("Flowstone Mauler", 133, Rarity.UNCOMMON, mage.cards.f.FlowstoneMauler.class));
         cards.add(new SetCardInfo("Flowstone Wyvern", 134, Rarity.UNCOMMON, mage.cards.f.FlowstoneWyvern.class));
         cards.add(new SetCardInfo("Forbid", 50, Rarity.RARE, mage.cards.f.Forbid.class));
-        cards.add(new SetCardInfo("Forest", 266, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 267, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 268, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Forest", 269, Rarity.LAND, mage.cards.basiclands.Forest.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Forest", 266, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 267, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 268, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Forest", 269, Rarity.LAND, mage.cards.basiclands.Forest.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Fugue", 105, Rarity.UNCOMMON, mage.cards.f.Fugue.class));
         cards.add(new SetCardInfo("Furnace Brood", 135, Rarity.COMMON, mage.cards.f.FurnaceBrood.class));
         cards.add(new SetCardInfo("Gallantry", 14, Rarity.UNCOMMON, mage.cards.g.Gallantry.class));
@@ -150,10 +122,10 @@ public class TempestRemastered extends ExpansionSet {
         cards.add(new SetCardInfo("Horned Turtle", 53, Rarity.COMMON, mage.cards.h.HornedTurtle.class));
         cards.add(new SetCardInfo("Humility", 16, Rarity.MYTHIC, mage.cards.h.Humility.class));
         cards.add(new SetCardInfo("Intuition", 54, Rarity.RARE, mage.cards.i.Intuition.class));
-        cards.add(new SetCardInfo("Island", 254, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 255, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 256, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Island", 257, Rarity.LAND, mage.cards.basiclands.Island.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Island", 254, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 255, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 256, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Island", 257, Rarity.LAND, mage.cards.basiclands.Island.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Jinxed Idol", 224, Rarity.RARE, mage.cards.j.JinxedIdol.class));
         cards.add(new SetCardInfo("Kezzerdrix", 107, Rarity.RARE, mage.cards.k.Kezzerdrix.class));
         cards.add(new SetCardInfo("Killer Whale", 55, Rarity.UNCOMMON, mage.cards.k.KillerWhale.class));
@@ -161,7 +133,7 @@ public class TempestRemastered extends ExpansionSet {
         cards.add(new SetCardInfo("Kor Chant", 17, Rarity.UNCOMMON, mage.cards.k.KorChant.class));
         cards.add(new SetCardInfo("Krakilin", 177, Rarity.RARE, mage.cards.k.Krakilin.class));
         cards.add(new SetCardInfo("Lab Rats", 108, Rarity.COMMON, mage.cards.l.LabRats.class));
-        cards.add(new SetCardInfo("Legacy's Allure", 57, Rarity.RARE, mage.cards.l.LegacysAllure.class));
+        cards.add(new SetCardInfo("Legacy's Allure", 56, Rarity.RARE, mage.cards.l.LegacysAllure.class));
         cards.add(new SetCardInfo("Legerdemain", 57, Rarity.UNCOMMON, mage.cards.l.Legerdemain.class));
         cards.add(new SetCardInfo("Lightning Blast", 138, Rarity.COMMON, mage.cards.l.LightningBlast.class));
         cards.add(new SetCardInfo("Living Death", 109, Rarity.MYTHIC, mage.cards.l.LivingDeath.class));
@@ -170,8 +142,8 @@ public class TempestRemastered extends ExpansionSet {
         cards.add(new SetCardInfo("Lowland Giant", 139, Rarity.COMMON, mage.cards.l.LowlandGiant.class));
         cards.add(new SetCardInfo("Mage il-Vec", 140, Rarity.UNCOMMON, mage.cards.m.MageIlVec.class));
         cards.add(new SetCardInfo("Magmasaur", 141, Rarity.RARE, mage.cards.m.Magmasaur.class));
-        cards.add(new SetCardInfo("Manabond", 179, Rarity.RARE, mage.cards.m.Manabond.class));
         cards.add(new SetCardInfo("Mana Leak", 58, Rarity.COMMON, mage.cards.m.ManaLeak.class));
+        cards.add(new SetCardInfo("Manabond", 179, Rarity.RARE, mage.cards.m.Manabond.class));
         cards.add(new SetCardInfo("Maniacal Rage", 142, Rarity.COMMON, mage.cards.m.ManiacalRage.class));
         cards.add(new SetCardInfo("Master Decoy", 18, Rarity.COMMON, mage.cards.m.MasterDecoy.class));
         cards.add(new SetCardInfo("Mawcor", 59, Rarity.RARE, mage.cards.m.Mawcor.class));
@@ -188,10 +160,10 @@ public class TempestRemastered extends ExpansionSet {
         cards.add(new SetCardInfo("Mogg Hollows", 239, Rarity.UNCOMMON, mage.cards.m.MoggHollows.class));
         cards.add(new SetCardInfo("Mogg Infestation", 146, Rarity.RARE, mage.cards.m.MoggInfestation.class));
         cards.add(new SetCardInfo("Mogg Maniac", 147, Rarity.UNCOMMON, mage.cards.m.MoggManiac.class));
-        cards.add(new SetCardInfo("Mountain", 262, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 263, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 264, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Mountain", 265, Rarity.LAND, mage.cards.basiclands.Mountain.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Mountain", 262, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 263, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 264, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Mountain", 265, Rarity.LAND, mage.cards.basiclands.Mountain.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Mounted Archers", 19, Rarity.COMMON, mage.cards.m.MountedArchers.class));
         cards.add(new SetCardInfo("Mox Diamond", 228, Rarity.MYTHIC, mage.cards.m.MoxDiamond.class));
         cards.add(new SetCardInfo("Mulch", 181, Rarity.COMMON, mage.cards.m.Mulch.class));
@@ -210,10 +182,10 @@ public class TempestRemastered extends ExpansionSet {
         cards.add(new SetCardInfo("Pegasus Stampede", 24, Rarity.UNCOMMON, mage.cards.p.PegasusStampede.class));
         cards.add(new SetCardInfo("Phyrexian Hulk", 230, Rarity.UNCOMMON, mage.cards.p.PhyrexianHulk.class));
         cards.add(new SetCardInfo("Pine Barrens", 240, Rarity.UNCOMMON, mage.cards.p.PineBarrens.class));
-        cards.add(new SetCardInfo("Plains", 250, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 251, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 252, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Plains", 253, Rarity.LAND, mage.cards.basiclands.Plains.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Plains", 250, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 251, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 252, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Plains", 253, Rarity.LAND, mage.cards.basiclands.Plains.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Provoke", 186, Rarity.COMMON, mage.cards.p.Provoke.class));
         cards.add(new SetCardInfo("Rampant Growth", 187, Rarity.COMMON, mage.cards.r.RampantGrowth.class));
         cards.add(new SetCardInfo("Rathi Dragon", 150, Rarity.RARE, mage.cards.r.RathiDragon.class));
@@ -282,10 +254,10 @@ public class TempestRemastered extends ExpansionSet {
         cards.add(new SetCardInfo("Stronghold Assassin", 120, Rarity.RARE, mage.cards.s.StrongholdAssassin.class));
         cards.add(new SetCardInfo("Stun", 163, Rarity.COMMON, mage.cards.s.Stun.class));
         cards.add(new SetCardInfo("Survival of the Fittest", 199, Rarity.MYTHIC, mage.cards.s.SurvivalOfTheFittest.class));
-        cards.add(new SetCardInfo("Swamp", 258, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 259, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 260, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
-        cards.add(new SetCardInfo("Swamp", 261, Rarity.LAND, mage.cards.basiclands.Swamp.class, new CardGraphicInfo(null, true)));
+        cards.add(new SetCardInfo("Swamp", 258, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 259, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 260, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
+        cards.add(new SetCardInfo("Swamp", 261, Rarity.LAND, mage.cards.basiclands.Swamp.class, NON_FULL_USE_VARIOUS));
         cards.add(new SetCardInfo("Telethopter", 232, Rarity.COMMON, mage.cards.t.Telethopter.class));
         cards.add(new SetCardInfo("Thalakos Drifters", 70, Rarity.UNCOMMON, mage.cards.t.ThalakosDrifters.class));
         cards.add(new SetCardInfo("Thalakos Lowlands", 246, Rarity.UNCOMMON, mage.cards.t.ThalakosLowlands.class));

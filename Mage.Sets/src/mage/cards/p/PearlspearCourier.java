@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.p;
 
 import java.util.UUID;
@@ -43,6 +17,7 @@ import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.CardType;
 import mage.constants.Duration;
+import mage.constants.SubType;
 import mage.constants.Zone;
 import mage.filter.common.FilterCreaturePermanent;
 import mage.filter.predicate.mageobject.SubtypePredicate;
@@ -52,18 +27,18 @@ import mage.target.common.TargetCreaturePermanent;
  *
  * @author LoneFox
  */
-public class PearlspearCourier extends CardImpl {
+public final class PearlspearCourier extends CardImpl {
 
     private static final FilterCreaturePermanent filter = new FilterCreaturePermanent("Soldier creature");
 
     static {
-        filter.add(new SubtypePredicate("Soldier"));
+        filter.add(new SubtypePredicate(SubType.SOLDIER));
     }
 
     public PearlspearCourier(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{2}{W}");
-        this.subtype.add("Human");
-        this.subtype.add("Soldier");
+        this.subtype.add(SubType.HUMAN);
+        this.subtype.add(SubType.SOLDIER);
         this.power = new MageInt(2);
         this.toughness = new MageInt(1);
 
@@ -71,10 +46,10 @@ public class PearlspearCourier extends CardImpl {
         this.addAbility(new SkipUntapOptionalAbility());
         // {2}{W}, {tap}: Target Soldier creature gets +2/+2 and has vigilance for as long as Pearlspear Courier remains tapped.
         Ability ability = new SimpleActivatedAbility(Zone.BATTLEFIELD, new ConditionalContinuousEffect(
-            new BoostTargetEffect(2, 2, Duration.Custom), SourceTappedCondition.getInstance(),
+            new BoostTargetEffect(2, 2, Duration.Custom), SourceTappedCondition.instance,
             "target Soldier creature gets +2/+2"), new ManaCostsImpl("{2}{W}"));
         ability.addEffect(new ConditionalContinuousEffect(new GainAbilityTargetEffect(VigilanceAbility.getInstance(),
-            Duration.Custom), SourceTappedCondition.getInstance(),"and has vigilance for as long as {this} remains tapped"));
+            Duration.Custom), SourceTappedCondition.instance,"and has vigilance for as long as {this} remains tapped"));
         ability.addCost(new TapSourceCost());
         ability.addTarget(new TargetCreaturePermanent(filter));
         this.addAbility(ability);

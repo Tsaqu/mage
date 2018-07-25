@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.m;
 
 import java.util.LinkedHashSet;
@@ -42,6 +16,7 @@ import mage.choices.Choice;
 import mage.choices.ChoiceImpl;
 import mage.constants.CardType;
 import mage.constants.Outcome;
+import mage.constants.SubType;
 import mage.constants.Zone;
 import mage.game.Game;
 import mage.players.Player;
@@ -50,18 +25,18 @@ import mage.players.Player;
  *
  * @author jeffwadsworth
  */
-public class ManaforgeCinder extends CardImpl {
+public final class ManaforgeCinder extends CardImpl {
 
     public ManaforgeCinder(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{B/R}");
-        this.subtype.add("Elemental");
-        this.subtype.add("Shaman");
+        super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{B/R}");
+        this.subtype.add(SubType.ELEMENTAL);
+        this.subtype.add(SubType.SHAMAN);
         this.power = new MageInt(1);
         this.toughness = new MageInt(1);
 
-        // {1}: Add {B} or {R} to your mana pool. Activate this ability no more than three times each turn.
+        // {1}: Add {B} or {R}. Activate this ability no more than three times each turn.
         this.addAbility(new LimitedTimesPerTurnActivatedAbility(Zone.BATTLEFIELD, new ManaforgeCinderManaEffect(), new ManaCostsImpl("{1}"), 3));
-        
+
     }
 
     public ManaforgeCinder(final ManaforgeCinder card) {
@@ -74,13 +49,11 @@ public class ManaforgeCinder extends CardImpl {
     }
 }
 
-
-
 class ManaforgeCinderManaEffect extends OneShotEffect {
 
     public ManaforgeCinderManaEffect() {
         super(Outcome.PutManaInPool);
-        this.staticText = "Add {B} or {R} to your mana pool";
+        this.staticText = "Add {B} or {R}";
     }
 
     public ManaforgeCinderManaEffect(final ManaforgeCinderManaEffect effect) {
@@ -101,12 +74,10 @@ class ManaforgeCinderManaEffect extends OneShotEffect {
             choices.add("Black");
             choices.add("Red");
             manaChoice.setChoices(choices);
-            manaChoice.setMessage("Select black or red mana to add to your mana pool");
+            manaChoice.setMessage("Select black or red mana to add");
             Mana mana = new Mana();
-            while (!controller.choose(Outcome.Benefit, manaChoice, game)) {
-                if (!controller.canRespond()) {
-                    return false;
-                }
+            if (!controller.choose(Outcome.Benefit, manaChoice, game)) {
+                return false;
             }
             if (manaChoice.getChoice() == null) {
                 return false;

@@ -1,16 +1,15 @@
 package mage.sets;
 
 import mage.cards.ExpansionSet;
+import mage.constants.Rarity;
 import mage.constants.SetType;
 
-import mage.constants.Rarity;
+public final class Darksteel extends ExpansionSet {
 
-public class Darksteel extends ExpansionSet {
-
-    private static final Darksteel fINSTANCE = new Darksteel();
+    private static final Darksteel instance = new Darksteel();
 
     public static Darksteel getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     public Darksteel() {
@@ -31,6 +30,7 @@ public class Darksteel extends ExpansionSet {
         cards.add(new SetCardInfo("Arcane Spyglass", 93, Rarity.COMMON, mage.cards.a.ArcaneSpyglass.class));
         cards.add(new SetCardInfo("Arcbound Bruiser", 94, Rarity.COMMON, mage.cards.a.ArcboundBruiser.class));
         cards.add(new SetCardInfo("Arcbound Crusher", 95, Rarity.UNCOMMON, mage.cards.a.ArcboundCrusher.class));
+        cards.add(new SetCardInfo("Arcbound Fiend", 96, Rarity.UNCOMMON, mage.cards.a.ArcboundFiend.class));
         cards.add(new SetCardInfo("Arcbound Hybrid", 97, Rarity.COMMON, mage.cards.a.ArcboundHybrid.class));
         cards.add(new SetCardInfo("Arcbound Lancer", 98, Rarity.UNCOMMON, mage.cards.a.ArcboundLancer.class));
         cards.add(new SetCardInfo("Arcbound Overseer", 99, Rarity.RARE, mage.cards.a.ArcboundOverseer.class));
@@ -44,6 +44,8 @@ public class Darksteel extends ExpansionSet {
         cards.add(new SetCardInfo("Barbed Lightning", 55, Rarity.COMMON, mage.cards.b.BarbedLightning.class));
         cards.add(new SetCardInfo("Blinkmoth Nexus", 163, Rarity.RARE, mage.cards.b.BlinkmothNexus.class));
         cards.add(new SetCardInfo("Burden of Greed", 38, Rarity.COMMON, mage.cards.b.BurdenOfGreed.class));
+        cards.add(new SetCardInfo("Carry Away", 19, Rarity.UNCOMMON, mage.cards.c.CarryAway.class));
+        cards.add(new SetCardInfo("Chimeric Egg", 106, Rarity.UNCOMMON, mage.cards.c.ChimericEgg.class));
         cards.add(new SetCardInfo("Chittering Rats", 39, Rarity.COMMON, mage.cards.c.ChitteringRats.class));
         cards.add(new SetCardInfo("Chromescale Drake", 20, Rarity.RARE, mage.cards.c.ChromescaleDrake.class));
         cards.add(new SetCardInfo("Coretapper", 107, Rarity.UNCOMMON, mage.cards.c.Coretapper.class));
@@ -57,7 +59,9 @@ public class Darksteel extends ExpansionSet {
         cards.add(new SetCardInfo("Darksteel Pendant", 113, Rarity.COMMON, mage.cards.d.DarksteelPendant.class));
         cards.add(new SetCardInfo("Darksteel Reactor", 114, Rarity.RARE, mage.cards.d.DarksteelReactor.class));
         cards.add(new SetCardInfo("Death Cloud", 40, Rarity.RARE, mage.cards.d.DeathCloud.class));
+        cards.add(new SetCardInfo("Death-Mask Duplicant", 115, Rarity.UNCOMMON, mage.cards.d.DeathMaskDuplicant.class));
         cards.add(new SetCardInfo("Demon's Horn", 116, Rarity.UNCOMMON, mage.cards.d.DemonsHorn.class));
+        cards.add(new SetCardInfo("Dismantle", 57, Rarity.UNCOMMON, mage.cards.d.Dismantle.class));
         cards.add(new SetCardInfo("Dragon's Claw", 117, Rarity.UNCOMMON, mage.cards.d.DragonsClaw.class));
         cards.add(new SetCardInfo("Drill-Skimmer", 118, Rarity.COMMON, mage.cards.d.DrillSkimmer.class));
         cards.add(new SetCardInfo("Drooling Ogre", 58, Rarity.COMMON, mage.cards.d.DroolingOgre.class));
@@ -75,14 +79,17 @@ public class Darksteel extends ExpansionSet {
         cards.add(new SetCardInfo("Fireball", 60, Rarity.UNCOMMON, mage.cards.f.Fireball.class));
         cards.add(new SetCardInfo("Flamebreak", 61, Rarity.RARE, mage.cards.f.Flamebreak.class));
         cards.add(new SetCardInfo("Furnace Dragon", 62, Rarity.RARE, mage.cards.f.FurnaceDragon.class));
+        cards.add(new SetCardInfo("Gemini Engine", 121, Rarity.RARE, mage.cards.g.GeminiEngine.class));
         cards.add(new SetCardInfo("Genesis Chamber", 122, Rarity.UNCOMMON, mage.cards.g.GenesisChamber.class));
         cards.add(new SetCardInfo("Geth's Grimoire", 123, Rarity.UNCOMMON, mage.cards.g.GethsGrimoire.class));
         cards.add(new SetCardInfo("Goblin Archaeologist", 63, Rarity.UNCOMMON, mage.cards.g.GoblinArchaeologist.class));
         cards.add(new SetCardInfo("Greater Harvester", 44, Rarity.RARE, mage.cards.g.GreaterHarvester.class));
         cards.add(new SetCardInfo("Grimclaw Bats", 45, Rarity.COMMON, mage.cards.g.GrimclawBats.class));
         cards.add(new SetCardInfo("Hallow", 4, Rarity.COMMON, mage.cards.h.Hallow.class));
+        cards.add(new SetCardInfo("Heartseeker", 124, Rarity.RARE, mage.cards.h.Heartseeker.class));
         cards.add(new SetCardInfo("Hoverguard Observer", 22, Rarity.UNCOMMON, mage.cards.h.HoverguardObserver.class));
         cards.add(new SetCardInfo("Hunger of the Nim", 46, Rarity.COMMON, mage.cards.h.HungerOfTheNim.class));
+        cards.add(new SetCardInfo("Infested Roothold", 76, Rarity.UNCOMMON, mage.cards.i.InfestedRoothold.class));
         cards.add(new SetCardInfo("Inflame", 64, Rarity.COMMON, mage.cards.i.Inflame.class));
         cards.add(new SetCardInfo("Juggernaut", 125, Rarity.UNCOMMON, mage.cards.j.Juggernaut.class));
         cards.add(new SetCardInfo("Karstoderm", 77, Rarity.UNCOMMON, mage.cards.k.Karstoderm.class));
@@ -94,6 +101,7 @@ public class Darksteel extends ExpansionSet {
         cards.add(new SetCardInfo("Leonin Shikari", 6, Rarity.RARE, mage.cards.l.LeoninShikari.class));
         cards.add(new SetCardInfo("Lich's Tomb", 128, Rarity.RARE, mage.cards.l.LichsTomb.class));
         cards.add(new SetCardInfo("Loxodon Mystic", 7, Rarity.COMMON, mage.cards.l.LoxodonMystic.class));
+        cards.add(new SetCardInfo("Machinate", 24, Rarity.COMMON, mage.cards.m.Machinate.class));
         cards.add(new SetCardInfo("Magnetic Flux", 25, Rarity.COMMON, mage.cards.m.MagneticFlux.class));
         cards.add(new SetCardInfo("Memnarch", 129, Rarity.RARE, mage.cards.m.Memnarch.class));
         cards.add(new SetCardInfo("Mephitic Ooze", 47, Rarity.RARE, mage.cards.m.MephiticOoze.class));
@@ -106,6 +114,7 @@ public class Darksteel extends ExpansionSet {
         cards.add(new SetCardInfo("Myr Moonvessel", 133, Rarity.COMMON, mage.cards.m.MyrMoonvessel.class));
         cards.add(new SetCardInfo("Nemesis Mask", 134, Rarity.UNCOMMON, mage.cards.n.NemesisMask.class));
         cards.add(new SetCardInfo("Neurok Prodigy", 26, Rarity.COMMON, mage.cards.n.NeurokProdigy.class));
+        cards.add(new SetCardInfo("Neurok Transmuter", 27, Rarity.UNCOMMON, mage.cards.n.NeurokTransmuter.class));
         cards.add(new SetCardInfo("Nim Abomination", 49, Rarity.UNCOMMON, mage.cards.n.NimAbomination.class));
         cards.add(new SetCardInfo("Nourish", 78, Rarity.COMMON, mage.cards.n.Nourish.class));
         cards.add(new SetCardInfo("Oxidda Golem", 135, Rarity.COMMON, mage.cards.o.OxiddaGolem.class));
@@ -114,6 +123,7 @@ public class Darksteel extends ExpansionSet {
         cards.add(new SetCardInfo("Pristine Angel", 9, Rarity.RARE, mage.cards.p.PristineAngel.class));
         cards.add(new SetCardInfo("Psychic Overload", 28, Rarity.UNCOMMON, mage.cards.p.PsychicOverload.class));
         cards.add(new SetCardInfo("Pteron Ghost", 10, Rarity.COMMON, mage.cards.p.PteronGhost.class));
+        cards.add(new SetCardInfo("Pulse of the Dross", 50, Rarity.RARE, mage.cards.p.PulseOfTheDross.class));
         cards.add(new SetCardInfo("Pulse of the Fields", 11, Rarity.RARE, mage.cards.p.PulseOfTheFields.class));
         cards.add(new SetCardInfo("Pulse of the Forge", 66, Rarity.RARE, mage.cards.p.PulseOfTheForge.class));
         cards.add(new SetCardInfo("Pulse of the Grid", 29, Rarity.RARE, mage.cards.p.PulseOfTheGrid.class));
@@ -130,13 +140,17 @@ public class Darksteel extends ExpansionSet {
         cards.add(new SetCardInfo("Savage Beating", 67, Rarity.RARE, mage.cards.s.SavageBeating.class));
         cards.add(new SetCardInfo("Scavenging Scarab", 51, Rarity.COMMON, mage.cards.s.ScavengingScarab.class));
         cards.add(new SetCardInfo("Screams from Within", 52, Rarity.UNCOMMON, mage.cards.s.ScreamsFromWithin.class));
+        cards.add(new SetCardInfo("Scrounge", 53, Rarity.UNCOMMON, mage.cards.s.Scrounge.class));
+        cards.add(new SetCardInfo("Second Sight", 33, Rarity.UNCOMMON, mage.cards.s.SecondSight.class));
         cards.add(new SetCardInfo("Serum Powder", 138, Rarity.RARE, mage.cards.s.SerumPowder.class));
         cards.add(new SetCardInfo("Shield of Kaldra", 139, Rarity.RARE, mage.cards.s.ShieldOfKaldra.class));
+        cards.add(new SetCardInfo("Shriveling Rot", 54, Rarity.RARE, mage.cards.s.ShrivelingRot.class));
         cards.add(new SetCardInfo("Shunt", 68, Rarity.RARE, mage.cards.s.Shunt.class));
         cards.add(new SetCardInfo("Skullclamp", 140, Rarity.UNCOMMON, mage.cards.s.Skullclamp.class));
         cards.add(new SetCardInfo("Slobad, Goblin Tinkerer", 69, Rarity.RARE, mage.cards.s.SlobadGoblinTinkerer.class));
         cards.add(new SetCardInfo("Soulscour", 14, Rarity.RARE, mage.cards.s.Soulscour.class));
         cards.add(new SetCardInfo("Spawning Pit", 141, Rarity.UNCOMMON, mage.cards.s.SpawningPit.class));
+        cards.add(new SetCardInfo("Specter's Shroud", 142, Rarity.UNCOMMON, mage.cards.s.SpectersShroud.class));
         cards.add(new SetCardInfo("Spellbinder", 143, Rarity.RARE, mage.cards.s.Spellbinder.class));
         cards.add(new SetCardInfo("Spincrusher", 144, Rarity.UNCOMMON, mage.cards.s.Spincrusher.class));
         cards.add(new SetCardInfo("Spire Golem", 145, Rarity.COMMON, mage.cards.s.SpireGolem.class));
@@ -148,6 +162,7 @@ public class Darksteel extends ExpansionSet {
         cards.add(new SetCardInfo("Sword of Fire and Ice", 148, Rarity.RARE, mage.cards.s.SwordOfFireAndIce.class));
         cards.add(new SetCardInfo("Sword of Light and Shadow", 149, Rarity.RARE, mage.cards.s.SwordOfLightAndShadow.class));
         cards.add(new SetCardInfo("Synod Artificer", 34, Rarity.RARE, mage.cards.s.SynodArtificer.class));
+        cards.add(new SetCardInfo("Talon of Pain", 150, Rarity.UNCOMMON, mage.cards.t.TalonOfPain.class));
         cards.add(new SetCardInfo("Tangle Golem", 151, Rarity.COMMON, mage.cards.t.TangleGolem.class));
         cards.add(new SetCardInfo("Tangle Spider", 85, Rarity.COMMON, mage.cards.t.TangleSpider.class));
         cards.add(new SetCardInfo("Tanglewalker", 86, Rarity.UNCOMMON, mage.cards.t.Tanglewalker.class));
@@ -155,8 +170,10 @@ public class Darksteel extends ExpansionSet {
         cards.add(new SetCardInfo("Tel-Jilad Outrider", 87, Rarity.COMMON, mage.cards.t.TelJiladOutrider.class));
         cards.add(new SetCardInfo("Tel-Jilad Wolf", 88, Rarity.COMMON, mage.cards.t.TelJiladWolf.class));
         cards.add(new SetCardInfo("Test of Faith", 17, Rarity.UNCOMMON, mage.cards.t.TestOfFaith.class));
+        cards.add(new SetCardInfo("Thought Dissector", 152, Rarity.RARE, mage.cards.t.ThoughtDissector.class));
         cards.add(new SetCardInfo("Thunderstaff", 153, Rarity.UNCOMMON, mage.cards.t.Thunderstaff.class));
         cards.add(new SetCardInfo("Trinisphere", 154, Rarity.RARE, mage.cards.t.Trinisphere.class));
+        cards.add(new SetCardInfo("Turn the Tables", 18, Rarity.RARE, mage.cards.t.TurnTheTables.class));
         cards.add(new SetCardInfo("Unforge", 71, Rarity.COMMON, mage.cards.u.Unforge.class));
         cards.add(new SetCardInfo("Ur-Golem's Eye", 155, Rarity.COMMON, mage.cards.u.UrGolemsEye.class));
         cards.add(new SetCardInfo("Vedalken Engineer", 35, Rarity.COMMON, mage.cards.v.VedalkenEngineer.class));

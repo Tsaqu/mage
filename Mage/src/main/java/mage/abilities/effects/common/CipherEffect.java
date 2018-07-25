@@ -1,33 +1,8 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.abilities.effects.common;
 
 import java.util.UUID;
+import mage.MageObjectReference;
 import mage.abilities.Ability;
 import mage.abilities.SpellAbility;
 import mage.abilities.common.DealsCombatDamageToAPlayerTriggeredAbility;
@@ -96,13 +71,13 @@ public class CipherEffect extends OneShotEffect {
                 Card sourceCard = game.getCard(source.getSourceId());
                 Permanent targetCreature = game.getPermanent(target.getFirstTarget());
                 if (targetCreature != null && sourceCard != null) {
-                    String ruleText = new StringBuilder("you may cast a copy of ").append(sourceCard.getLogName()).append(" without paying its mana cost").toString();
+                    String ruleText = "you may cast a copy of " + sourceCard.getLogName() + " without paying its mana cost";
                     Ability ability = new DealsCombatDamageToAPlayerTriggeredAbility(new CipherStoreEffect(source.getSourceId(), ruleText), true);
                     ContinuousEffect effect = new GainAbilityTargetEffect(ability, Duration.Custom);
                     effect.setTargetPointer(new FixedTarget(target.getFirstTarget()));
                     game.addEffect(effect, source);
                     if (!game.isSimulation()) {
-                        game.informPlayers(new StringBuilder(sourceCard.getLogName()).append(": Spell ciphered to ").append(targetCreature.getLogName()).toString());
+                        game.informPlayers(sourceCard.getLogName() + ": Spell ciphered to " + targetCreature.getLogName());
                     }
                     return controller.moveCards(sourceCard, Zone.EXILED, source, game);
                 } else {
@@ -151,7 +126,7 @@ class CipherStoreEffect extends OneShotEffect {
             }
             ability.getEffects().remove(cipherEffect);
             if (ability instanceof SpellAbility) {
-                controller.cast(ability, game, true);
+                controller.cast(ability, game, true, new MageObjectReference(source.getSourceObject(game), game));
             }
         }
 

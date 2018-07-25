@@ -16,24 +16,24 @@ import mage.abilities.effects.OneShotEffect;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.CardType;
+import mage.constants.SubType;
 import mage.constants.Outcome;
 import mage.constants.Zone;
-import mage.filter.common.FilterArtifactPermanent;
 import mage.game.Game;
 import mage.game.permanent.Permanent;
 import mage.players.Player;
-import mage.target.TargetPermanent;
+import mage.target.common.TargetArtifactPermanent;
 
 /**
  *
  * @author BursegSardaukar
  */
-public class GoblinArchaeologist extends CardImpl {
+public final class GoblinArchaeologist extends CardImpl {
 
     public GoblinArchaeologist(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{1}{R}");
-        this.subtype.add("Goblin");
-        this.subtype.add("Artificer");
+        this.subtype.add(SubType.GOBLIN);
+        this.subtype.add(SubType.ARTIFICER);
 
         this.power = new MageInt(1);
         this.toughness = new MageInt(2);
@@ -41,7 +41,7 @@ public class GoblinArchaeologist extends CardImpl {
         // {R}, {T]: Flip a coin. If you win the flip, destroy target artifact and untap Goblin Archaeologist. If you lose the flip, sacrifice Goblin Archaeologist.
         Ability ability = new SimpleActivatedAbility(Zone.BATTLEFIELD, new GoblinArchaeologistEffect(),new ManaCostsImpl("{R}"));
         ability.addCost(new TapSourceCost());
-        ability.addTarget(new TargetPermanent(new FilterArtifactPermanent()));
+        ability.addTarget(new TargetArtifactPermanent());
         this.addAbility(ability);
     }
 

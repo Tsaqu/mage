@@ -1,30 +1,4 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.s;
 
 import java.util.UUID;
@@ -39,6 +13,7 @@ import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
 import mage.constants.AbilityType;
 import mage.constants.CardType;
+import mage.constants.SubType;
 import mage.counters.CounterType;
 import mage.filter.FilterCard;
 import mage.filter.predicate.mageobject.SubtypePredicate;
@@ -52,35 +27,35 @@ import mage.watchers.common.DragonOnTheBattlefieldWhileSpellWasCastWatcher;
  *
  * @author LevelX2
  */
-public class ScaleguardSentinels extends CardImpl {
+public final class ScaleguardSentinels extends CardImpl {
 
     private static final FilterCard filter = new FilterCard("a Dragon card from your hand (you don't have to)");
 
     static {
-        filter.add(new SubtypePredicate("Dragon"));
+        filter.add(new SubtypePredicate(SubType.DRAGON));
     }
 
     public ScaleguardSentinels(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{G}{G}");
-        this.subtype.add("Human");
-        this.subtype.add("Soldier");
+        super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{G}{G}");
+        this.subtype.add(SubType.HUMAN);
+        this.subtype.add(SubType.SOLDIER);
         this.power = new MageInt(2);
         this.toughness = new MageInt(3);
 
         // As an additional cost to cast Scaleguard Sentinels, you may reveal a Dragon card from your hand.
-        this.getSpellAbility().addEffect(new InfoEffect("As an additional cost to cast {this}, you may reveal a Dragon card from your hand"));
+        this.getSpellAbility().addEffect(new InfoEffect("as an additional cost to cast this spell, you may reveal a Dragon card from your hand"));
 
         // Scaleguard Sentinels enters the battlefield with a +1/+1 counter on it if you revealed a Dragon card or controlled a Dragon as you cast Scaleguard Sentinels.
         this.addAbility(new EntersBattlefieldAbility(new AddCountersSourceEffect(CounterType.P1P1.createInstance(), true),
-                ScaleguardSentinelsCondition.getInstance(),
-                "{this} enters the battlefield with a +1/+1 counter on it if you revealed a Dragon card or controlled a Dragon as you cast {this}", ""),
+                ScaleguardSentinelsCondition.instance,
+                "{this} enters the battlefield with a +1/+1 counter on it if you revealed a Dragon card or controlled a Dragon as you cast {this}.", ""),
                 new DragonOnTheBattlefieldWhileSpellWasCastWatcher());
 
     }
 
     @Override
     public void adjustCosts(Ability ability, Game game) {
-        if (ability.getAbilityType().equals(AbilityType.SPELL)) {
+        if (ability.getAbilityType() == AbilityType.SPELL) {
             Player controller = game.getPlayer(ability.getControllerId());
             if (controller != null) {
                 if (controller.getHand().count(filter, game) > 0) {
@@ -100,19 +75,15 @@ public class ScaleguardSentinels extends CardImpl {
     }
 }
 
-class ScaleguardSentinelsCondition implements Condition {
+enum ScaleguardSentinelsCondition implements Condition {
 
-    private static final ScaleguardSentinelsCondition fInstance = new ScaleguardSentinelsCondition();
-
-    public static Condition getInstance() {
-        return fInstance;
-    }
+    instance;
 
     @Override
     public boolean apply(Game game, Ability source) {
         Permanent sourcePermanent = game.getPermanentEntering(source.getSourceId());
         if (sourcePermanent != null) {
-            DragonOnTheBattlefieldWhileSpellWasCastWatcher watcher = (DragonOnTheBattlefieldWhileSpellWasCastWatcher) game.getState().getWatchers().get("DragonOnTheBattlefieldWhileSpellWasCastWatcher");
+            DragonOnTheBattlefieldWhileSpellWasCastWatcher watcher = (DragonOnTheBattlefieldWhileSpellWasCastWatcher) game.getState().getWatchers().get(DragonOnTheBattlefieldWhileSpellWasCastWatcher.class.getSimpleName());
             return (watcher != null && watcher.castWithConditionTrue(sourcePermanent.getSpellAbility().getId()));
         }
         return false;

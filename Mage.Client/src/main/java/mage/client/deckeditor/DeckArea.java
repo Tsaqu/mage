@@ -1,30 +1,4 @@
-/*
-* Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are
-* permitted provided that the following conditions are met:
-*
-*    1. Redistributions of source code must retain the above copyright notice, this list of
-*       conditions and the following disclaimer.
-*
-*    2. Redistributions in binary form must reproduce the above copyright notice, this list
-*       of conditions and the following disclaimer in the documentation and/or other materials
-*       provided with the distribution.
-*
-* THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-* FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*
-* The views and conclusions contained in the software and documentation are those of the
-* authors and should not be interpreted as representing official policies, either expressed
-* or implied, of BetaSteward_at_googlemail.com.
- */
+
  /*
  * DeckArea.java
  *
@@ -32,10 +6,6 @@
  */
 package mage.client.deckeditor;
 
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.swing.*;
 import mage.cards.Card;
 import mage.cards.decks.Deck;
 import mage.cards.decks.DeckCardLayout;
@@ -43,11 +13,17 @@ import mage.client.cards.BigCard;
 import mage.client.cards.CardEventSource;
 import mage.client.cards.DragCardGrid;
 import mage.client.constants.Constants.DeckEditorMode;
+import mage.client.util.ClientEventType;
 import mage.client.util.Event;
 import mage.client.util.GUISizeHelper;
 import mage.client.util.Listener;
 import mage.view.CardView;
 import mage.view.CardsView;
+
+import javax.swing.*;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -55,14 +31,14 @@ import mage.view.CardsView;
  */
 public class DeckArea extends javax.swing.JPanel {
 
-    private CardEventSource maindeckVirtualEvent = new CardEventSource();
-    private CardEventSource sideboardVirtualEvent = new CardEventSource();
-    private Set<UUID> hiddenCards = new HashSet<>();
+    private final CardEventSource maindeckVirtualEvent = new CardEventSource();
+    private final CardEventSource sideboardVirtualEvent = new CardEventSource();
+    private final Set<UUID> hiddenCards = new HashSet<>();
     private Deck lastDeck = new Deck();
     private BigCard lastBigCard = null;
     private int dividerLocationNormal = 0;
     private int dividerLocationLimited = 0;
-    private final boolean isLimitedBuildingOrientation = false;
+    private static final boolean isLimitedBuildingOrientation = false;
 
     public DeckCardLayout getCardLayout() {
         return deckList.getCardLayout();
@@ -97,7 +73,7 @@ public class DeckArea extends javax.swing.JPanel {
 
         @Override
         public String toString() {
-            return maindeckSettings.toString() + "|" + sideboardSetings.toString() + "|" + dividerLocationNormal + "|" + dividerLocationLimited;
+            return maindeckSettings.toString() + '|' + sideboardSetings.toString() + '|' + dividerLocationNormal + '|' + dividerLocationLimited;
         }
     }
 
@@ -124,8 +100,8 @@ public class DeckArea extends javax.swing.JPanel {
                 // Add to hidden and move to sideboard
                 for (CardView card : cards) {
                     hiddenCards.add(card.getId());
-                    maindeckVirtualEvent.removeSpecificCard(card, "remove-specific-card");
-                    sideboardVirtualEvent.addSpecificCard(card, "add-specific-card");
+                    maindeckVirtualEvent.fireEvent(card, ClientEventType.REMOVE_SPECIFIC_CARD);
+                    sideboardVirtualEvent.fireEvent(card, ClientEventType.ADD_SPECIFIC_CARD);
                 }
                 loadDeck(lastDeck, lastBigCard);
             }
@@ -142,6 +118,14 @@ public class DeckArea extends javax.swing.JPanel {
                 for (CardView card : cards) {
                     CardView newCard = new CardView(card);
                     deckList.addCardView(newCard, true);
+                }
+            }
+
+            @Override
+            public void invertCardSelection(Collection<CardView> cards) {
+                // Invert Selection
+                for (CardView card : cards) {
+                    card.setSelected(!card.isSelected());
                 }
             }
         });
@@ -174,6 +158,15 @@ public class DeckArea extends javax.swing.JPanel {
                     sideboardList.addCardView(newCard, true);
                 }                
             }
+
+            @Override
+            public void invertCardSelection(Collection<CardView> cards) {
+                // Invert Selection
+                for (CardView card : cards) {
+                    card.setSelected(!card.isSelected());
+                }
+            }
+
         });
     }
 

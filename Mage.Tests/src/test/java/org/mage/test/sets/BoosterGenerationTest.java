@@ -1,22 +1,27 @@
 package org.mage.test.sets;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import mage.cards.Card;
+import mage.cards.repository.CardInfo;
 import mage.cards.repository.CardScanner;
-import mage.sets.FateReforged;
-import mage.sets.MastersEditionII;
-import mage.sets.MastersEditionIV;
+import mage.constants.CardType;
+import mage.constants.Rarity;
+import mage.sets.*;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mage.test.serverside.base.MageTestBase;
 
 /**
  *
- * @author nigelzor
+ * @author nigelzor, JayDi85
  */
 public class BoosterGenerationTest extends MageTestBase {
 
@@ -56,15 +61,65 @@ public class BoosterGenerationTest extends MageTestBase {
     }
 
     @Test
-    public void testMastersEditionIV() {
+    public void testMastersEditionIV_UrzaSpecialLandsList() {
+
+        List<String> needUrzaList = Arrays.asList(
+                "Urza's Mine",
+                "Urza's Power Plant",
+                "Urza's Tower"
+        );
+
+        List<CardInfo> setOrzaList = MastersEditionIV.getInstance().getSpecialLand();
+        Assert.assertEquals("Urza special lands must have 4 variation for each of 3 card", 3 * 4, setOrzaList.size());
+
+        List<String> foundedUrzaList = new ArrayList<>();
+        for (CardInfo cardInfo: setOrzaList) {
+            Assert.assertTrue("card " + cardInfo.getName() + " must be in urza's list", needUrzaList.contains(cardInfo.getName()));
+            foundedUrzaList.add(cardInfo.getName());
+        }
+
+        for (String needName: needUrzaList) {
+            Assert.assertTrue("can't find need card " + needName + " in special land list", foundedUrzaList.contains(needName));
+        }
+    }
+
+    @Test
+    public void testMastersEditionIV_UrzaSpecialLandInBoosters() {
+        // ME4 replace all basic lands with special (1 per booster)
+        // https://mtg.gamepedia.com/Masters_Edition_IV
         List<String> urzaLand = Arrays.asList(
                 "Urza's Mine",
                 "Urza's Power Plant",
                 "Urza's Tower"
         );
-        List<Card> booster = MastersEditionIV.getInstance().createBooster();
-        assertTrue(str(booster), contains(booster, urzaLand, "ME4"));
-        assertFalse(str(booster), contains(booster, basics, null));
+
+        for(int i = 1; i <= 5; i++) {
+            List<Card> booster = MastersEditionIV.getInstance().createBooster();
+            assertTrue(str(booster), contains(booster, urzaLand, "ME4"));
+            assertFalse(str(booster), contains(booster, basics, null));
+        }
+    }
+
+    @Test
+    public void testCoreSet2019_DualLandsAreGenerated() {
+        List<Card> allCards = new ArrayList<>();
+        for (int i = 0; i < 50; i++) {
+            List<Card> booster = CoreSet2019.getInstance().createBooster();
+            // check that booster contains a land card
+            assertTrue(booster.stream().anyMatch(card -> card.getCardType().contains(CardType.LAND)));
+            allCards.addAll(booster);
+        }
+        // check that some dual lands were generated
+        assertTrue(allCards.stream().anyMatch(card -> card.getCardType().contains(CardType.LAND) && card.getRarity().equals(Rarity.COMMON)));
+    }
+
+    @Test
+    public void testDominaria_EveryBoosterContainsLegendaryCreature() {
+        for (int i = 0; i < 10; i++) {
+            List<Card> booster = Dominaria.getInstance().createBooster();
+            // check that booster contains legendary creature
+            assertTrue(booster.stream().anyMatch(card -> card.isCreature() && card.isLegendary()));
+        }
     }
 
     private static String str(List<Card> cards) {
@@ -77,7 +132,7 @@ public class BoosterGenerationTest extends MageTestBase {
                 sb.append(", ");
             }
         }
-        sb.append("] (").append(cards.size()).append(")");
+        sb.append("] (").append(cards.size()).append(')');
         return sb.toString();
     }
 

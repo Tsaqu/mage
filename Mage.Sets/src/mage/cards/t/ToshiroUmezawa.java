@@ -1,39 +1,9 @@
-/*
- *  Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without modification, are
- *  permitted provided that the following conditions are met:
- *
- *     1. Redistributions of source code must retain the above copyright notice, this list of
- *        conditions and the following disclaimer.
- *
- *     2. Redistributions in binary form must reproduce the above copyright notice, this list
- *        of conditions and the following disclaimer in the documentation and/or other materials
- *        provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- *  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  The views and conclusions contained in the software and documentation are those of the
- *  authors and should not be interpreted as representing official policies, either expressed
- *  or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.cards.t;
 
 import java.util.UUID;
-
-import mage.constants.CardType;
-import mage.constants.Duration;
-import mage.constants.Outcome;
-import mage.constants.Zone;
 import mage.MageInt;
+import mage.MageObjectReference;
 import mage.abilities.Ability;
 import mage.abilities.common.DiesCreatureTriggeredAbility;
 import mage.abilities.effects.OneShotEffect;
@@ -42,7 +12,7 @@ import mage.abilities.keyword.BushidoAbility;
 import mage.cards.Card;
 import mage.cards.CardImpl;
 import mage.cards.CardSetInfo;
-import mage.constants.TargetController;
+import mage.constants.*;
 import mage.filter.FilterCard;
 import mage.filter.common.FilterCreaturePermanent;
 import mage.filter.predicate.mageobject.CardTypePredicate;
@@ -60,20 +30,21 @@ import mage.target.common.TargetCardInYourGraveyard;
  *
  * @author LevelX2
  */
-public class ToshiroUmezawa extends CardImpl {
+public final class ToshiroUmezawa extends CardImpl {
 
     private static final FilterCreaturePermanent filter = new FilterCreaturePermanent("a creature an opponent controls");
     private static final FilterCard filterInstant = new FilterCard("instant card from your graveyard");
+
     static {
         filter.add(new ControllerPredicate(TargetController.OPPONENT));
         filterInstant.add(new CardTypePredicate(CardType.INSTANT));
     }
 
     public ToshiroUmezawa(UUID ownerId, CardSetInfo setInfo) {
-        super(ownerId,setInfo,new CardType[]{CardType.CREATURE},"{1}{B}{B}");
-        this.supertype.add("Legendary");
-        this.subtype.add("Human");
-        this.subtype.add("Samurai");
+        super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{1}{B}{B}");
+        this.addSuperType(SuperType.LEGENDARY);
+        this.subtype.add(SubType.HUMAN);
+        this.subtype.add(SubType.SAMURAI);
 
         this.power = new MageInt(2);
         this.toughness = new MageInt(2);
@@ -82,7 +53,7 @@ public class ToshiroUmezawa extends CardImpl {
         this.addAbility(new BushidoAbility(1));
         // Whenever a creature an opponent controls dies, you may cast target instant card from your graveyard. If that card would be put into a graveyard this turn, exile it instead.
         Ability ability = new DiesCreatureTriggeredAbility(new ToshiroUmezawaEffect(), true, filter);
-        ability.addTarget(new TargetCardInYourGraveyard(1,1, filterInstant));
+        ability.addTarget(new TargetCardInYourGraveyard(1, 1, filterInstant));
         this.addAbility(ability);
 
     }
@@ -119,7 +90,7 @@ class ToshiroUmezawaEffect extends OneShotEffect {
         if (controller != null) {
             Card card = game.getCard(getTargetPointer().getFirst(game, source));
             if (card != null) {
-                controller.cast(card.getSpellAbility(), game, false);
+                controller.cast(card.getSpellAbility(), game, false, new MageObjectReference(source.getSourceObject(game), game));
                 game.addEffect(new ToshiroUmezawaReplacementEffect(card.getId()), source);
             }
         }
@@ -149,24 +120,24 @@ class ToshiroUmezawaReplacementEffect extends ReplacementEffectImpl {
     @Override
     public boolean replaceEvent(GameEvent event, Ability source, Game game) {
         UUID eventObject = ((ZoneChangeEvent) event).getTargetId();
-        StackObject card = game.getStack().getStackObject(eventObject);
-        if (card != null) {
-            if (card instanceof Spell) {
-                game.rememberLKI(card.getId(), Zone.STACK, (Spell) card);
+        StackObject stackObject = game.getStack().getStackObject(eventObject);
+        if (stackObject != null) {
+            if (stackObject instanceof Spell) {
+                game.rememberLKI(stackObject.getId(), Zone.STACK, (Spell) stackObject);
             }
-            if (card instanceof Card && eventObject.equals(cardId)) {
-                ((Card) card).moveToExile(null, null, source.getSourceId(), game);
+            if (stackObject instanceof Card && eventObject.equals(cardId)) {
+                ((Card) stackObject).moveToExile(null, null, source.getSourceId(), game);
                 return true;
             }
         }
         return false;
     }
-    
+
     @Override
     public boolean checksEventType(GameEvent event, Game game) {
         return event.getType() == EventType.ZONE_CHANGE;
     }
-    
+
     @Override
     public boolean applies(GameEvent event, Ability source, Game game) {
         ZoneChangeEvent zEvent = (ZoneChangeEvent) event;

@@ -1,30 +1,4 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 
  /*
  * FeedbackPanel.java
@@ -52,7 +26,7 @@ import static mage.constants.Constants.Option.ORIGINAL_ID;
 import static mage.constants.Constants.Option.SECOND_MESSAGE;
 import static mage.constants.Constants.Option.SPECIAL_BUTTON;
 import mage.constants.PlayerAction;
-import mage.remote.Session;
+import mage.constants.TurnPhase;
 import org.apache.log4j.Logger;
 
 /**
@@ -64,7 +38,6 @@ public class FeedbackPanel extends javax.swing.JPanel {
     private static final Logger LOGGER = Logger.getLogger(FeedbackPanel.class);
 
     public enum FeedbackMode {
-
         INFORM, QUESTION, CONFIRM, CANCEL, SELECT, END
     }
 
@@ -98,7 +71,8 @@ public class FeedbackPanel extends javax.swing.JPanel {
     private void setGUISize() {
     }
 
-    public void getFeedback(FeedbackMode mode, String message, boolean special, Map<String, Serializable> options, int messageId) {
+    public void getFeedback(FeedbackMode mode, String message, boolean special, Map<String, Serializable> options,
+                            int messageId, boolean gameNeedUserFeedback, TurnPhase gameTurnPhase) {
         synchronized (this) {
             if (messageId < this.lastMessageId) {
                 LOGGER.warn("ignoring message from later source: " + messageId + ", text=" + message);
@@ -152,6 +126,8 @@ public class FeedbackPanel extends javax.swing.JPanel {
         this.helper.setLinks(btnLeft, btnRight, btnSpecial, btnUndo);
 
         this.helper.setVisible(true);
+        this.helper.setGameNeedFeedback(gameNeedUserFeedback, gameTurnPhase);
+        this.helper.autoSizeButtonsAndFeedbackState();
     }
 
     private void setButtonState(String leftText, String rightText, FeedbackMode mode) {
@@ -184,17 +160,14 @@ public class FeedbackPanel extends javax.swing.JPanel {
      * Close game window by pressing OK button after 8 seconds
      */
     private void endWithTimeout() {
-        Runnable task = new Runnable() {
-            @Override
-            public void run() {
-                LOGGER.info("Ending game...");
-                Component c = MageFrame.getGame(gameId);
-                while (c != null && !(c instanceof GamePane)) {
-                    c = c.getParent();
-                }
-                if (c != null && ((GamePane) c).isVisible()) { // check if GamePanel still visible
-                    FeedbackPanel.this.btnRight.doClick();
-                }
+        Runnable task = () -> {
+            LOGGER.info("Ending game...");
+            Component c = MageFrame.getGame(gameId);
+            while (c != null && !(c instanceof GamePane)) {
+                c = c.getParent();
+            }
+            if (c != null && c.isVisible()) { // check if GamePanel still visible
+                FeedbackPanel.this.btnRight.doClick();
             }
         };
         WORKER.schedule(task, 8, TimeUnit.SECONDS);
@@ -215,6 +188,8 @@ public class FeedbackPanel extends javax.swing.JPanel {
             if (options.containsKey("dialog")) {
                 connectedDialog = (MageDialog) options.get("dialog");
             }
+
+            this.helper.autoSizeButtonsAndFeedbackState();
         }
     }
 
@@ -255,36 +230,16 @@ public class FeedbackPanel extends javax.swing.JPanel {
         setBackground(new java.awt.Color(0, 0, 0, 80));
 
         btnRight.setText("Cancel");
-        btnRight.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRightActionPerformed(evt);
-            }
-        });
+        btnRight.addActionListener(evt -> btnRightActionPerformed(evt));
 
         btnLeft.setText("OK");
-        btnLeft.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLeftActionPerformed(evt);
-            }
-        });
+        btnLeft.addActionListener(evt -> btnLeftActionPerformed(evt));
 
         btnSpecial.setText("Special");
-        btnSpecial.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSpecialActionPerformed(evt);
-            }
-        });
+        btnSpecial.addActionListener(evt -> btnSpecialActionPerformed(evt));
 
         btnUndo.setText("Undo");
-        btnUndo.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnUndoActionPerformed(evt);
-            }
-        });
+        btnUndo.addActionListener(evt -> btnUndoActionPerformed(evt));
 
     }
 

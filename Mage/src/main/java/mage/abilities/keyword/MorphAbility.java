@@ -1,30 +1,4 @@
-/*
- * Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.abilities.keyword;
 
 import java.util.Iterator;
@@ -100,7 +74,7 @@ public class MorphAbility extends StaticAbility implements AlternativeSourceCost
     protected static final String ABILITY_KEYWORD = "Morph";
     protected static final String ABILITY_KEYWORD_MEGA = "Megamorph";
     protected static final String REMINDER_TEXT = "<i>(You may cast this card face down as a 2/2 creature for {3}. Turn it face up any time for its morph cost.)</i>";
-    protected static final String REMINDER_TEXT_MEGA = "<i>(You may cast this card face down as a 2/2 creature for {3}. Turn it face up at any time for its megamorph cost and put a +1/+1 counter on it.)</i>";
+    protected static final String REMINDER_TEXT_MEGA = "<i>(You may cast this card face down as a 2/2 creature for {3}. Turn it face up any time for its megamorph cost and put a +1/+1 counter on it.)</i>";
     protected String ruleText;
     protected AlternativeCost2Impl alternateCosts = new AlternativeCost2Impl(ABILITY_KEYWORD, REMINDER_TEXT, new GenericManaCost(3));
     protected Costs<Cost> morphCosts;
@@ -127,9 +101,9 @@ public class MorphAbility extends StaticAbility implements AlternativeSourceCost
         this.setWorksFaceDown(true);
         StringBuilder sb = new StringBuilder();
         if (megamorph) {
-            sb.append(ABILITY_KEYWORD_MEGA).append(" ");
+            sb.append(ABILITY_KEYWORD_MEGA).append(' ');
         } else {
-            sb.append(ABILITY_KEYWORD).append(" ");
+            sb.append(ABILITY_KEYWORD).append(' ');
         }
         name = ABILITY_KEYWORD;
         for (Cost cost : morphCosts) {
@@ -138,7 +112,11 @@ public class MorphAbility extends StaticAbility implements AlternativeSourceCost
                 break;
             }
         }
-        sb.append(morphCosts.getText()).append(" ");
+        sb.append(morphCosts.getText());
+        if (!(morphCosts.get(morphCosts.size() - 1) instanceof ManaCosts)) {
+            sb.append('.');
+        }
+        sb.append(' ');
         if (megamorph) {
             sb.append(REMINDER_TEXT_MEGA);
         } else {
@@ -199,7 +177,7 @@ public class MorphAbility extends StaticAbility implements AlternativeSourceCost
 
     @Override
     public boolean askToActivateAlternativeCosts(Ability ability, Game game) {
-        if (ability.getAbilityType().equals(AbilityType.SPELL)) {
+        if (ability.getAbilityType() == AbilityType.SPELL) {
             Player player = game.getPlayer(controllerId);
             Spell spell = game.getStack().getSpell(ability.getId());
             if (player != null && spell != null) {
@@ -226,13 +204,14 @@ public class MorphAbility extends StaticAbility implements AlternativeSourceCost
                         spellColor.setGreen(false);
                         spellColor.setWhite(false);
                         spellColor.setBlue(false);
+                        game.getState().getCreateCardAttribute(spell.getCard(), game).getSubtype().clear();
                     } else {
                         spell.setFaceDown(false, game);
                     }
                 }
             }
         }
-        if (ability.getAbilityType().equals(AbilityType.PLAY_LAND)) {
+        if (ability.getAbilityType() == AbilityType.PLAY_LAND) {
             Player player = game.getPlayer(controllerId);
             if (player != null) {
                 this.resetMorph();
@@ -282,10 +261,7 @@ public class MorphAbility extends StaticAbility implements AlternativeSourceCost
 
     @Override
     public String getCastMessageSuffix(Game game) {
-        StringBuilder sb = new StringBuilder();
-        int position = 0;
-        sb.append(alternateCosts.getCastSuffixMessage(position));
-        return sb.toString();
+        return alternateCosts.getCastSuffixMessage(0);
     }
 
     @Override
@@ -301,9 +277,9 @@ public class MorphAbility extends StaticAbility implements AlternativeSourceCost
         mageObject.getColor(null).setColor(new ObjectColor());
         mageObject.setName("");
         mageObject.getCardType().clear();
-        mageObject.getCardType().add(CardType.CREATURE);
+        mageObject.addCardType(CardType.CREATURE);
         mageObject.getSubtype(null).clear();
-        mageObject.getSupertype().clear();
+        mageObject.getSuperType().clear();
         mageObject.getManaCost().clear();
         if (mageObject instanceof Permanent) {
             ((Permanent) mageObject).setExpansionSetCode("");

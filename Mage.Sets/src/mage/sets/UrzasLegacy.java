@@ -1,30 +1,4 @@
-/*
-* Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are
-* permitted provided that the following conditions are met:
-*
-*    1. Redistributions of source code must retain the above copyright notice, this list of
-*       conditions and the following disclaimer.
-*
-*    2. Redistributions in binary form must reproduce the above copyright notice, this list
-*       of conditions and the following disclaimer in the documentation and/or other materials
-*       provided with the distribution.
-*
-* THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-* FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*
-* The views and conclusions contained in the software and documentation are those of the
-* authors and should not be interpreted as representing official policies, either expressed
-* or implied, of BetaSteward_at_googlemail.com.
- */
+
 package mage.sets;
 
 import mage.cards.ExpansionSet;
@@ -35,16 +9,16 @@ import mage.constants.SetType;
  *
  * @author noxx
  */
-public class UrzasLegacy extends ExpansionSet {
+public final class UrzasLegacy extends ExpansionSet {
 
-    private static final UrzasLegacy fINSTANCE = new UrzasLegacy();
+    private static final UrzasLegacy instance = new UrzasLegacy();
 
     public static UrzasLegacy getInstance() {
-        return fINSTANCE;
+        return instance;
     }
 
     private UrzasLegacy() {
-        super("Urza's Legacy", "ULG", ExpansionSet.buildDate(1999, 3, 6), SetType.EXPANSION);
+        super("Urza's Legacy", "ULG", ExpansionSet.buildDate(1999, 2, 15), SetType.EXPANSION);
         this.blockName = "Urza";
         this.parentSet = UrzasSaga.getInstance();
         this.hasBasicLands = false;
@@ -55,8 +29,8 @@ public class UrzasLegacy extends ExpansionSet {
         this.numBoosterRare = 1;
         this.ratioBoosterMythic = 0;
         cards.add(new SetCardInfo("About Face", 73, Rarity.COMMON, mage.cards.a.AboutFace.class));
-        cards.add(new SetCardInfo("Angelic Curator", 1, Rarity.COMMON, mage.cards.a.AngelicCurator.class));
         cards.add(new SetCardInfo("Angel's Trumpet", 121, Rarity.UNCOMMON, mage.cards.a.AngelsTrumpet.class));
+        cards.add(new SetCardInfo("Angelic Curator", 1, Rarity.COMMON, mage.cards.a.AngelicCurator.class));
         cards.add(new SetCardInfo("Anthroplasm", 25, Rarity.RARE, mage.cards.a.Anthroplasm.class));
         cards.add(new SetCardInfo("Archivist", 26, Rarity.RARE, mage.cards.a.Archivist.class));
         cards.add(new SetCardInfo("Aura Flux", 27, Rarity.COMMON, mage.cards.a.AuraFlux.class));
@@ -120,8 +94,9 @@ public class UrzasLegacy extends ExpansionSet {
         cards.add(new SetCardInfo("Miscalculation", 36, Rarity.COMMON, mage.cards.m.Miscalculation.class));
         cards.add(new SetCardInfo("Molten Hydra", 85, Rarity.RARE, mage.cards.m.MoltenHydra.class));
         cards.add(new SetCardInfo("Mother of Runes", 14, Rarity.UNCOMMON, mage.cards.m.MotherOfRunes.class));
-        cards.add(new SetCardInfo("Multani, Maro-Sorcerer", 107, Rarity.RARE, mage.cards.m.MultaniMaroSorcerer.class));
         cards.add(new SetCardInfo("Multani's Acolyte", 108, Rarity.COMMON, mage.cards.m.MultanisAcolyte.class));
+        cards.add(new SetCardInfo("Multani's Presence", 109, Rarity.UNCOMMON, mage.cards.m.MultanisPresence.class));
+        cards.add(new SetCardInfo("Multani, Maro-Sorcerer", 107, Rarity.RARE, mage.cards.m.MultaniMaroSorcerer.class));
         cards.add(new SetCardInfo("No Mercy", 56, Rarity.RARE, mage.cards.n.NoMercy.class));
         cards.add(new SetCardInfo("Opal Champion", 16, Rarity.COMMON, mage.cards.o.OpalChampion.class));
         cards.add(new SetCardInfo("Opportunity", 37, Rarity.UNCOMMON, mage.cards.o.Opportunity.class));
@@ -142,9 +117,9 @@ public class UrzasLegacy extends ExpansionSet {
         cards.add(new SetCardInfo("Pyromancy", 88, Rarity.RARE, mage.cards.p.Pyromancy.class));
         cards.add(new SetCardInfo("Quicksilver Amulet", 130, Rarity.RARE, mage.cards.q.QuicksilverAmulet.class));
         cards.add(new SetCardInfo("Rack and Ruin", 89, Rarity.UNCOMMON, mage.cards.r.RackAndRuin.class));
-        cards.add(new SetCardInfo("Radiant, Archangel", 20, Rarity.RARE, mage.cards.r.RadiantArchangel.class));
         cards.add(new SetCardInfo("Radiant's Dragoons", 21, Rarity.UNCOMMON, mage.cards.r.RadiantsDragoons.class));
         cards.add(new SetCardInfo("Radiant's Judgment", 22, Rarity.COMMON, mage.cards.r.RadiantsJudgment.class));
+        cards.add(new SetCardInfo("Radiant, Archangel", 20, Rarity.RARE, mage.cards.r.RadiantArchangel.class));
         cards.add(new SetCardInfo("Rancor", 110, Rarity.COMMON, mage.cards.r.Rancor.class));
         cards.add(new SetCardInfo("Rank and File", 65, Rarity.UNCOMMON, mage.cards.r.RankAndFile.class));
         cards.add(new SetCardInfo("Raven Familiar", 39, Rarity.UNCOMMON, mage.cards.r.RavenFamiliar.class));
@@ -174,6 +149,7 @@ public class UrzasLegacy extends ExpansionSet {
         cards.add(new SetCardInfo("Ticking Gnomes", 136, Rarity.UNCOMMON, mage.cards.t.TickingGnomes.class));
         cards.add(new SetCardInfo("Tinker", 45, Rarity.UNCOMMON, mage.cards.t.Tinker.class));
         cards.add(new SetCardInfo("Tragic Poet", 24, Rarity.COMMON, mage.cards.t.TragicPoet.class));
+        cards.add(new SetCardInfo("Treacherous Link", 71, Rarity.UNCOMMON, mage.cards.t.TreacherousLink.class));
         cards.add(new SetCardInfo("Treefolk Mystic", 114, Rarity.COMMON, mage.cards.t.TreefolkMystic.class));
         cards.add(new SetCardInfo("Treetop Village", 143, Rarity.UNCOMMON, mage.cards.t.TreetopVillage.class));
         cards.add(new SetCardInfo("Unearth", 72, Rarity.COMMON, mage.cards.u.Unearth.class));
@@ -182,6 +158,7 @@ public class UrzasLegacy extends ExpansionSet {
         cards.add(new SetCardInfo("Viashino Heretic", 95, Rarity.UNCOMMON, mage.cards.v.ViashinoHeretic.class));
         cards.add(new SetCardInfo("Viashino Sandscout", 96, Rarity.COMMON, mage.cards.v.ViashinoSandscout.class));
         cards.add(new SetCardInfo("Vigilant Drake", 46, Rarity.COMMON, mage.cards.v.VigilantDrake.class));
+        cards.add(new SetCardInfo("Walking Sponge", 47, Rarity.UNCOMMON, mage.cards.w.WalkingSponge.class));
         cards.add(new SetCardInfo("Weatherseed Elf", 115, Rarity.COMMON, mage.cards.w.WeatherseedElf.class));
         cards.add(new SetCardInfo("Weatherseed Faeries", 48, Rarity.COMMON, mage.cards.w.WeatherseedFaeries.class));
         cards.add(new SetCardInfo("Weatherseed Treefolk", 116, Rarity.RARE, mage.cards.w.WeatherseedTreefolk.class));

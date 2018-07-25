@@ -1,30 +1,4 @@
-/*
-* Copyright 2010 BetaSteward_at_googlemail.com. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification, are
-* permitted provided that the following conditions are met:
-*
-*    1. Redistributions of source code must retain the above copyright notice, this list of
-*       conditions and the following disclaimer.
-*
-*    2. Redistributions in binary form must reproduce the above copyright notice, this list
-*       of conditions and the following disclaimer in the documentation and/or other materials
-*       provided with the distribution.
-*
-* THIS SOFTWARE IS PROVIDED BY BetaSteward_at_googlemail.com ``AS IS'' AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-* FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BetaSteward_at_googlemail.com OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*
-* The views and conclusions contained in the software and documentation are those of the
-* authors and should not be interpreted as representing official policies, either expressed
-* or implied, of BetaSteward_at_googlemail.com.
- */
+
  /*
  * ErrorDialog.java
  *
@@ -35,7 +9,6 @@ package mage.client.dialog;
 import java.awt.Dimension;
 import java.awt.Font;
 import javax.swing.JComponent;
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 import mage.client.MageFrame;
 import mage.client.util.GUISizeHelper;
@@ -76,7 +49,7 @@ public class UserRequestDialog extends MageDialog {
         btn3.setMinimumSize(new Dimension(50 + 4 * font.getSize(), 2 * font.getSize() + 10));
         btn3.setMaximumSize(new Dimension(50 + 4 * font.getSize(), 2 * font.getSize() + 10));
         btn3.setPreferredSize(new Dimension(50 + 4 * font.getSize(), 2 * font.getSize() + 10));
-        JComponent c = (BasicInternalFrameTitlePane) ((BasicInternalFrameUI) this.getUI()).getNorthPane();
+        JComponent c = ((BasicInternalFrameUI) this.getUI()).getNorthPane();
         c.setMinimumSize(new Dimension(c.getMinimumSize().width, font.getSize() + 10));
         c.setMaximumSize(new Dimension(c.getMaximumSize().width, font.getSize() + 10));
         c.setPreferredSize(new Dimension(c.getPreferredSize().width, font.getSize() + 10));
@@ -138,31 +111,19 @@ public class UserRequestDialog extends MageDialog {
         btn3.setMaximumSize(new java.awt.Dimension(150, 50));
         btn3.setMinimumSize(new java.awt.Dimension(75, 25));
         btn3.setPreferredSize(new java.awt.Dimension(150, 50));
-        btn3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn3ActionPerformed(evt);
-            }
-        });
+        btn3.addActionListener(evt -> btn3ActionPerformed(evt));
 
         btn2.setText("btn2");
         btn2.setMaximumSize(new java.awt.Dimension(150, 50));
         btn2.setMinimumSize(new java.awt.Dimension(75, 25));
         btn2.setPreferredSize(new java.awt.Dimension(150, 50));
-        btn2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn2ActionPerformed(evt);
-            }
-        });
+        btn2.addActionListener(evt -> btn2ActionPerformed(evt));
 
         btn1.setText("btn1");
         btn1.setMaximumSize(new java.awt.Dimension(150, 50));
         btn1.setMinimumSize(new java.awt.Dimension(75, 25));
         btn1.setPreferredSize(new java.awt.Dimension(150, 50));
-        btn1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn1ActionPerformed(evt);
-            }
-        });
+        btn1.addActionListener(evt -> btn1ActionPerformed(evt));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
